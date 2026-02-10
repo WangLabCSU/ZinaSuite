@@ -1,4 +1,7 @@
-' About Module UI
+#' About Module UI
+#'
+#' @param id Module ID
+#' @return UI elements
 mod_about_ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::fluidRow(
