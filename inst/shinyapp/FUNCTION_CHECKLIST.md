@@ -14,11 +14,11 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 
 | Feature | UCSCXenaShiny File | ZinaSuite Function | Status | Test Coverage |
 |---------|-------------------|-------------------|--------|---------------|
-| Scatter Correlation | modules-ga-scatter-correlation.R | `analyze_scatter_correlation()` | ⏳ | ⏳ |
-| Matrix Correlation | modules-ga-matrix-correlation.R | `analyze_matrix_correlation()` | ⏳ | ⏳ |
-| Group Comparison | modules-ga-group-comparison.R | `analyze_group_comparison()` | ⏳ | ⏳ |
-| Survival Analysis | modules-ga-surv-analysis.R | `analyze_survival()` | ⏳ | ⏳ |
-| Dimension Distribution | modules-ga-dim-distribution.R | `analyze_dimension_distribution()` | ⏳ | ⏳ |
+| Scatter Correlation | modules-ga-scatter-correlation.R | `ga_scatter_correlation()` | ✅ | ✅ |
+| Matrix Correlation | modules-ga-matrix-correlation.R | `ga_matrix_correlation()` | ✅ | ✅ |
+| Group Comparison | modules-ga-group-comparison.R | `ga_group_comparison()` | ✅ | ✅ |
+| Survival Analysis | modules-ga-surv-analysis.R | `ga_survival_analysis()` | ✅ | ✅ |
+| Dimension Distribution | modules-ga-dim-distribution.R | `ga_dimension_distribution()` | ✅ | ✅ |
 
 ---
 
@@ -194,7 +194,7 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 
 | Category | Total | Complete | In Progress | Pending | Coverage |
 |----------|-------|----------|-------------|---------|----------|
-| General Analysis | 5 | 0 | 0 | 5 | 0% |
+| General Analysis | 5 | 5 | 0 | 0 | 100% |
 | TCGA Quick | 11 | 0 | 4 | 7 | 36% |
 | PCAWG Quick | 4 | 0 | 4 | 0 | 100% |
 | CCLE Quick | 4 | 0 | 2 | 2 | 50% |
@@ -204,7 +204,7 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 | TPC Functions | 8 | 1 | 0 | 7 | 12.5% |
 | Pharmacogenomics | 5 | 5 | 0 | 0 | 100% |
 | Other Pages | 6 | 0 | 2 | 4 | 33% |
-| **TOTAL** | **69** | **6** | **12** | **51** | **26%** |
+| **TOTAL** | **69** | **11** | **12** | **46** | **33%** |
 
 ### By Priority
 

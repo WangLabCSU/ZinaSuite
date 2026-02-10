@@ -1,13 +1,14 @@
-#' General Analysis Functions
+#' General Analysis Functions for Shiny Modules
 #'
 #' @description
 #' This file contains general analysis functions extracted from UCSCXenaShiny
-#' for use in ZinaSuite Shiny applications.
+#' for use in ZinaSuite Shiny applications. These functions are specifically
+#' designed for the General Analysis module.
 #'
-#' @name analysis-general
+#' @name analysis-ga-general
 NULL
 
-#' Scatter Correlation Analysis
+#' Scatter Correlation Analysis for General Analysis Module
 #'
 #' @description
 #' Perform scatter correlation analysis between two molecular identifiers.
@@ -30,7 +31,7 @@ NULL
 #' @examples
 #' \donttest{
 #' # Basic correlation plot
-#' p <- analyze_scatter_correlation(
+#' p <- ga_scatter_correlation(
 #'   dataset1 = "TcgaTargetGtex_rsem_gene_tpm",
 #'   id1 = "TP53",
 #'   dataset2 = "TcgaTargetGtex_rsem_gene_tpm",
@@ -40,7 +41,7 @@ NULL
 #'
 #' # With specific samples
 #' samples <- c("TCGA-D5-5538-01", "TCGA-VM-A8C8-01")
-#' p <- analyze_scatter_correlation(
+#' p <- ga_scatter_correlation(
 #'   dataset1 = "TcgaTargetGtex_rsem_gene_tpm",
 #'   id1 = "TP53",
 #'   dataset2 = "TcgaTargetGtex_rsem_gene_tpm",
@@ -48,12 +49,12 @@ NULL
 #'   samples = samples
 #' )
 #' }
-analyze_scatter_correlation <- function(dataset1, id1, dataset2, id2,
-                                        samples = NULL,
-                                        use_ggstats = FALSE,
-                                        use_simple_axis_label = TRUE,
-                                        line_color = "blue",
-                                        alpha = 0.5, ...) {
+ga_scatter_correlation <- function(dataset1, id1, dataset2, id2,
+                                   samples = NULL,
+                                   use_ggstats = FALSE,
+                                   use_simple_axis_label = TRUE,
+                                   line_color = "blue",
+                                   alpha = 0.5, ...) {
   # Validate inputs
   stopifnot(length(id1) == 1, length(id2) == 1)
   stopifnot(is.character(dataset1), is.character(dataset2))
@@ -133,7 +134,7 @@ analyze_scatter_correlation <- function(dataset1, id1, dataset2, id2,
   p
 }
 
-#' Matrix Correlation Analysis
+#' Matrix Correlation Analysis for General Analysis Module
 #'
 #' @description
 #' Perform correlation analysis for multiple molecular identifiers.
@@ -157,29 +158,29 @@ analyze_scatter_correlation <- function(dataset1, id1, dataset2, id2,
 #' @examples
 #' \donttest{
 #' # Correlation matrix for multiple genes
-#' p <- analyze_matrix_correlation(
+#' p <- ga_matrix_correlation(
 #'   dataset = "TcgaTargetGtex_rsem_gene_tpm",
 #'   ids = c("TP53", "KRAS", "PTEN", "BRCA1")
 #' )
 #' print(p)
 #'
 #' # Upper triangle only
-#' p <- analyze_matrix_correlation(
+#' p <- ga_matrix_correlation(
 #'   dataset = "TcgaTargetGtex_rsem_gene_tpm",
 #'   ids = c("TP53", "KRAS", "PTEN"),
 #'   matrix.type = "upper"
 #' )
 #' }
-analyze_matrix_correlation <- function(dataset, ids,
-                                       samples = NULL,
-                                       matrix.type = c("full", "upper", "lower"),
-                                       type = c("parametric", "nonparametric", "robust", "bayes"),
-                                       partial = FALSE,
-                                       sig.level = 0.05,
-                                       p.adjust.method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
-                                       color_low = "#E69F00",
-                                       color_high = "#009E73",
-                                       ...) {
+ga_matrix_correlation <- function(dataset, ids,
+                                  samples = NULL,
+                                  matrix.type = c("full", "upper", "lower"),
+                                  type = c("parametric", "nonparametric", "robust", "bayes"),
+                                  partial = FALSE,
+                                  sig.level = 0.05,
+                                  p.adjust.method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
+                                  color_low = "#E69F00",
+                                  color_high = "#009E73",
+                                  ...) {
   # Validate inputs
   stopifnot(length(ids) >= 2)
 
@@ -239,7 +240,7 @@ analyze_matrix_correlation <- function(dataset, ids,
   p
 }
 
-#' Group Comparison Analysis
+#' Group Comparison Analysis for General Analysis Module
 #'
 #' @description
 #' Perform group comparison analysis for a molecular identifier.
@@ -255,7 +256,7 @@ analyze_matrix_correlation <- function(dataset, ids,
 #' @param type Character string: "parametric", "nonparametric", "robust", or "bayes" (default: "parametric")
 #' @param pairwise.comparisons Logical indicating whether to show pairwise comparisons (default: TRUE)
 #' @param p.adjust.method Character string for p-value adjustment method (default: "fdr")
-#' @param ggtheme ggplot2 theme object (default: cowplot::theme_cowplot())
+#' @param ggtheme ggplot2 theme object (default: ggplot2::theme_bw())
 #' @param ... Additional parameters passed to ggbetweenstats or ggwithinstats
 #'
 #' @return A ggplot object showing the group comparison
@@ -271,26 +272,19 @@ analyze_matrix_correlation <- function(dataset, ids,
 #' )
 #'
 #' # Direct comparison with value column
-#' p <- analyze_group_comparison(grp_df = grp_df)
+#' p <- ga_group_comparison(grp_df = grp_df)
 #' print(p)
-#'
-#' # Using dataset and identifier
-#' # p <- analyze_group_comparison(
-#' #   dataset = "TcgaTargetGtex_rsem_gene_tpm",
-#' #   id = "TP53",
-#' #   grp_df = grp_df[, c("sample", "group")]
-#' # )
 #' }
-analyze_group_comparison <- function(dataset = NULL,
-                                     id = NULL,
-                                     grp_df,
-                                     samples = NULL,
-                                     fun_type = c("betweenstats", "withinstats"),
-                                     type = c("parametric", "nonparametric", "robust", "bayes"),
-                                     pairwise.comparisons = TRUE,
-                                     p.adjust.method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
-                                     ggtheme = ggplot2::theme_bw(),
-                                     ...) {
+ga_group_comparison <- function(dataset = NULL,
+                                id = NULL,
+                                grp_df,
+                                samples = NULL,
+                                fun_type = c("betweenstats", "withinstats"),
+                                type = c("parametric", "nonparametric", "robust", "bayes"),
+                                pairwise.comparisons = TRUE,
+                                p.adjust.method = c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"),
+                                ggtheme = ggplot2::theme_bw(),
+                                ...) {
   # Validate inputs
   stopifnot(ncol(grp_df) > 1)
 
@@ -377,7 +371,7 @@ analyze_group_comparison <- function(dataset = NULL,
   p
 }
 
-#' Survival Analysis
+#' Survival Analysis for General Analysis Module
 #'
 #' @description
 #' Perform survival analysis for a molecular identifier.
@@ -408,24 +402,24 @@ analyze_group_comparison <- function(dataset = NULL,
 #' )
 #'
 #' # Direct survival analysis
-#' p <- analyze_survival(surv_df = surv_df)
+#' p <- ga_survival_analysis(surv_df = surv_df)
 #' print(p)
 #'
 #' # With custom cutpoints
-#' p <- analyze_survival(
+#' p <- ga_survival_analysis(
 #'   surv_df = surv_df,
 #'   cutoff_mode = "Custom",
 #'   cutpoint = c(25, 75)
 #' )
 #' }
-analyze_survival <- function(dataset = NULL,
-                             id = NULL,
-                             surv_df,
-                             samples = NULL,
-                             cutoff_mode = c("Auto", "Custom", "None"),
-                             cutpoint = c(50, 50),
-                             palette = "aaas",
-                             ...) {
+ga_survival_analysis <- function(dataset = NULL,
+                                 id = NULL,
+                                 surv_df,
+                                 samples = NULL,
+                                 cutoff_mode = c("Auto", "Custom", "None"),
+                                 cutpoint = c(50, 50),
+                                 palette = "aaas",
+                                 ...) {
   cutoff_mode <- match.arg(cutoff_mode)
 
   # Determine data source
@@ -473,16 +467,16 @@ analyze_survival <- function(dataset = NULL,
   rlang::check_installed(c("survival", "survminer"), "for survival analysis")
 
   if (cutoff_mode != "None") {
-    p <- sur_plot(df, cutoff_mode, cutpoint, palette = palette, ...)
+    p <- ga_sur_plot(df, cutoff_mode, cutpoint, palette = palette, ...)
   } else {
     colnames(df)[2] <- "group"
-    p <- p_survplot(df, palette = palette, ...)
+    p <- ga_p_survplot(df, palette = palette, ...)
   }
 
   p
 }
 
-#' Dimension Distribution Analysis
+#' Dimension Distribution Analysis for General Analysis Module
 #'
 #' @description
 #' Perform dimension reduction and distribution analysis.
@@ -509,19 +503,19 @@ analyze_survival <- function(dataset = NULL,
 #' colnames(data) <- paste0("S", 1:10)
 #'
 #' # PCA analysis
-#' result <- analyze_dimension_distribution(data, method = "pca")
+#' result <- ga_dimension_distribution(data, method = "pca")
 #' print(result$plot)
 #'
 #' # With coloring
 #' groups <- rep(c("A", "B"), each = 5)
-#' result <- analyze_dimension_distribution(data, method = "pca", color_by = groups)
+#' result <- ga_dimension_distribution(data, method = "pca", color_by = groups)
 #' }
-analyze_dimension_distribution <- function(data,
-                                           method = c("pca", "tsne", "umap"),
-                                           n_components = 2,
-                                           color_by = NULL,
-                                           shape_by = NULL,
-                                           ...) {
+ga_dimension_distribution <- function(data,
+                                      method = c("pca", "tsne", "umap"),
+                                      n_components = 2,
+                                      color_by = NULL,
+                                      shape_by = NULL,
+                                      ...) {
   method <- match.arg(method)
 
   # Validate data
@@ -646,7 +640,7 @@ analyze_dimension_distribution <- function(data,
 
 #' Helper function for survival plotting with cutoff
 #' @keywords internal
-sur_plot <- function(df, cutoff_mode, cutpoint, palette, ...) {
+ga_sur_plot <- function(df, cutoff_mode, cutpoint, palette, ...) {
   # Calculate groups based on cutoff mode
   if (cutoff_mode == "Auto") {
     # Use median as cutoff
@@ -664,12 +658,12 @@ sur_plot <- function(df, cutoff_mode, cutpoint, palette, ...) {
     df <- df[df$group != "Medium", ]
   }
 
-  p_survplot(df, palette, ...)
+  ga_p_survplot(df, palette, ...)
 }
 
 #' Helper function for survival plotting
 #' @keywords internal
-p_survplot <- function(df, palette, ...) {
+ga_p_survplot <- function(df, palette, ...) {
   # Create survival object
   surv_obj <- survival::Surv(df$time, df$status)
 
