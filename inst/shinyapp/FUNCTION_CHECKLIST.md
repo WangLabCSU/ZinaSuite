@@ -72,25 +72,25 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 
 | Mode | UCSCXenaShiny File | ZinaSuite Function | Status | Test Coverage |
 |------|-------------------|-------------------|--------|---------------|
-| One-to-One | modules-pancan-cor-o2o.R | `analyze_tcga_cor_o2o()` | ⏳ | ⏳ |
-| One-to-Many | modules-pancan-cor-o2m.R | `analyze_tcga_cor_o2m()` | ⏳ | ⏳ |
-| Many-to-One | modules-pancan-cor-m2o.R | `analyze_tcga_cor_m2o()` | ⏳ | ⏳ |
+| One-to-One | modules-pancan-cor-o2o.R | `run_tcga_cor_o2o()` | ✅ | ✅ |
+| One-to-Many | modules-pancan-cor-o2m.R | `run_tcga_cor_o2m()` | ✅ | ✅ |
+| Many-to-One | modules-pancan-cor-m2o.R | `run_tcga_cor_m2o()` | ✅ | ✅ |
 
 ### 3.2 Comparison Analysis
 
 | Mode | UCSCXenaShiny File | ZinaSuite Function | Status | Test Coverage |
 |------|-------------------|-------------------|--------|---------------|
-| One-to-One | modules-pancan-comp-o2o.R | `analyze_tcga_comp_o2o()` | ⏳ | ⏳ |
-| One-to-Many | modules-pancan-comp-o2m.R | `analyze_tcga_comp_o2m()` | ⏳ | ⏳ |
-| Many-to-One | modules-pancan-comp-m2o.R | `analyze_tcga_comp_m2o()` | ⏳ | ⏳ |
+| One-to-One | modules-pancan-comp-o2o.R | `run_tcga_comp_o2o()` | ✅ | ✅ |
+| One-to-Many | modules-pancan-comp-o2m.R | `run_tcga_comp_o2m()` | ✅ | ✅ |
+| Many-to-One | modules-pancan-comp-m2o.R | `run_tcga_comp_m2o()` | ✅ | ✅ |
 
 ### 3.3 Survival Analysis
 
 | Mode | UCSCXenaShiny File | ZinaSuite Function | Status | Test Coverage |
 |------|-------------------|-------------------|--------|---------------|
-| One-to-One | modules-pancan-sur-o2o.R | `analyze_tcga_sur_o2o()` | ⏳ | ⏳ |
-| One-to-Many | modules-pancan-sur-o2m.R | `analyze_tcga_sur_o2m()` | ⏳ | ⏳ |
-| Many-to-One | modules-pancan-sur-m2o.R | `analyze_tcga_sur_m2o()` | ⏳ | ⏳ |
+| One-to-One | modules-pancan-sur-o2o.R | `run_tcga_sur_o2o()` | ✅ | ✅ |
+| One-to-Many | modules-pancan-sur-o2m.R | `run_tcga_sur_o2m()` | ✅ | ✅ |
+| Many-to-One | modules-pancan-sur-m2o.R | `run_tcga_sur_m2o()` | ✅ | ✅ |
 
 ### 3.4 Cross-Omics Analysis
 
@@ -200,13 +200,13 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 | TCGA Quick | 11 | **11** | 0 | 0 | **100%** |
 | PCAWG Quick | 4 | 0 | 4 | 0 | 100% |
 | CCLE Quick | 4 | **4** | 0 | 0 | **100%** |
-| TCGA Deep | 11 | 0 | 0 | 11 | 0% |
+| TCGA Deep | 11 | **10** | 0 | 1 | **91%** |
 | PCAWG Deep | 10 | **9** | 0 | 1 | **90%** |
 | CCLE Deep | 5 | **6** | 0 | 0 | **100%** |
 | TPC Functions | 8 | 1 | 0 | 7 | 12.5% |
 | Pharmacogenomics | 5 | 5 | 0 | 0 | 100% |
 | Other Pages | 6 | 0 | 2 | 4 | 33% |
-| **TOTAL** | **69** | **41** | **8** | **20** | **64%** |
+| **TOTAL** | **69** | **51** | **8** | **10** | **78%** |
 
 ### By Priority
 
