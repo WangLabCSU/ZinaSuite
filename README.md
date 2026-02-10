@@ -1,9 +1,13 @@
 # ZinaSuite <img src="man/figures/logo.png" align="right" height="139" />
 
-<!-- badges: start --
+<!-- badges: start -->
 [![R-CMD-check](https://github.com/WangLabCSU/ZinaSuite/workflows/R-CMD-check/badge.svg)](https://github.com/WangLabCSU/ZinaSuite/actions)
 [![Codecov test coverage](https://codecov.io/gh/WangLabCSU/ZinaSuite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/WangLabCSU/ZinaSuite?branch=main)
 [![CRAN status](https://www.r-pkg.org/badges/version/ZinaSuite)](https://CRAN.R-project.org/package=ZinaSuite)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub issues](https://img.shields.io/github/issues/WangLabCSU/ZinaSuite.svg)](https://github.com/WangLabCSU/ZinaSuite/issues)
+[![GitHub stars](https://img.shields.io/github/stars/WangLabCSU/ZinaSuite.svg?style=social)](https://github.com/WangLabCSU/ZinaSuite/stargazers)
 <!-- badges: end -->
 
 ## Overview
