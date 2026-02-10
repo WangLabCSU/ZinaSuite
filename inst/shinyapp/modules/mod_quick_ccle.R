@@ -1,13 +1,13 @@
-' CCLE Quick Analysis Module UI
-'
-' @description
-' Quick analysis module for CCLE (Cancer Cell Line Encyclopedia) data,
-' providing analysis of cell line data including distribution, correlation,
-' and drug sensitivity analysis.
-'
-' @param id Module ID
-' @return UI elements
-' @export
+# CCLE Quick Analysis Module UI
+#
+# @description
+# Quick analysis module for CCLE (Cancer Cell Line Encyclopedia) data,
+# providing analysis of cell line data including distribution, correlation,
+# and drug sensitivity analysis.
+#
+# @param id Module ID
+# @return UI elements
+# @export
 mod_quick_ccle_ui <- function(id) {
   ns <- shiny::NS(id)
 
@@ -23,7 +23,7 @@ mod_quick_ccle_ui <- function(id) {
             open = TRUE,
             width = 350,
 
-            ' Analysis Type Selection
+            # Analysis Type Selection
             shiny::selectInput(
               ns("analysis_type"),
               "Analysis Type:",
@@ -38,7 +38,7 @@ mod_quick_ccle_ui <- function(id) {
 
             shiny::hr(),
 
-            ' Gene Input
+            # Gene Input
             shiny::textInput(
               ns("gene"),
               "Gene Symbol:",
@@ -46,7 +46,7 @@ mod_quick_ccle_ui <- function(id) {
               placeholder = "e.g., TP53, BRCA1, EGFR"
             ),
 
-            ' Data Type Selection
+            # Data Type Selection
             shiny::selectInput(
               ns("data_type"),
               "Data Type:",
@@ -59,7 +59,7 @@ mod_quick_ccle_ui <- function(id) {
               selected = "mRNA"
             ),
 
-            ' Conditional panels for different analysis types
+            # Conditional panels for different analysis types
             shiny::conditionalPanel(
               condition = sprintf("input['%s'] == 'correlation'", ns("analysis_type")),
               shiny::textInput(
@@ -87,7 +87,7 @@ mod_quick_ccle_ui <- function(id) {
 
             shiny::hr(),
 
-            ' Action Button
+            # Action Button
             shiny::actionButton(
               ns("run_btn"),
               "Run Analysis",
@@ -97,7 +97,7 @@ mod_quick_ccle_ui <- function(id) {
 
             shiny::hr(),
 
-            ' Download Options
+            # Download Options
             shiny::h5("Download Results"),
             shiny::downloadButton(
               ns("download_plot"),
@@ -111,7 +111,7 @@ mod_quick_ccle_ui <- function(id) {
             )
           ),
 
-          ' Main Content Area
+          # Main Content Area
           bslib::navset_card_tab(
             bslib::nav_panel(
               title = shiny::icon("chart-bar"),
@@ -135,36 +135,36 @@ mod_quick_ccle_ui <- function(id) {
   )
 }
 
-' CCLE Quick Analysis Module Server
-'
-' @param id Module ID
-' @param app_state Shared reactive state
-' @param async_compute Async compute engine
-' @export
+# CCLE Quick Analysis Module Server
+#
+# @param id Module ID
+# @param app_state Shared reactive state
+# @param async_compute Async compute engine
+# @export
 mod_quick_ccle_server <- function(id, app_state, async_compute) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    ' Reactive values to store results
+    # Reactive values to store results
     results <- shiny::reactiveValues(
       plot = NULL,
       data = NULL,
       stats = NULL
     )
 
-    ' Run analysis when button is clicked
+    # Run analysis when button is clicked
     shiny::observeEvent(input$run_btn, {
       gene <- input$gene
       analysis_type <- input$analysis_type
       data_type <- input$data_type
 
-      ' Validate input
+      # Validate input
       if (gene == "") {
         shiny::showNotification("Please enter a gene symbol", type = "error")
         return()
       }
 
-      ' Show progress
+      # Show progress
       shiny::withProgress(message = "Running CCLE analysis...", value = 0, {
         tryCatch({
           result <- switch(analysis_type,
@@ -200,25 +200,25 @@ mod_quick_ccle_server <- function(id, app_state, async_compute) {
       })
     })
 
-    ' Output plot
+    # Output plot
     output$plot_output <- shiny::renderPlot({
       shiny::req(results$plot)
       print(results$plot)
     }, res = 100)
 
-    ' Output data table
+    # Output data table
     output$data_table <- DT::renderDataTable({
       shiny::req(results$data)
       DT::datatable(results$data, options = list(pageLength = 10, scrollX = TRUE))
     })
 
-    ' Output statistics
+    # Output statistics
     output$stats_output <- shiny::renderPrint({
       shiny::req(results$stats)
       print(results$stats)
     })
 
-    ' Download handlers
+    # Download handlers
     output$download_plot <- shiny::downloadHandler(
       filename = function() {
         paste0(input$gene, "_ccle_", input$analysis_type, ".pdf")
@@ -241,18 +241,18 @@ mod_quick_ccle_server <- function(id, app_state, async_compute) {
   })
 }
 
-' CCLE Analysis Functions ----------------------------------------------------
+# CCLE Analysis Functions ----------------------------------------------------
 
-' Run CCLE Distribution Analysis
-' @keywords internal
+# Run CCLE Distribution Analysis
+# @keywords internal
 run_ccle_distribution <- function(gene, data_type) {
-  ' Query gene expression from CCLE
+  # Query gene expression from CCLE
   gene_expr <- query_molecule(gene, data_type = data_type, source = "ccle")
 
-  ' Load CCLE sample information
+  # Load CCLE sample information
   sample_info <- load_data("ccle_info")
 
-  ' Prepare data
+  # Prepare data
   common_samples <- intersect(names(gene_expr), sample_info$sample)
 
   plot_data <- data.frame(
@@ -264,7 +264,7 @@ run_ccle_distribution <- function(gene, data_type) {
     stringsAsFactors = FALSE
   )
 
-  ' Create plot by primary site
+  # Create plot by primary site
   plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Primary, y = .data$Expression)) +
     ggplot2::geom_boxplot(fill = "steelblue", alpha = 0.7) +
     ggplot2::labs(
@@ -280,31 +280,31 @@ run_ccle_distribution <- function(gene, data_type) {
   list(plot = plot, data = plot_data, stats = stats)
 }
 
-' Run CCLE Correlation Analysis
-' @keywords internal
+# Run CCLE Correlation Analysis
+# @keywords internal
 run_ccle_correlation <- function(gene1, gene2, data_type) {
-  ' Query gene expressions from CCLE
+  # Query gene expressions from CCLE
   expr1 <- query_molecule(gene1, data_type = data_type, source = "ccle")
   expr2 <- query_molecule(gene2, data_type = data_type, source = "ccle")
 
-  ' Find common samples
+  # Find common samples
   common_samples <- intersect(names(expr1), names(expr2))
 
   if (length(common_samples) < 10) {
     stop("Insufficient common samples for correlation analysis")
   }
 
-  ' Prepare data
+  # Prepare data
   plot_data <- data.frame(
     Gene1 = as.numeric(expr1[common_samples]),
     Gene2 = as.numeric(expr2[common_samples]),
     stringsAsFactors = FALSE
   )
 
-  ' Calculate correlation
+  # Calculate correlation
   cor_test <- stats::cor.test(plot_data$Gene1, plot_data$Gene2)
 
-  ' Create plot
+  # Create plot
   plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Gene1, y = .data$Gene2)) +
     ggplot2::geom_point(alpha = 0.6, color = "steelblue") +
     ggplot2::geom_smooth(method = "lm", color = "red") +
@@ -325,11 +325,11 @@ run_ccle_correlation <- function(gene1, gene2, data_type) {
   list(plot = plot, data = plot_data, stats = stats)
 }
 
-' Run CCLE Drug Sensitivity Analysis
-' @keywords internal
+# Run CCLE Drug Sensitivity Analysis
+# @keywords internal
 run_ccle_drug_sensitivity <- function(gene, data_type, drug) {
-  ' Use the new drug response analysis function
-  ' This creates a volcano plot showing gene-drug associations
+  # Use the new drug response analysis function
+  # This creates a volcano plot showing gene-drug associations
 
   plot <- vis_gene_drug_response_asso(
     Gene = gene,
@@ -337,7 +337,7 @@ run_ccle_drug_sensitivity <- function(gene, data_type, drug) {
     output_form = "ggplot2"
   )
 
-  ' Get the underlying data
+  # Get the underlying data
   data <- analyze_gene_drug_response_asso(gene)
 
   stats <- list(
@@ -350,13 +350,13 @@ run_ccle_drug_sensitivity <- function(gene, data_type, drug) {
   list(plot = plot, data = data, stats = stats)
 }
 
-' Run CCLE Drug Response Analysis
-' @keywords internal
+# Run CCLE Drug Response Analysis
+# @keywords internal
 run_ccle_drug_response <- function(gene, data_type, drug) {
-  ' Use the new drug response difference function
-  ' This creates a dot plot comparing IC50 between high/low expression groups
+  # Use the new drug response difference function
+  # This creates a dot plot comparing IC50 between high/low expression groups
 
-  ' Get primary sites
+  # Get primary sites
   ccle_data <- load_data("ccle_expr_and_drug_response")
   available_sites <- unique(ccle_data$drug_info$`Site Primary`)
   selected_site <- available_sites[1]  ' Use first available site
@@ -368,7 +368,7 @@ run_ccle_drug_response <- function(gene, data_type, drug) {
     Method = "wilcox.test"
   )
 
-  ' Get the underlying data
+  # Get the underlying data
   data <- analyze_gene_drug_response_diff(gene, tissue = selected_site)
 
   stats <- list(

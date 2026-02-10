@@ -8,7 +8,8 @@ load_data(
   data_name = c("tcga_gtex", "tcga_clinical", "tcga_clinical_fine", "tcga_surv",
     "tcga_purity", "tcga_subtypes", "TCGA.organ", "pcawg_info", "pcawg_info_fine",
     "pcawg_purity", "ccle_info", "ccle_info_fine", "ccle_absolute", "tcga_TIL",
-    "tcga_tmb", "tcga_MSI", "tcga_stemness", "tcga_genome_instability"),
+    "tcga_tmb", "tcga_MSI", "tcga_stemness", "tcga_genome_instability",
+    "ccle_expr_and_drug_response"),
   force_download = FALSE
 )
 }

@@ -37,7 +37,13 @@ Imports:
     utils,
     stats,
     methods,
-    broom
+    broom,
+    jsonlite,
+    moments,
+    purrr,
+    readxl,
+    scales,
+    writexl
 Suggests: 
     shiny (>= 1.7.0),
     bslib (>= 0.5.0),
