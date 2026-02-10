@@ -57,6 +57,10 @@
 ^TODO\.md$
 ^NOTES\.md$
 
+# R check artifacts
+^\.\.Rcheck$
+^\.\.Rcheck/.*$
+
 # Vignettes (temporarily excluded until pandoc is available)
 ^vignettes$
 ^vignettes/.*$
