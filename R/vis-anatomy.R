@@ -111,16 +111,16 @@ plot_anatomy_heatmap <- function(data, gene, color_palette, text_size) {
   data$System <- factor(data$System, levels = unique(data$System))
   data$Organ <- factor(data$Organ, levels = unique(data$Organ))
 
-  ggplot2::ggplot(data, ggplot2::aes(x = Cancer, y = Organ, fill = Expression)) +
+  ggplot2::ggplot(data, ggplot2::aes(x = .data$Cancer, y = .data$Organ, fill = .data$Expression)) +
     ggplot2::geom_tile(color = "white") +
     ggplot2::scale_fill_gradient2(
       low = color_palette[1],
       mid = color_palette[2],
       high = color_palette[3],
-      midpoint = median(data$Expression, na.rm = TRUE),
+      midpoint = stats::median(data$Expression, na.rm = TRUE),
       name = paste(gene, "Expression")
     ) +
-    ggplot2::facet_grid(System ~ ., scales = "free_y", space = "free") +
+    ggplot2::facet_grid(.data$System ~ ., scales = "free_y", space = "free") +
     ggplot2::labs(
       title = paste("Anatomical Expression Map:", gene),
       x = "Cancer Type",
@@ -147,27 +147,27 @@ plot_anatomy_dotplot <- function(data, gene, color_palette, text_size) {
   # Calculate expression quartile for sizing
   data$Size <- cut(
     data$Expression,
-    breaks = quantile(data$Expression, probs = c(0, 0.25, 0.5, 0.75, 1)),
+    breaks = stats::quantile(data$Expression, probs = c(0, 0.25, 0.5, 0.75, 1)),
     labels = c("Q1", "Q2", "Q3", "Q4"),
     include.lowest = TRUE
   )
 
-  ggplot2::ggplot(data, ggplot2::aes(x = Cancer, y = Organ)) +
+  ggplot2::ggplot(data, ggplot2::aes(x = .data$Cancer, y = .data$Organ)) +
     ggplot2::geom_point(
-      ggplot2::aes(size = Size, color = Expression)
+      ggplot2::aes(size = .data$Size, color = .data$Expression)
     ) +
     ggplot2::scale_color_gradient2(
       low = color_palette[1],
       mid = color_palette[2],
       high = color_palette[3],
-      midpoint = median(data$Expression, na.rm = TRUE),
+      midpoint = stats::median(data$Expression, na.rm = TRUE),
       name = paste(gene, "Expression")
     ) +
     ggplot2::scale_size_manual(
       values = c("Q1" = 2, "Q2" = 4, "Q3" = 6, "Q4" = 8),
       name = "Expression\nQuartile"
     ) +
-    ggplot2::facet_grid(System ~ ., scales = "free_y", space = "free") +
+    ggplot2::facet_grid(.data$System ~ ., scales = "free_y", space = "free") +
     ggplot2::labs(
       title = paste("Anatomical Expression Map:", gene),
       x = "Cancer Type",
@@ -191,18 +191,18 @@ plot_anatomy_dotplot <- function(data, gene, color_palette, text_size) {
 #' @keywords internal
 plot_anatomy_barplot <- function(data, gene, color_palette, text_size) {
   # Order by expression level
-  data$Cancer <- reorder(data$Cancer, data$Expression)
+  data$Cancer <- stats::reorder(data$Cancer, data$Expression)
 
-  ggplot2::ggplot(data, ggplot2::aes(x = Cancer, y = Expression, fill = Expression)) +
+  ggplot2::ggplot(data, ggplot2::aes(x = .data$Cancer, y = .data$Expression, fill = .data$Expression)) +
     ggplot2::geom_col() +
     ggplot2::scale_fill_gradient2(
       low = color_palette[1],
       mid = color_palette[2],
       high = color_palette[3],
-      midpoint = median(data$Expression, na.rm = TRUE),
+      midpoint = stats::median(data$Expression, na.rm = TRUE),
       name = paste(gene, "Expression")
     ) +
-    ggplot2::facet_grid(System ~ ., scales = "free_y", space = "free") +
+    ggplot2::facet_grid(.data$System ~ ., scales = "free_y", space = "free") +
     ggplot2::coord_flip() +
     ggplot2::labs(
       title = paste("Expression by Anatomical Location:", gene),

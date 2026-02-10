@@ -22,15 +22,19 @@ Partial correlation results
 Perform partial correlation analysis adjusting for confounding variables.
 }
 \examples{
-\dontrun{
+\donttest{
 # Partial correlation adjusting for tumor purity
-tp53_expr <- query_gene_expression("TP53")
-brca1_expr <- query_gene_expression("BRCA1")
-purity <- load_data("tcga_purity")$purity
+# Note: x, y, z must have the same length
+set.seed(123)
+n <- 100
+x <- rnorm(n)
+y <- rnorm(n) + 0.5 * x
+z <- rnorm(n) + 0.3 * x + 0.3 * y
 
 result <- analyze_partial_correlation(
-  tp53_expr, brca1_expr, purity,
+  x, y, z,
   method = "pearson"
 )
+print(result$estimate)
 }
 }

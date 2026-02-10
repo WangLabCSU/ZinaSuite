@@ -54,7 +54,7 @@ vis_gene_immune_cor <- function(gene,
 
   # Get sample cancer types
   sample_info <- load_data("tcga_gtex")
-  sample_cancer <- setNames(
+  sample_cancer <- stats::setNames(
     sample_info$tissue[match(names(gene_expr), sample_info$sample)],
     names(gene_expr)
   )
@@ -92,13 +92,13 @@ vis_gene_immune_cor <- function(gene,
       if (length(common_samples) < 10) next
 
       x <- cancer_expr[common_samples]
-      y <- setNames(cancer_immune[[feature]], cancer_immune$Sample)[common_samples]
+      y <- stats::setNames(cancer_immune[[feature]], cancer_immune$Sample)[common_samples]
 
       # Remove NA
-      valid <- complete.cases(x, y)
+      valid <- stats::complete.cases(x, y)
       if (sum(valid) < 10) next
 
-      cor_result <- cor.test(x[valid], y[valid], method = method)
+      cor_result <- stats::cor.test(x[valid], y[valid], method = method)
 
       results[[length(results) + 1]] <- data.frame(
         Cancer = cancer,
@@ -116,7 +116,7 @@ vis_gene_immune_cor <- function(gene,
   }
 
   result_df <- do.call(rbind, results)
-  result_df$Padj <- p.adjust(result_df$Pvalue, method = adjust_method)
+  result_df$Padj <- stats::p.adjust(result_df$Pvalue, method = adjust_method)
   result_df$Significance <- cut(
     result_df$Padj,
     breaks = c(-Inf, 0.001, 0.01, 0.05, Inf),
@@ -138,7 +138,7 @@ vis_gene_immune_cor <- function(gene,
 #' @return ggplot object
 #' @keywords internal
 plot_immune_heatmap <- function(data, gene) {
-  ggplot2::ggplot(data, ggplot2::aes(x = Cancer, y = Feature, fill = Correlation)) +
+  ggplot2::ggplot(data, ggplot2::aes(x = .data$Cancer, y = .data$Feature, fill = .data$Correlation)) +
     ggplot2::geom_tile(color = "white") +
     ggplot2::scale_fill_gradient2(
       low = "#2166ac", mid = "white", high = "#b2182b",
@@ -146,7 +146,7 @@ plot_immune_heatmap <- function(data, gene) {
       name = "Correlation"
     ) +
     ggplot2::geom_text(
-      ggplot2::aes(label = Significance),
+      ggplot2::aes(label = .data$Significance),
       color = "black", size = 3
     ) +
     ggplot2::labs(
@@ -168,9 +168,9 @@ plot_immune_heatmap <- function(data, gene) {
 #' @return ggplot object
 #' @keywords internal
 plot_immune_dotplot <- function(data, gene) {
-  ggplot2::ggplot(data, ggplot2::aes(x = Cancer, y = Feature)) +
+  ggplot2::ggplot(data, ggplot2::aes(x = .data$Cancer, y = .data$Feature)) +
     ggplot2::geom_point(
-      ggplot2::aes(size = abs(Correlation), color = Correlation)
+      ggplot2::aes(size = abs(.data$Correlation), color = .data$Correlation))
     ) +
     ggplot2::scale_color_gradient2(
       low = "#2166ac", mid = "white", high = "#b2182b",
@@ -198,12 +198,12 @@ plot_immune_dotplot <- function(data, gene) {
 plot_immune_barplot <- function(data, gene) {
   # Select top correlations per cancer
   data_top <- data %>%
-    dplyr::group_by(Cancer) %>%
-    dplyr::slice_max(order_by = abs(Correlation), n = 5)
+    dplyr::group_by(.data$Cancer) %>%
+    dplyr::slice_max(order_by = abs(.data$Correlation), n = 5)
 
-  ggplot2::ggplot(data_top, ggplot2::aes(x = reorder(Feature, Correlation), y = Correlation)) +
-    ggplot2::geom_col(ggplot2::aes(fill = Correlation > 0)) +
-    ggplot2::facet_wrap(~Cancer, scales = "free_y") +
+  ggplot2::ggplot(data_top, ggplot2::aes(x = stats::reorder(.data$Feature, .data$Correlation), y = .data$Correlation)) +
+    ggplot2::geom_col(ggplot2::aes(fill = .data$Correlation > 0)) +
+    ggplot2::facet_wrap(~.data$Cancer, scales = "free_y") +
     ggplot2::coord_flip() +
     ggplot2::scale_fill_manual(
       values = c("TRUE" = "#b2182b", "FALSE" = "#2166ac"),
@@ -264,7 +264,7 @@ vis_gene_TIL_cor <- function(gene,
 
   # Get sample cancer info
   sample_info <- load_data("tcga_gtex")
-  sample_cancer <- setNames(
+  sample_cancer <- stats::setNames(
     sample_info$tissue[match(names(gene_expr), sample_info$sample)],
     names(gene_expr)
   )
