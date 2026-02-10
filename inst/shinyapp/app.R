@@ -52,6 +52,9 @@ run_zinasuite <- function() {
         shinydashboard::menuItem("Data Query", tabName = "data_query", icon = shiny::icon("database")),
         shinydashboard::menuItem("Analysis", tabName = "analysis", icon = shiny::icon("chart-line")),
         shinydashboard::menuItem("Visualization", tabName = "visualization", icon = shiny::icon("chart-bar")),
+        shinydashboard::menuItem("Pan-Cancer", tabName = "pancan", icon = shiny::icon("globe")),
+        shinydashboard::menuItem("Mutation", tabName = "mutation", icon = shiny::icon("dna")),
+        shinydashboard::menuItem("Dimension", tabName = "dimension", icon = shiny::icon("project-diagram")),
         shinydashboard::menuItem("Immune Analysis", tabName = "immune", icon = shiny::icon("shield-virus")),
         shinydashboard::menuItem("Batch Analysis", tabName = "batch", icon = shiny::icon("tasks")),
         shinydashboard::menuItem("About", tabName = "about", icon = shiny::icon("info-circle"))
@@ -90,6 +93,24 @@ run_zinasuite <- function() {
         shinydashboard::tabItem(
           tabName = "visualization",
           mod_visualization_ui("visualization")
+        ),
+
+        # Pan-Cancer tab
+        shinydashboard::tabItem(
+          tabName = "pancan",
+          mod_pancan_ui("pancan")
+        ),
+
+        # Mutation tab
+        shinydashboard::tabItem(
+          tabName = "mutation",
+          mod_mutation_ui("mutation")
+        ),
+
+        # Dimension tab
+        shinydashboard::tabItem(
+          tabName = "dimension",
+          mod_dimension_ui("dimension")
         ),
 
         # Immune Analysis tab
@@ -150,6 +171,9 @@ run_zinasuite <- function() {
     mod_data_query_server("data_query", app_state)
     mod_analysis_server("analysis", app_state)
     mod_visualization_server("visualization", app_state)
+    mod_pancan_server("pancan", app_state)
+    mod_mutation_server("mutation", app_state)
+    mod_dimension_server("dimension", app_state)
     mod_immune_server("immune", app_state)
     mod_batch_server("batch", app_state, async_compute)
     mod_about_server("about")
