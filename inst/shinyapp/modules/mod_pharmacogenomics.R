@@ -10,222 +10,208 @@
 mod_pharmacogenomics_ui <- function(id) {
   ns <- shiny::NS(id)
 
-  shinydashboard::box(
-    title = "PharmacoGenomics Analysis",
-    status = "primary",
-    solidHeader = TRUE,
-    width = 12,
-
-    shiny::tabsetPanel(
-      id = ns("pharma_tabs"),
-
-      # Drug-Omics Correlation Tab
-      shiny::tabPanel(
-        title = "Drug-Omics Correlation",
-        icon = shiny::icon("pills"),
-
-        shiny::fluidRow(
-          shiny::column(
-            width = 3,
-            shiny::wellPanel(
-              shiny::h4("Analysis Parameters"),
-
-              shiny::selectInput(
-                ns("data_source"),
-                "Data Source:",
-                choices = c(
-                  "CCLE" = "ccle",
-                  "GDSC" = "gdsc",
-                  "CTRP" = "ctrp"
-                ),
-                selected = "ccle"
-              ),
-
-              shiny::textInput(
-                ns("gene_id"),
-                "Gene Symbol:",
-                value = "TP53",
-                placeholder = "e.g., TP53, BRCA1"
-              ),
-
-              shiny::selectInput(
-                ns("drug_id"),
-                "Drug:",
-                choices = c(
-                  "Select drug..." = "",
-                  "Paclitaxel" = "paclitaxel",
-                  "Doxorubicin" = "doxorubicin",
-                  "Cisplatin" = "cisplatin",
-                  "Gemcitabine" = "gemcitabine",
-                  "5-Fluorouracil" = "5-fu",
-                  "Temozolomide" = "temozolomide"
-                ),
-                selected = ""
-              ),
-
-              shiny::selectInput(
-                ns("omic_type"),
-                "Omics Type:",
-                choices = c(
-                  "Gene Expression" = "expression",
-                  "Copy Number" = "cnv",
-                  "Mutation" = "mutation",
-                  "Protein" = "protein"
-                ),
-                selected = "expression"
-              ),
-
-              shiny::hr(),
-
-              shiny::actionButton(
-                ns("run_correlation"),
-                "Run Analysis",
-                icon = shiny::icon("play"),
-                class = "btn-primary"
-              )
-            )
-          ),
-
-          shiny::column(
-            width = 9,
-            shiny::wellPanel(
-              shiny::h4("Drug-Omics Correlation Results"),
-              shiny::plotOutput(ns("correlation_plot"), height = "500px"),
-              shiny::hr(),
-              shiny::verbatimTextOutput(ns("correlation_stats"))
-            )
-          )
-        )
+  bslib::page_fillable(
+    bslib::card(
+      bslib::card_header(
+        class = "bg-primary text-white",
+        shiny::icon("pills"), "PharmacoGenomics Analysis"
       ),
+      bslib::card_body(
+        bslib::navset_card_tab(
+          # Drug-Omics Correlation Tab
+          bslib::nav_panel(
+            title = shiny::tagList(shiny::icon("pills"), "Drug-Omics Correlation"),
 
-      # Drug Sensitivity Profile Tab
-      shiny::tabPanel(
-        title = "Drug Sensitivity Profile",
-        icon = shiny::icon("chart-bar"),
+            bslib::layout_sidebar(
+              sidebar = bslib::sidebar(
+                open = TRUE,
+                width = 300,
 
-        shiny::fluidRow(
-          shiny::column(
-            width = 3,
-            shiny::wellPanel(
-              shiny::h4("Profile Parameters"),
-
-              shiny::selectInput(
-                ns("profile_source"),
-                "Database:",
-                choices = c(
-                  "CCLE" = "ccle",
-                  "GDSC1" = "gdsc1",
-                  "GDSC2" = "gdsc2"
+                shiny::selectInput(
+                  ns("data_source"),
+                  "Data Source:",
+                  choices = c(
+                    "CCLE" = "ccle",
+                    "GDSC" = "gdsc"
+                  ),
+                  selected = "ccle"
                 ),
-                selected = "ccle"
+
+                shiny::textInput(
+                  ns("gene_id"),
+                  "Gene Symbol:",
+                  value = "TP53",
+                  placeholder = "e.g., TP53, BRCA1"
+                ),
+
+                shiny::selectInput(
+                  ns("drug_id"),
+                  "Drug:",
+                  choices = c("Select drug..." = ""),
+                  selected = ""
+                ),
+
+                shiny::selectInput(
+                  ns("sensitivity_metric"),
+                  "Sensitivity Metric:",
+                  choices = c(
+                    "AUC" = "auc",
+                    "IC50" = "ic50"
+                  ),
+                  selected = "auc"
+                ),
+
+                shiny::selectInput(
+                  ns("cor_method"),
+                  "Correlation Method:",
+                  choices = c(
+                    "Spearman" = "spearman",
+                    "Pearson" = "pearson"
+                  ),
+                  selected = "spearman"
+                ),
+
+                shiny::hr(),
+
+                shiny::actionButton(
+                  ns("run_correlation"),
+                  "Run Analysis",
+                  icon = shiny::icon("play"),
+                  class = "btn-primary w-100"
+                )
               ),
 
-              shiny::selectInput(
-                ns("profile_metric"),
-                "Sensitivity Metric:",
-                choices = c(
-                  "IC50" = "ic50",
-                  "AUC" = "auc",
-                  "EC50" = "ec50"
+              # Main content
+              bslib::navset_card_tab(
+                bslib::nav_panel(
+                  title = shiny::icon("chart-scatter"),
+                  shiny::plotOutput(ns("correlation_plot"), height = "500px")
                 ),
-                selected = "ic50"
-              ),
-
-              shiny::checkboxGroupInput(
-                ns("cancer_types"),
-                "Cancer Types:",
-                choices = c(
-                  "BRCA" = "BRCA",
-                  "LUAD" = "LUAD",
-                  "LUSC" = "LUSC",
-                  "COAD" = "COAD",
-                  "READ" = "READ",
-                  "HNSC" = "HNSC"
+                bslib::nav_panel(
+                  title = shiny::icon("table"),
+                  DT::dataTableOutput(ns("correlation_table"))
                 ),
-                selected = c("BRCA", "LUAD")
-              ),
-
-              shiny::hr(),
-
-              shiny::actionButton(
-                ns("show_profile"),
-                "Show Profile",
-                icon = shiny::icon("chart-bar"),
-                class = "btn-primary"
+                bslib::nav_panel(
+                  title = shiny::icon("info-circle"),
+                  shiny::verbatimTextOutput(ns("correlation_stats"))
+                )
               )
             )
           ),
 
-          shiny::column(
-            width = 9,
-            shiny::wellPanel(
-              shiny::h4("Drug Sensitivity Profile"),
-              shiny::plotOutput(ns("sensitivity_plot"), height = "500px"),
-              shiny::hr(),
-              DT::dataTableOutput(ns("sensitivity_table"))
-            )
-          )
-        )
-      ),
+          # Drug Sensitivity by Mutation Tab
+          bslib::nav_panel(
+            title = shiny::tagList(shiny::icon("dna"), "Drug-Mutation Analysis"),
 
-      # Feature Association Tab
-      shiny::tabPanel(
-        title = "Feature Association",
-        icon = shiny::icon("project-diagram"),
+            bslib::layout_sidebar(
+              sidebar = bslib::sidebar(
+                open = TRUE,
+                width = 300,
 
-        shiny::fluidRow(
-          shiny::column(
-            width = 3,
-            shiny::wellPanel(
-              shiny::h4("Association Parameters"),
-
-              shiny::textInput(
-                ns("feature_gene"),
-                "Feature Gene:",
-                value = "TP53"
-              ),
-
-              shiny::selectInput(
-                ns("feature_type"),
-                "Feature Type:",
-                choices = c(
-                  "Mutation" = "mutation",
-                  "CNV" = "cnv",
-                  "Expression" = "expression"
+                shiny::textInput(
+                  ns("mut_gene"),
+                  "Gene (Mutation):",
+                  value = "BRCA1",
+                  placeholder = "e.g., BRCA1, TP53"
                 ),
-                selected = "mutation"
-              ),
 
-              shiny::selectInput(
-                ns("association_drug"),
-                "Drug:",
-                choices = c(
-                  "All Drugs" = "all",
-                  "Paclitaxel" = "paclitaxel",
-                  "Doxorubicin" = "doxorubicin",
-                  "Cisplatin" = "cisplatin"
+                shiny::selectInput(
+                  ns("mut_drug"),
+                  "Drug:",
+                  choices = c("Select drug..." = ""),
+                  selected = ""
                 ),
-                selected = "all"
+
+                shiny::selectInput(
+                  ns("mut_metric"),
+                  "Sensitivity Metric:",
+                  choices = c(
+                    "AUC" = "auc",
+                    "IC50" = "ic50"
+                  ),
+                  selected = "auc"
+                ),
+
+                shiny::hr(),
+
+                shiny::actionButton(
+                  ns("run_mutation_analysis"),
+                  "Run Analysis",
+                  icon = shiny::icon("play"),
+                  class = "btn-primary w-100"
+                )
               ),
 
-              shiny::hr(),
-
-              shiny::actionButton(
-                ns("run_association"),
-                "Run Association",
-                icon = shiny::icon("calculator"),
-                class = "btn-primary"
+              bslib::navset_card_tab(
+                bslib::nav_panel(
+                  title = shiny::icon("chart-bar"),
+                  shiny::plotOutput(ns("mutation_plot"), height = "500px")
+                ),
+                bslib::nav_panel(
+                  title = shiny::icon("table"),
+                  DT::dataTableOutput(ns("mutation_table"))
+                ),
+                bslib::nav_panel(
+                  title = shiny::icon("info-circle"),
+                  shiny::verbatimTextOutput(ns("mutation_stats"))
+                )
               )
             )
           ),
 
-          shiny::column(
-            width = 9,
-            shiny::wellPanel(
-              shiny::h4("Feature-Drug Association Results"),
-              shiny::plotOutput(ns("association_plot"), height = "400px"),
-              shiny::hr(),
-              DT::dataTableOutput(ns("association_table"))
+          # Batch Gene-Drug Analysis Tab
+          bslib::nav_panel(
+            title = shiny::tagList(shiny::icon("list"), "Batch Analysis"),
+
+            bslib::layout_sidebar(
+              sidebar = bslib::sidebar(
+                open = TRUE,
+                width = 300,
+
+                shiny::textAreaInput(
+                  ns("batch_genes"),
+                  "Genes (one per line):",
+                  value = "TP53\nBRCA1\nEGFR\nMYC",
+                  rows = 6
+                ),
+
+                shiny::selectInput(
+                  ns("batch_drug"),
+                  "Drug:",
+                  choices = c("Select drug..." = ""),
+                  selected = ""
+                ),
+
+                shiny::selectInput(
+                  ns("batch_metric"),
+                  "Sensitivity Metric:",
+                  choices = c(
+                    "AUC" = "auc",
+                    "IC50" = "ic50"
+                  ),
+                  selected = "auc"
+                ),
+
+                shiny::hr(),
+
+                shiny::actionButton(
+                  ns("run_batch"),
+                  "Run Batch Analysis",
+                  icon = shiny::icon("play"),
+                  class = "btn-primary w-100"
+                )
+              ),
+
+              bslib::navset_card_tab(
+                bslib::nav_panel(
+                  title = shiny::icon("chart-bar"),
+                  shiny::plotOutput(ns("batch_plot"), height = "500px")
+                ),
+                bslib::nav_panel(
+                  title = shiny::icon("table"),
+                  DT::dataTableOutput(ns("batch_table"))
+                )
+              )
             )
           )
         )
@@ -238,153 +224,239 @@ mod_pharmacogenomics_ui <- function(id) {
 #'
 #' @param id Module ID
 #' @param app_state Reactive values for shared state
+#' @param async_compute Async compute engine
 #' @export
-mod_pharmacogenomics_server <- function(id, app_state) {
+mod_pharmacogenomics_server <- function(id, app_state, async_compute) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # Drug-Omics Correlation Analysis
+    # Update drug choices based on data source
+    shiny::observeEvent(input$data_source, {
+      drugs <- get_available_drugs(source = input$data_source)
+      shiny::updateSelectInput(session, "drug_id", choices = c("Select drug..." = "", drugs))
+    })
+
+    shiny::observeEvent(input$data_source, {
+      drugs <- get_available_drugs(source = input$data_source)
+      shiny::updateSelectInput(session, "mut_drug", choices = c("Select drug..." = "", drugs))
+      shiny::updateSelectInput(session, "batch_drug", choices = c("Select drug..." = "", drugs))
+    })
+
+    # Drug-Gene Correlation Analysis
     correlation_results <- shiny::eventReactive(input$run_correlation, {
       shiny::req(input$gene_id, input$drug_id)
 
-      shiny::withProgress(message = 'Running drug-omics correlation...', {
-        # Simulate analysis (in real implementation, query actual data)
-        set.seed(42)
-        n_samples <- 200
+      shiny::withProgress(message = 'Analyzing drug-gene correlation...', value = 0, {
+        shiny::incProgress(0.3, detail = "Querying data")
 
-        omic_values <- rnorm(n_samples, mean = 5, sd = 2)
-        drug_sensitivity <- -0.5 * omic_values + rnorm(n_samples, mean = 0, sd = 1)
-
-        data.frame(
-          omic_value = omic_values,
-          drug_sensitivity = drug_sensitivity,
-          cell_line = paste0("Cell_", 1:n_samples)
+        result <- analyze_drug_gene_cor(
+          gene = input$gene_id,
+          drug = input$drug_id,
+          metric = input$sensitivity_metric,
+          cor_method = input$cor_method
         )
+
+        shiny::incProgress(1, detail = "Complete")
+        result
       })
     })
 
     output$correlation_plot <- shiny::renderPlot({
       shiny::req(correlation_results())
 
-      data <- correlation_results()
+      result <- correlation_results()
+      data <- result$data
 
-      ggplot2::ggplot(data, ggplot2::aes(x = omic_value, y = drug_sensitivity)) +
-        ggplot2::geom_point(alpha = 0.6, color = "steelblue") +
+      cor_label <- sprintf(
+        "%s = %.3f, p = %.2e, n = %d",
+        ifelse(input$cor_method == "spearman", "rho", "r"),
+        result$correlation$estimate,
+        result$correlation$pvalue,
+        result$n_samples
+      )
+
+      ggplot2::ggplot(data, ggplot2::aes(x = Gene, y = Drug)) +
+        ggplot2::geom_point(alpha = 0.6, color = "steelblue", size = 2) +
         ggplot2::geom_smooth(method = "lm", color = "red", se = TRUE) +
         ggplot2::labs(
-          title = paste("Drug-Omics Correlation:", input$gene_id, "vs", input$drug_id),
-          x = paste(input$omic_type, "level"),
-          y = "Drug Sensitivity"
+          title = paste(input$gene_id, "Expression vs", input$drug_id, "Sensitivity"),
+          subtitle = cor_label,
+          x = paste(input$gene_id, "Expression"),
+          y = paste(input$drug_id, toupper(input$sensitivity_metric))
         ) +
-        ggplot2::theme_minimal()
+        theme_zinasuite()
     })
 
-    output$correlation_stats <- shiny::renderPrint({
+    output$correlation_table <- DT::renderDataTable({
       shiny::req(correlation_results())
 
-      data <- correlation_results()
-      cor_test <- cor.test(data$omic_value, data$drug_sensitivity)
+      result <- correlation_results()
+      data <- result$data
+      data$Gene <- round(data$Gene, 4)
+      data$Drug <- round(data$Drug, 4)
 
-      cat("Correlation Analysis Results:\n")
-      cat("============================\n")
-      cat("Pearson correlation:", round(cor_test$estimate, 4), "\n")
-      cat("P-value:", format(cor_test$p.value, digits = 4), "\n")
-      cat("95% CI:", paste(round(cor_test$conf.int, 4), collapse = " to "), "\n")
-      cat("Sample size:", nrow(data), "\n")
-    })
-
-    # Drug Sensitivity Profile
-    sensitivity_data <- shiny::eventReactive(input$show_profile, {
-      shiny::req(input$cancer_types)
-
-      shiny::withProgress(message = 'Loading drug sensitivity data...', {
-        # Simulate data
-        set.seed(123)
-        data_list <- lapply(input$cancer_types, function(cancer) {
-          data.frame(
-            cancer_type = cancer,
-            drug_name = c("Paclitaxel", "Doxorubicin", "Cisplatin", "Gemcitabine"),
-            ic50 = runif(4, min = 0.1, max = 10),
-            auc = runif(4, min = 0.2, max = 1.0),
-            n_cell_lines = sample(20:100, 4)
-          )
-        })
-        do.call(rbind, data_list)
-      })
-    })
-
-    output$sensitivity_plot <- shiny::renderPlot({
-      shiny::req(sensitivity_data())
-
-      data <- sensitivity_data()
-
-      ggplot2::ggplot(data, ggplot2::aes(x = cancer_type, y = .data[[input$profile_metric]], fill = drug_name)) +
-        ggplot2::geom_bar(stat = "identity", position = "dodge") +
-        ggplot2::labs(
-          title = paste("Drug Sensitivity Profile (", toupper(input$profile_metric), ")"),
-          x = "Cancer Type",
-          y = toupper(input$profile_metric)
-        ) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
-    })
-
-    output$sensitivity_table <- DT::renderDataTable({
-      shiny::req(sensitivity_data())
       DT::datatable(
-        sensitivity_data(),
+        data,
         options = list(pageLength = 10, scrollX = TRUE),
         rownames = FALSE
       )
     })
 
-    # Feature Association
-    association_results <- shiny::eventReactive(input$run_association, {
-      shiny::req(input$feature_gene)
+    output$correlation_stats <- shiny::renderPrint({
+      shiny::req(correlation_results())
 
-      shiny::withProgress(message = 'Running feature association...', {
-        # Simulate association results
-        set.seed(456)
-        drugs <- c("Paclitaxel", "Doxorubicin", "Cisplatin", "Gemcitabine",
-                   "5-Fluorouracil", "Temozolomide", "Erlotinib", "Lapatinib")
+      result <- correlation_results()
+      cor <- result$correlation
 
-        data.frame(
-          drug = drugs,
-          estimate = runif(8, -1, 1),
-          p_value = runif(8, 0.001, 0.1),
-          n_samples = sample(50:200, 8)
+      cat("Drug-Gene Correlation Analysis\n")
+      cat("==============================\n\n")
+      cat("Gene:", result$gene, "\n")
+      cat("Drug:", result$drug, "\n")
+      cat("Metric:", toupper(result$metric), "\n")
+      cat("Method:", cor$method, "\n\n")
+      cat("Results:\n")
+      cat("  Correlation coefficient:", round(cor$estimate, 4), "\n")
+      cat("  P-value:", format(cor$pvalue, digits = 4), "\n")
+      cat("  Sample size:", result$n_samples, "\n")
+    })
+
+    # Drug-Mutation Analysis
+    mutation_results <- shiny::eventReactive(input$run_mutation_analysis, {
+      shiny::req(input$mut_gene, input$mut_drug)
+
+      shiny::withProgress(message = 'Analyzing drug-mutation association...', value = 0, {
+        shiny::incProgress(0.3, detail = "Querying data")
+
+        result <- analyze_drug_mutation(
+          drug = input$mut_drug,
+          gene = input$mut_gene,
+          metric = input$mut_metric
         )
+
+        shiny::incProgress(1, detail = "Complete")
+        result
       })
     })
 
-    output$association_plot <- shiny::renderPlot({
-      shiny::req(association_results())
+    output$mutation_plot <- shiny::renderPlot({
+      shiny::req(mutation_results())
 
-      data <- association_results()
-      data$significance <- ifelse(data$p_value < 0.05, "Significant", "Not Significant")
+      result <- mutation_results()
+      data <- result$data
 
-      ggplot2::ggplot(data, ggplot2::aes(x = reorder(drug, estimate), y = estimate, fill = significance)) +
-        ggplot2::geom_bar(stat = "identity") +
-        ggplot2::coord_flip() +
+      ggplot2::ggplot(data, ggplot2::aes(x = Mutated, y = Sensitivity, fill = Mutated)) +
+        ggplot2::geom_boxplot(alpha = 0.7) +
+        ggplot2::geom_jitter(width = 0.2, alpha = 0.5) +
+        ggplot2::scale_fill_manual(values = c("Wild-type" = "steelblue", "Mutated" = "coral")) +
         ggplot2::labs(
-          title = paste("Feature Association:", input$feature_gene),
-          x = "Drug",
-          y = "Effect Size"
+          title = paste(input$mut_drug, "Sensitivity by", input$mut_gene, "Status"),
+          subtitle = paste("Wilcoxon p-value:", format(result$test$p.value, digits = 4)),
+          x = paste(input$mut_gene, "Status"),
+          y = paste(toupper(input$mut_metric))
         ) +
-        ggplot2::scale_fill_manual(values = c("Significant" = "red", "Not Significant" = "gray")) +
-        ggplot2::theme_minimal()
+        theme_zinasuite() +
+        ggplot2::theme(legend.position = "none")
     })
 
-    output$association_table <- DT::renderDataTable({
-      shiny::req(association_results())
+    output$mutation_table <- DT::renderDataTable({
+      shiny::req(mutation_results())
 
-      data <- association_results()
-      data$p_value <- format(data$p_value, digits = 4)
-      data$estimate <- round(data$estimate, 4)
+      result <- mutation_results()
+
+      summary_df <- data.frame(
+        Group = c("Wild-type", "Mutated"),
+        N = c(result$summary$wt_n, result$summary$mut_n),
+        Median_Sensitivity = c(
+          round(result$summary$wt_median, 4),
+          round(result$summary$mut_median, 4)
+        ),
+        P_value = c(format(result$test$p.value, digits = 4), NA)
+      )
 
       DT::datatable(
-        data,
-        options = list(pageLength = 10),
+        summary_df,
+        options = list(pageLength = 10, dom = 't'),
+        rownames = FALSE
+      )
+    })
+
+    output$mutation_stats <- shiny::renderPrint({
+      shiny::req(mutation_results())
+
+      result <- mutation_results()
+
+      cat("Drug-Mutation Association Analysis\n")
+      cat("==================================\n\n")
+      cat("Drug:", result$drug, "\n")
+      cat("Gene:", result$gene, "\n")
+      cat("Metric:", toupper(result$metric), "\n\n")
+      cat("Summary:\n")
+      cat("  Wild-type median:", round(result$summary$wt_median, 4), "\n")
+      cat("  Mutated median:", round(result$summary$mut_median, 4), "\n")
+      cat("  Wild-type n:", result$summary$wt_n, "\n")
+      cat("  Mutated n:", result$summary$mut_n, "\n\n")
+      cat("Wilcoxon test p-value:", format(result$test$p.value, digits = 4), "\n")
+    })
+
+    # Batch Analysis
+    batch_results <- shiny::eventReactive(input$run_batch, {
+      shiny::req(input$batch_genes, input$batch_drug)
+
+      genes <- strsplit(input$batch_genes, "\n")[[1]]
+      genes <- trimws(genes)
+      genes <- genes[genes != ""]
+
+      if (length(genes) < 2) {
+        shiny::showNotification("Please enter at least 2 genes", type = "error")
+        return(NULL)
+      }
+
+      shiny::withProgress(message = 'Running batch analysis...', value = 0, {
+        result <- analyze_drug_gene_batch(
+          genes = genes,
+          drug = input$batch_drug,
+          metric = input$batch_metric,
+          cor_method = "spearman",
+          n_workers = 2,
+          .progress = TRUE
+        )
+
+        shiny::incProgress(1, detail = "Complete")
+        result
+      })
+    })
+
+    output$batch_plot <- shiny::renderPlot({
+      shiny::req(batch_results())
+
+      result <- batch_results()
+      result$significant <- result$padj < 0.05
+
+      ggplot2::ggplot(result, ggplot2::aes(x = stats::reorder(gene, cor), y = cor, fill = significant)) +
+        ggplot2::geom_bar(stat = "identity") +
+        ggplot2::coord_flip() +
+        ggplot2::scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "gray50")) +
+        ggplot2::labs(
+          title = paste("Gene-Drug Correlations:", input$batch_drug),
+          subtitle = paste("Metric:", toupper(input$batch_metric)),
+          x = "Gene",
+          y = "Correlation Coefficient",
+          fill = "Significant (FDR < 0.05)"
+        ) +
+        theme_zinasuite()
+    })
+
+    output$batch_table <- DT::renderDataTable({
+      shiny::req(batch_results())
+
+      result <- batch_results()
+      result$cor <- round(result$cor, 4)
+      result$pvalue <- format(result$pvalue, digits = 4)
+      result$padj <- format(result$padj, digits = 4)
+
+      DT::datatable(
+        result,
+        options = list(pageLength = 15, scrollX = TRUE),
         rownames = FALSE
       )
     })

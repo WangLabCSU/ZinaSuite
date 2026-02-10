@@ -36,6 +36,7 @@ XenaData <- R6::R6Class(
     #' @description
     #' Initialize a new XenaData instance
     #' @param host Xena hub name (e.g., "toilHub", "tcgaHub", "pancanAtlasHub")
+    #' @return XenaData instance
     initialize = function(host = "toilHub") {
       super$initialize("Xena", host)
       private$validate_host()
@@ -108,12 +109,23 @@ XenaData <- R6::R6Class(
     #' Get copy number variation (CNV) data
     #' @param gene Gene symbol
     #' @param use_thresholded Use thresholded data (default: TRUE)
+    #' @param ... Additional parameters
     #' @return Named numeric vector of GISTIC2 scores
-    get_cnv = function(gene, use_thresholded = TRUE) {
+    get_cnv = function(gene, use_thresholded = TRUE, ...) {
       # CNV data is on tcgaHub
       old_host <- private$host
       private$host <- "tcgaHub"
       on.exit(private$host <- old_host)
+
+      # Ensure use_thresholded is a valid boolean
+      if (is.null(use_thresholded) || length(use_thresholded) == 0 || is.na(use_thresholded)) {
+        use_thresholded <- TRUE
+      } else {
+        use_thresholded <- as.logical(use_thresholded)[1]
+        if (is.na(use_thresholded)) {
+          use_thresholded <- TRUE
+        }
+      }
 
       dataset <- if (use_thresholded) {
         "TCGA.PANCAN.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes"
@@ -285,7 +297,19 @@ XenaData <- R6::R6Class(
           use_probeMap = FALSE
         ),
         "cnv" = {
-          use_thresholded <- args$use_thresholded %||% TRUE
+          # Default to TRUE if use_thresholded is not provided or invalid
+          use_thresholded <- TRUE
+          
+          # Only process if use_thresholded is provided
+          if (!is.null(args$use_thresholded)) {
+            # Convert to logical
+            logical_val <- as.logical(args$use_thresholded)
+            # Check if conversion was successful
+            if (!is.na(logical_val) && length(logical_val) > 0) {
+              use_thresholded <- logical_val[1]
+            }
+          }
+          
           list(
             host = "tcgaHub",
             dataset = if (use_thresholded) {

@@ -187,7 +187,7 @@ query_methylation <- function(gene,
   type <- match.arg(type)
 
   ds <- get_data_source(source)
-  ds$get_methylation(gene, dataset = dataset)
+  ds$get_methylation(gene, type = type)
 }
 
 #' Query miRNA Expression

@@ -84,14 +84,14 @@ vis_identifier_dim_dist <- function(data,
   }
   
   # Create plot
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = Dim1, y = Dim2))
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Dim1, y = .data$Dim2))
   
   if (!is.null(color_by) && !is.null(shape_by)) {
-    p <- p + ggplot2::geom_point(ggplot2::aes(color = Color, shape = Shape), alpha = 0.7, size = 3)
+    p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Color, shape = .data$Shape), alpha = 0.7, size = 3)
   } else if (!is.null(color_by)) {
-    p <- p + ggplot2::geom_point(ggplot2::aes(color = Color), alpha = 0.7, size = 3)
+    p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Color), alpha = 0.7, size = 3)
   } else if (!is.null(shape_by)) {
-    p <- p + ggplot2::geom_point(ggplot2::aes(shape = Shape), alpha = 0.7, size = 3)
+    p <- p + ggplot2::geom_point(ggplot2::aes(shape = .data$Shape), alpha = 0.7, size = 3)
   } else {
     p <- p + ggplot2::geom_point(alpha = 0.7, size = 3, color = "steelblue")
   }
@@ -206,7 +206,7 @@ vis_identifier_grp_comparison <- function(data,
   subtitle <- sprintf("%s: p = %.2e", test_method, p_value)
   
   # Create plot
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = Group, y = Value, fill = Group))
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Group, y = .data$Value, fill = .data$Group))
   
   p <- switch(plot_type,
     "boxplot" = p + ggplot2::geom_boxplot(alpha = 0.7, outlier.size = 0.5),
@@ -219,9 +219,9 @@ vis_identifier_grp_comparison <- function(data,
       summary_df <- do.call(data.frame, summary_df)
       colnames(summary_df) <- c("Group", "Mean", "SE")
       
-      ggplot2::ggplot(summary_df, ggplot2::aes(x = Group, y = Mean, fill = Group)) +
+      ggplot2::ggplot(summary_df, ggplot2::aes(x = .data$Group, y = .data$Mean, fill = .data$Group)) +
         ggplot2::geom_bar(stat = "identity", alpha = 0.7) +
-        ggplot2::geom_errorbar(ggplot2::aes(ymin = Mean - SE, ymax = Mean + SE), width = 0.2)
+        ggplot2::geom_errorbar(ggplot2::aes(ymin = .data$Mean - .data$SE, ymax = .data$Mean + .data$SE), width = 0.2)
     }
   )
   
@@ -318,7 +318,7 @@ vis_identifier_grp_surv <- function(time,
       group = rep(names(km_fit$strata), km_fit$strata)
     )
     
-    p <- ggplot2::ggplot(df, ggplot2::aes(x = time, y = surv, color = group)) +
+    p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$time, y = .data$surv, color = .data$group)) +
       ggplot2::geom_step(size = 1) +
       ggplot2::labs(
         title = plot_title,
@@ -328,7 +328,7 @@ vis_identifier_grp_surv <- function(time,
       theme_zinasuite()
     
     if (conf.int) {
-      p <- p + ggplot2::geom_ribbon(ggplot2::aes(ymin = lower, ymax = upper, fill = group), 
+      p <- p + ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lower, ymax = .data$upper, fill = .data$group), 
                                     alpha = 0.2, color = NA)
     }
     

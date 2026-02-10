@@ -1,7 +1,4 @@
-#' About Module UI
-#'
-#' @param id Module ID
-#' @return UI elements
+# About Module UI
 mod_about_ui <- function(id) {
   ns <- shiny::NS(id)
   shiny::fluidRow(
@@ -36,7 +33,7 @@ mod_about_ui <- function(id) {
   )
 }
 
-#' About Module Server
+# About Module Server
 mod_about_server <- function(id) {
   shiny::moduleServer(id, function(input, output, session) {
     # About module logic (if needed)

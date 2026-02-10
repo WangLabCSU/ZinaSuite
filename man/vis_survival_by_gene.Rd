@@ -6,7 +6,6 @@
 \usage{
 vis_survival_by_gene(
   gene,
-  surv_data,
   source = "tcga",
   cutoff_method = c("median", "tertile", "quartile"),
   title = NULL
@@ -15,11 +14,9 @@ vis_survival_by_gene(
 \arguments{
 \item{gene}{Gene symbol}
 
-\item{surv_data}{Survival data frame}
-
 \item{source}{Data source (default: "tcga")}
 
-\item{cutoff_method}{Cutoff method: "median", "tertile", or "quartile"}
+\item{cutoff_method}{Cutoff method: "median", "tertile", "quartile"}
 
 \item{title}{Plot title}
 }
@@ -31,13 +28,9 @@ Create Kaplan-Meier curves comparing survival between high and low expression gr
 }
 \examples{
 \donttest{
-# Load survival data
-surv_data <- load_data("tcga_surv")
-
 # Create survival plot by TP53 expression
 p <- vis_survival_by_gene(
   gene = "TP53",
-  surv_data = surv_data,
   cutoff_method = "median",
   title = "Survival by TP53 Expression"
 )

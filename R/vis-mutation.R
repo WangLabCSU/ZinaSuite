@@ -111,18 +111,18 @@ vis_toil_Mut <- function(gene,
 
   # Calculate statistics by cancer
   stats_by_cancer <- plot_data %>%
-    dplyr::group_by(Cancer) %>%
-    dplyr::filter(length(unique(Mutation)) == 2) %>%
+    dplyr::group_by(.data$Cancer) %>%
+    dplyr::filter(length(unique(.data$Mutation)) == 2) %>%
     dplyr::summarise(
       test = list(broom::tidy(switch(test_method,
-        "wilcox.test" = wilcox.test(Value ~ Mutation),
-        "t.test" = t.test(Value ~ Mutation)
+        "wilcox.test" = stats::wilcox.test(.data$Value ~ .data$Mutation),
+        "t.test" = stats::t.test(.data$Value ~ .data$Mutation)
       ))),
-      n_wt = sum(Mutation == "WT"),
-      n_mut = sum(Mutation == "Mutant"),
+      n_wt = sum(.data$Mutation == "WT"),
+      n_mut = sum(.data$Mutation == "Mutant"),
       .groups = "drop"
     ) %>%
-    tidyr::unnest(test)
+    tidyr::unnest(.data$test)
 
   # Determine y-position for p-value labels
   y_max <- max(plot_data$Value, na.rm = TRUE)
@@ -132,7 +132,7 @@ vis_toil_Mut <- function(gene,
   # Create base plot
   p <- ggplot2::ggplot(
     plot_data,
-    ggplot2::aes(x = Mutation, y = Value, fill = Mutation)
+    ggplot2::aes(x = .data$Mutation, y = .data$Value, fill = .data$Mutation)
   )
 
   # Add geometry based on plot_type
@@ -189,8 +189,8 @@ vis_toil_Mut <- function(gene,
     } else {
       # Overall comparison
       overall_test <- switch(test_method,
-        "wilcox.test" = wilcox.test(Value ~ Mutation, data = plot_data),
-        "t.test" = t.test(Value ~ Mutation, data = plot_data)
+        "wilcox.test" = stats::wilcox.test(.data$Value ~ .data$Mutation, data = plot_data),
+        "t.test" = stats::t.test(.data$Value ~ .data$Mutation, data = plot_data)
       )
 
       p_label <- ifelse(
@@ -313,10 +313,10 @@ vis_mutation_frequency <- function(genes,
 
   # Calculate frequencies
   freq_data <- mut_data %>%
-    dplyr::group_by(Cancer, Gene) %>%
+    dplyr::group_by(.data$Cancer, .data$Gene) %>%
     dplyr::summarise(
-      Frequency = mean(Mutated, na.rm = TRUE),
-      N = sum(Mutated, na.rm = TRUE),
+      Frequency = mean(.data$Mutated, na.rm = TRUE),
+      N = sum(.data$Mutated, na.rm = TRUE),
       Total = dplyr::n(),
       .groups = "drop"
     )
@@ -324,10 +324,10 @@ vis_mutation_frequency <- function(genes,
   # Filter by minimum frequency
   if (min_freq > 0) {
     genes_keep <- freq_data %>%
-      dplyr::group_by(Gene) %>%
-      dplyr::summarise(max_freq = max(Frequency)) %>%
-      dplyr::filter(max_freq >= min_freq) %>%
-      dplyr::pull(Gene)
+      dplyr::group_by(.data$Gene) %>%
+      dplyr::summarise(max_freq = max(.data$Frequency)) %>%
+      dplyr::filter(.data$max_freq >= min_freq) %>%
+      dplyr::pull(.data$Gene)
 
     freq_data <- freq_data[freq_data$Gene %in% genes_keep, ]
   }
@@ -335,9 +335,9 @@ vis_mutation_frequency <- function(genes,
   # Create plot
   switch(plot_type,
     bar = {
-      ggplot2::ggplot(freq_data, ggplot2::aes(x = reorder(Gene, -Frequency), y = Frequency)) +
-        ggplot2::geom_col(ggplot2::aes(fill = Cancer)) +
-        ggplot2::facet_wrap(~Cancer, scales = "free_x") +
+      ggplot2::ggplot(freq_data, ggplot2::aes(x = stats::reorder(.data$Gene, -.data$Frequency), y = .data$Frequency)) +
+        ggplot2::geom_col(ggplot2::aes(fill = .data$Cancer)) +
+        ggplot2::facet_wrap(~.data$Cancer, scales = "free_x") +
         ggplot2::labs(
           title = "Mutation Frequency by Cancer Type",
           x = "Gene",
@@ -349,11 +349,11 @@ vis_mutation_frequency <- function(genes,
         )
     },
     heatmap = {
-      ggplot2::ggplot(freq_data, ggplot2::aes(x = Gene, y = Cancer, fill = Frequency)) +
+      ggplot2::ggplot(freq_data, ggplot2::aes(x = .data$Gene, y = .data$Cancer, fill = .data$Frequency)) +
         ggplot2::geom_tile(color = "white") +
         ggplot2::scale_fill_gradient(low = "white", high = "#b2182b", limits = c(0, 1)) +
         ggplot2::geom_text(
-          ggplot2::aes(label = sprintf("%.2f", Frequency)),
+          ggplot2::aes(label = sprintf("%.2f", .data$Frequency)),
           color = "black", size = 3
         ) +
         ggplot2::labs(
@@ -470,7 +470,7 @@ vis_mutation_cooccurrence <- function(gene1,
   p <- switch(plot_type,
     mosaic = {
       # Simplified mosaic plot using bar
-      ggplot2::ggplot(plot_data, ggplot2::aes(x = Label, y = Count, fill = Label)) +
+      ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Label, y = .data$Count, fill = .data$Label)) +
         ggplot2::geom_col() +
         ggplot2::labs(
           title = paste("Mutation Co-occurrence:", gene1, "vs", gene2),
@@ -488,10 +488,10 @@ vis_mutation_cooccurrence <- function(gene1,
         )
     },
     bar = {
-      ggplot2::ggplot(plot_data, ggplot2::aes(x = Label, y = Count, fill = Label)) +
+      ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Label, y = .data$Count, fill = .data$Label)) +
         ggplot2::geom_col() +
         ggplot2::geom_text(
-          ggplot2::aes(label = Count),
+          ggplot2::aes(label = .data$Count),
           vjust = -0.5
         ) +
         ggplot2::labs(

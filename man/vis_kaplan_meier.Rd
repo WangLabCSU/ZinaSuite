@@ -7,7 +7,7 @@
 vis_kaplan_meier(km_result, title = NULL, conf.int = TRUE, risk.table = FALSE)
 }
 \arguments{
-\item{km_result}{KM analysis result from analyze_kaplan_meier}
+\item{km_result}{KM analysis result from analyze_survival}
 
 \item{title}{Plot title}
 

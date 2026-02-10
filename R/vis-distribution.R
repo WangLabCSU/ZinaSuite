@@ -162,10 +162,10 @@ vis_tumor_normal <- function(gene,
 
   # Create plot
   if (mode == "Boxplot") {
-    p <- ggplot2::ggplot(data, ggplot2::aes(x = tissue, y = expression, fill = type)) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$tissue, y = .data$expression, fill = .data$type)) +
       ggplot2::geom_boxplot(...)
   } else {
-    p <- ggplot2::ggplot(data, ggplot2::aes(x = tissue, y = expression, fill = type)) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$tissue, y = .data$expression, fill = .data$type)) +
       ggplot2::geom_violin(trim = TRUE, ...) +
       ggplot2::geom_boxplot(width = 0.1, fill = "white", outlier.shape = NA)
   }
@@ -268,7 +268,7 @@ vis_pancan_expression <- function(genes,
       data_long <- as.data.frame(as.table(median_expr))
       colnames(data_long) <- c("Gene", "Cancer", "Expression")
 
-      ggplot2::ggplot(data_long, ggplot2::aes(x = Cancer, y = Gene, fill = Expression)) +
+      ggplot2::ggplot(data_long, ggplot2::aes(x = .data$Cancer, y = .data$Gene, fill = .data$Expression)) +
         ggplot2::geom_tile() +
         ggplot2::scale_fill_gradient2(low = "blue", mid = "white", high = "red") +
         ggplot2::theme_minimal() +
@@ -279,7 +279,7 @@ vis_pancan_expression <- function(genes,
     data_long <- as.data.frame(as.table(median_expr))
     colnames(data_long) <- c("Gene", "Cancer", "Expression")
 
-    ggplot2::ggplot(data_long, ggplot2::aes(x = Cancer, y = Expression, fill = Gene)) +
+    ggplot2::ggplot(data_long, ggplot2::aes(x = .data$Cancer, y = .data$Expression, fill = .data$Gene)) +
       ggplot2::geom_bar(stat = "identity", position = "dodge") +
       ggplot2::theme_minimal() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))

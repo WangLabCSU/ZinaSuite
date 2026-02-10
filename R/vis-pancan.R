@@ -131,11 +131,11 @@ vis_unicox_tree <- function(data,
   data$significant <- data$pvalue < 0.05
 
   # Create plot
-  p <- ggplot2::ggplot(data, ggplot2::aes(x = stats::reorder(gene, hr), y = hr))
+  p <- ggplot2::ggplot(data, ggplot2::aes(x = stats::reorder(.data$gene, .data$hr), y = .data$hr))
 
   p <- p +
-    ggplot2::geom_point(ggplot2::aes(color = significant), size = 3) +
-    ggplot2::geom_errorbar(ggplot2::aes(ymin = lower, ymax = upper, color = significant), width = 0.2) +
+    ggplot2::geom_point(ggplot2::aes(color = .data$significant), size = 3) +
+    ggplot2::geom_errorbar(ggplot2::aes(ymin = .data$lower, ymax = .data$upper, color = .data$significant), width = 0.2) +
     ggplot2::geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
     ggplot2::scale_color_manual(values = c("TRUE" = "red", "FALSE" = "gray50")) +
     ggplot2::coord_flip() +
@@ -209,10 +209,10 @@ vis_gene_cor <- function(gene1,
   cor_label <- sprintf("r = %.3f, p = %.2e", cor_test$estimate, cor_test$p.value)
 
   # Create plot
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = Gene1, y = Gene2))
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Gene1, y = .data$Gene2))
 
   if (!is.null(color_by) && "Color" %in% colnames(df)) {
-    p <- p + ggplot2::geom_point(ggplot2::aes(color = Color), alpha = 0.6, size = 2)
+    p <- p + ggplot2::geom_point(ggplot2::aes(color = .data$Color), alpha = 0.6, size = 2)
   } else {
     p <- p + ggplot2::geom_point(alpha = 0.6, size = 2, color = "steelblue")
   }

@@ -227,8 +227,8 @@ apply_filter <- function(data, var, values, operator) {
       # Greater than (percentile by cancer)
       thresh <- as.numeric(values[1])
       data <- data %>%
-        dplyr::group_by(Cancer) %>%
-        dplyr::filter(.data[[var]] > quantile(.data[[var]], thresh, na.rm = TRUE)) %>%
+        dplyr::group_by(.data$Cancer) %>%
+        dplyr::filter(.data[[var]] > stats::quantile(.data[[var]], thresh, na.rm = TRUE)) %>%
         dplyr::ungroup()
       as.data.frame(data)
     },
@@ -236,8 +236,8 @@ apply_filter <- function(data, var, values, operator) {
       # Less than (percentile by cancer)
       thresh <- as.numeric(values[1])
       data <- data %>%
-        dplyr::group_by(Cancer) %>%
-        dplyr::filter(.data[[var]] < quantile(.data[[var]], thresh, na.rm = TRUE)) %>%
+        dplyr::group_by(.data$Cancer) %>%
+        dplyr::filter(.data[[var]] < stats::quantile(.data[[var]], thresh, na.rm = TRUE)) %>%
         dplyr::ungroup()
       as.data.frame(data)
     },

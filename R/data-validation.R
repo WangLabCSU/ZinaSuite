@@ -93,7 +93,7 @@ validate_sample_ids <- function(sample_ids, pattern = NULL) {
 
   # Default TCGA sample ID pattern
   if (is.null(pattern)) {
-    pattern <- "^TCGA-[A-Z0-9]{2}-[A-Z0-9]{4}-[0-9]{2}[A-Z]$"
+    pattern <- "^TCGA-[A-Z0-9]{2}-[A-Z0-9]{4}-[A-Z0-9]{2}$"
   }
 
   invalid_samples <- sample_ids[!grepl(pattern, sample_ids)]

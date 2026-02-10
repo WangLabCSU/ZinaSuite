@@ -45,7 +45,7 @@ vis_survival <- function(surv_result,
 #' @description
 #' Create a Kaplan-Meier survival curve plot.
 #'
-#' @param km_result KM analysis result from analyze_kaplan_meier
+#' @param km_result KM analysis result from analyze_survival
 #' @param title Plot title
 #' @param conf.int Whether to show confidence intervals
 #' @param risk.table Whether to show risk table
@@ -59,7 +59,11 @@ vis_kaplan_meier <- function(km_result, title = NULL, conf.int = TRUE, risk.tabl
 
   if (!requireNamespace("survminer", quietly = TRUE)) {
     # Fallback to basic ggplot2
-    data <- km_result$surv_data
+    # Extract data from fit object
+    fit <- km_result$fit
+    data <- as.data.frame(summary(fit)$table)
+    data$time <- as.numeric(rownames(data))
+    data$surv <- data$surv
 
     p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$time, y = .data$surv)) +
       ggplot2::geom_step() +
@@ -70,15 +74,6 @@ vis_kaplan_meier <- function(km_result, title = NULL, conf.int = TRUE, risk.tabl
       ) +
       ggplot2::ylim(0, 1) +
       ggplot2::theme_minimal()
-
-    if (conf.int && "lower" %in% names(data) && "upper" %in% names(data)) {
-      p <- p + ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lower, ymax = .data$upper), alpha = 0.2)
-    }
-
-    if ("group" %in% names(data)) {
-      p <- p + ggplot2::aes(color = .data$group) +
-        ggplot2::theme(legend.position = "bottom")
-    }
 
     return(p)
   }
@@ -93,9 +88,8 @@ vis_kaplan_meier <- function(km_result, title = NULL, conf.int = TRUE, risk.tabl
     title = title %||% "Kaplan-Meier Survival Curve",
     xlab = "Time",
     ylab = "Survival Probability",
-    pval = !is.null(km_result$logrank_p),
-    pval.method = TRUE,
-    ...
+    pval = !is.null(km_result$pvalue),
+    pval.method = TRUE
   )
 }
 
@@ -197,29 +191,23 @@ vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
 #' Create Kaplan-Meier curves comparing survival between high and low expression groups.
 #'
 #' @param gene Gene symbol
-#' @param surv_data Survival data frame
 #' @param source Data source (default: "tcga")
-#' @param cutoff_method Cutoff method: "median", "tertile", or "quartile"
+#' @param cutoff_method Cutoff method: "median", "tertile", "quartile"
 #' @param title Plot title
 #' @return ggsurvplot object or ggplot object
 #' @export
 #'
 #' @examples
 #' \donttest{
-#' # Load survival data
-#' surv_data <- load_data("tcga_surv")
-#'
 #' # Create survival plot by TP53 expression
 #' p <- vis_survival_by_gene(
 #'   gene = "TP53",
-#'   surv_data = surv_data,
 #'   cutoff_method = "median",
 #'   title = "Survival by TP53 Expression"
 #' )
 #' print(p)
 #' }
 vis_survival_by_gene <- function(gene,
-                                 surv_data,
                                  source = "tcga",
                                  cutoff_method = c("median", "tertile", "quartile"),
                                  title = NULL) {
@@ -234,7 +222,7 @@ vis_survival_by_gene <- function(gene,
 
   # Create plot
   vis_kaplan_meier(
-    result$km,
+    result$survival$km,
     title = title %||% paste("Survival by", gene, "Expression (", cutoff_method, "cutoff)")
   )
 }

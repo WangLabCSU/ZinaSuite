@@ -75,6 +75,9 @@ Initialize a new XenaData instance
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+XenaData instance
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-XenaData-query"></a>}}
@@ -168,7 +171,7 @@ Named numeric vector (0 = wild-type, 1 = mutated)
 \subsection{Method \code{get_cnv()}}{
 Get copy number variation (CNV) data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{XenaData$get_cnv(gene, use_thresholded = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{XenaData$get_cnv(gene, use_thresholded = TRUE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -177,6 +180,8 @@ Get copy number variation (CNV) data
 \item{\code{gene}}{Gene symbol}
 
 \item{\code{use_thresholded}}{Use thresholded data (default: TRUE)}
+
+\item{\code{...}}{Additional parameters}
 }
 \if{html}{\out{</div>}}
 }

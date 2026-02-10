@@ -1,16 +1,18 @@
 Package: ZinaSuite
 Title: A Modern R Package for UCSC Xena Data Analysis
-Version: 0.0.0.9000
-Authors@R: person("Shixiang", "Wang", , "w_shixiang@163.com", role = c("aut", "cre"),
-            comment = c(ORCID = "0000-0001-9855-7357"))
-Author: Shixiang Wang [aut, cre]
-Maintainer: Shixiang Wang <w_shixiang@163.com>
-Description: Provides a modernized framework for interactively exploring 
-    UCSC Xena datasets. It enables downloading, analyzing and visualizing 
-    datasets from UCSC Xena with enhanced performance through mirai-based 
-    asynchronous computing and modular Shiny application design. 
-    The package supports TCGA, PCAWG, and CCLE datasets with advanced 
-    molecular analysis capabilities including correlation, survival, 
+Version: 0.1.0
+Authors@R: 
+    person(given = "Shixiang",
+           family = "Wang",
+           role = c("aut", "cre"),
+           email = "w_shixiang@163.com",
+           comment = c(ORCID = "0000-0001-9855-7357"))
+Description: Provides a modernized framework for interactively exploring
+    UCSC Xena datasets. It enables downloading, analyzing and visualizing
+    datasets from UCSC Xena with enhanced performance through mirai-based
+    asynchronous computing and modular Shiny application design.
+    The package supports TCGA, PCAWG, and CCLE datasets with advanced
+    molecular analysis capabilities including correlation, survival,
     mutation, and immune analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -18,7 +20,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Depends: 
     R (>= 4.1.0)
-Imports:
+Imports: 
     R6 (>= 2.5.0),
     rlang (>= 1.0.0),
     lifecycle,
@@ -36,8 +38,9 @@ Imports:
     stats,
     methods,
     broom
-Suggests:
+Suggests: 
     shiny (>= 1.7.0),
+    bslib (>= 0.5.0),
     shinydashboard,
     shinyWidgets,
     shinyjs,
@@ -55,11 +58,15 @@ Suggests:
     Rtsne,
     umap,
     testthat (>= 3.0.0),
+    shinytest2 (>= 0.2.0),
     roxytest,
     devtools,
     usethis,
     pkgdown,
-    covr
+    covr,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 URL: https://github.com/WangLabCSU/ZinaSuite, https://wanglabcsu.github.io/ZinaSuite/

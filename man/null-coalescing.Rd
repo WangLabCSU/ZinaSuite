@@ -18,9 +18,9 @@ lhs \%||\% rhs
 \value{
 lhs if not NULL, otherwise rhs
 
-lhs if not NULL, otherwise rhs
+lhs if not NULL and has length > 0, otherwise rhs
 }
 \description{
-Returns the left-hand side if not NULL, otherwise returns the right-hand side.
+Returns the left-hand side if not NULL and has length > 0, otherwise returns the right-hand side.
 }
 \keyword{internal}

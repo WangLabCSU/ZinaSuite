@@ -23,7 +23,7 @@ analyze_pathway <- function(pathway_name, gene_list, cancer = NULL) {
 
     # Query expression for all genes
     expr_data <- lapply(gene_list, function(gene) {
-      query_gene_expression(gene, cancer = cancer)
+      query_gene_expression(gene)
     })
     names(expr_data) <- gene_list
 
@@ -62,11 +62,11 @@ analyze_pathway <- function(pathway_name, gene_list, cancer = NULL) {
 analyze_cross_gene <- function(target_gene, correlate_genes, cancer = NULL) {
   tryCatch({
     # Query target gene
-    target_expr <- query_gene_expression(target_gene, cancer = cancer)
+    target_expr <- query_gene_expression(target_gene)
 
     # Query correlate genes
     results <- lapply(correlate_genes, function(gene) {
-      gene_expr <- query_gene_expression(gene, cancer = cancer)
+      gene_expr <- query_gene_expression(gene)
       cor_result <- analyze_correlation(target_expr, gene_expr)
       list(
         gene = gene,
@@ -139,7 +139,7 @@ analyze_cross_pathway <- function(pathway1, pathway2, cancer = NULL) {
 analyze_drug_sensitivity <- function(gene, drug, cancer = NULL) {
   tryCatch({
     # Query gene expression
-    gene_expr <- query_gene_expression(gene, cancer = cancer)
+    gene_expr <- query_gene_expression(gene)
 
     # Query drug sensitivity (placeholder - would need actual drug data)
     # In real implementation, this would query CCLE or GDSC data
@@ -273,7 +273,7 @@ analyze_feature_across <- function(feature, types = NULL) {
 
     results <- lapply(types, function(cancer) {
       tryCatch({
-        data <- query_gene_expression(feature, cancer = cancer)
+        data <- query_gene_expression(feature)
         list(
           cancer = cancer,
           mean = mean(data, na.rm = TRUE),
@@ -415,7 +415,7 @@ analyze_dimension_reduction <- function(genes, method = "pca", cancer = NULL, n_
 #' @export
 analyze_dimension_distribution <- function(gene, cancer = NULL) {
   tryCatch({
-    data <- query_gene_expression(gene, cancer = cancer)
+    data <- query_gene_expression(gene)
 
     # Calculate distribution metrics
     list(
@@ -450,7 +450,7 @@ analyze_dimension_distribution <- function(gene, cancer = NULL) {
 analyze_group_comparison <- function(gene, group_var, cancer = NULL) {
   tryCatch({
     # Query gene expression
-    expr <- query_gene_expression(gene, cancer = cancer)
+    expr <- query_gene_expression(gene)
 
     # Query grouping variable
     groups <- query_tcga_group(group_var, cancer = cancer)
