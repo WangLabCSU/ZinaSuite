@@ -7,6 +7,7 @@
 #' @param identifiers Vector of molecular identifiers
 #' @param data_type Type of data (see \code{\link{query_molecule}})
 #' @param source Data source: "tcga" (default), "pcawg", "ccle"
+#' @param dataset Specific dataset name (optional). If NULL, uses default dataset.
 #' @param n_workers Number of parallel workers (default: 4)
 #' @param .progress Show progress bar (default: TRUE)
 #' @param ... Additional parameters passed to query functions
@@ -38,6 +39,7 @@
 query_molecules <- function(identifiers,
                             data_type = c("mRNA", "protein", "mutation", "cnv", "methylation", "miRNA", "transcript"),
                             source = c("tcga", "pcawg", "ccle"),
+                            dataset = NULL,
                             n_workers = 4,
                             .progress = TRUE,
                             ...) {
@@ -54,5 +56,5 @@ query_molecules <- function(identifiers,
 
   # Use XenaData's parallel batch query
   xd <- XenaData$new(host = host)
-  xd$query_batch_parallel(identifiers, data_type = data_type, n_workers = n_workers, .progress = .progress, ...)
+  xd$query_batch_parallel(identifiers, data_type = data_type, dataset = dataset, n_workers = n_workers, .progress = .progress, ...)
 }

@@ -19,11 +19,9 @@ vis_survival_by_gene(
 
 \item{source}{Data source (default: "tcga")}
 
+\item{cutoff_method}{Cutoff method: "median", "tertile", or "quartile"}
+
 \item{title}{Plot title}
-
-\item{data_type}{Molecular data type (default: "mRNA")}
-
-\item{cutoff}{Cutoff method: "median", "tertile", or "quartile"}
 }
 \value{
 ggsurvplot object or ggplot object
@@ -40,7 +38,7 @@ surv_data <- load_data("tcga_surv")
 p <- vis_survival_by_gene(
   gene = "TP53",
   surv_data = surv_data,
-  cutoff = "median",
+  cutoff_method = "median",
   title = "Survival by TP53 Expression"
 )
 print(p)

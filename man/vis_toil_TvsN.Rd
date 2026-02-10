@@ -25,8 +25,6 @@ vis_toil_TvsN(
 \item{title}{Plot title (auto-generated if NULL)}
 
 \item{...}{Additional parameters}
-
-\item{data_type}{Type of molecular data (default: "mRNA")}
 }
 \value{
 ggplot object

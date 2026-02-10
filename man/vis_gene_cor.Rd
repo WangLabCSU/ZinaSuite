@@ -18,8 +18,6 @@ vis_gene_cor(gene1, gene2, source = "tcga", color_by = NULL, title = NULL, ...)
 \item{title}{Plot title (auto-generated if NULL)}
 
 \item{...}{Additional parameters}
-
-\item{data_type}{Type of molecular data (default: "mRNA")}
 }
 \value{
 ggplot object

@@ -193,9 +193,8 @@ vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
 #'
 #' @param gene Gene symbol
 #' @param surv_data Survival data frame
-#' @param data_type Molecular data type (default: "mRNA")
 #' @param source Data source (default: "tcga")
-#' @param cutoff Cutoff method: "median", "tertile", or "quartile"
+#' @param cutoff_method Cutoff method: "median", "tertile", or "quartile"
 #' @param title Plot title
 #' @return ggsurvplot object or ggplot object
 #' @export
@@ -209,7 +208,7 @@ vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
 #' p <- vis_survival_by_gene(
 #'   gene = "TP53",
 #'   surv_data = surv_data,
-#'   cutoff = "median",
+#'   cutoff_method = "median",
 #'   title = "Survival by TP53 Expression"
 #' )
 #' print(p)
