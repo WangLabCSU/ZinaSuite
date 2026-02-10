@@ -170,7 +170,7 @@ plot_immune_heatmap <- function(data, gene) {
 plot_immune_dotplot <- function(data, gene) {
   ggplot2::ggplot(data, ggplot2::aes(x = .data$Cancer, y = .data$Feature)) +
     ggplot2::geom_point(
-      ggplot2::aes(size = abs(.data$Correlation), color = .data$Correlation))
+      ggplot2::aes(size = abs(.data$Correlation), color = .data$Correlation)
     ) +
     ggplot2::scale_color_gradient2(
       low = "#2166ac", mid = "white", high = "#b2182b",
