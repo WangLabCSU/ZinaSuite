@@ -1,0 +1,62 @@
+# Development and IDE files
+^\.trae$
+^\.trae/.*$
+^\.github$
+^\.github/.*$
+^\.vscode$
+^\.vscode/.*$
+^\.idea$
+^\.idea/.*$
+
+# Git files
+^\.git$
+^\.git/.*$
+\.gitignore$
+\.gitattributes$
+
+# Documentation build files
+^docs$
+^docs/.*$
+^_pkgdown\.yml$
+^pkgdown$
+^pkgdown/.*$
+
+# CI/CD configuration (keep for GitHub but exclude from CRAN)
+^\.github/workflows/.*$
+
+# Data-raw scripts (used to generate data, not needed in package)
+^data-raw$
+^data-raw/.*$
+
+# Test files that should not be included
+^tests/testthat/_snaps$
+^tests/testthat/_snaps/.*$
+
+# Temporary and cache files
+^\.Rproj\.user$
+^\.Rhistory$
+^\.RData$
+^\.Ruserdata$
+\.DS_Store$
+\.cache$
+
+# Build artifacts
+^.*\.Rproj$
+^ZinaSuite\.Rcheck$
+^ZinaSuite_.*\.tar\.gz$
+^ZinaSuite_.*\.zip$
+
+# Local configuration
+^\.Renviron$
+^\.Rprofile$
+^\.httr-oauth$
+
+# Development notes and planning documents
+^.*开发计划.*\.md$
+^.*对标分析.*\.md$
+^TODO\.md$
+^NOTES\.md$
+
+# Vignettes (temporarily excluded until pandoc is available)
+^vignettes$
+^vignettes/.*$

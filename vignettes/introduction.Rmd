@@ -1,0 +1,288 @@
+---
+title: "Introduction to ZinaSuite"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to ZinaSuite}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>")
+```
+
+## Overview
+
+ZinaSuite is a comprehensive R package for querying and analyzing cancer genomics data from UCSC Xena. It provides:
+
+- **Data Query**: Access TCGA, PCAWG, and CCLE data
+- **Parallel Processing**: Fast analysis using mirai
+- **Analysis Tools**: Correlation, survival, and more
+- **Visualization**: Publication-ready plots
+
+## Installation
+
+```{r eval=FALSE}
+# Install from GitHub (when available)
+# devtools::install_github("yourusername/ZinaSuite")
+
+# Or install from local source
+devtools::install("/path/to/ZinaSuite")
+```
+
+## Quick Start
+
+### Query Gene Expression
+
+```{r eval=FALSE}
+library(ZinaSuite)
+
+# Query TP53 expression from TCGA
+tp53_expr <- query_gene_expression("TP53")
+head(tp53_expr)
+```
+
+### Query Multiple Data Types
+
+```{r eval=FALSE}
+# Query mutation status
+tp53_mut <- query_mutation_status("TP53")
+
+# Query CNV
+myc_cnv <- query_cnv("MYC")
+
+# Query protein expression (RPPA)
+tp53_prot <- query_protein_expression("TP53")
+```
+
+### Parallel Batch Query
+
+```{r eval=FALSE}
+# Query multiple genes in parallel
+genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
+results <- query_molecules(genes, data_type = "mRNA", n_workers = 4)
+```
+
+## Correlation Analysis
+
+### Single Correlation
+
+```{r eval=FALSE}
+# Query two genes
+tp53_expr <- query_gene_expression("TP53")
+brca1_expr <- query_gene_expression("BRCA1")
+
+# Match samples
+common_samples <- intersect(names(tp53_expr), names(brca1_expr))
+
+# Calculate correlation
+result <- analyze_correlation(
+  tp53_expr[common_samples],
+  brca1_expr[common_samples],
+  method = "pearson"
+)
+print(result)
+```
+
+### Batch Correlation (Parallel)
+
+```{r eval=FALSE}
+# Correlate TP53 with multiple genes in parallel
+results <- analyze_correlation_batch(
+  target_gene = "TP53",
+  candidate_genes = c("BRCA1", "EGFR", "KRAS", "MYC"),
+  n_workers = 4
+)
+head(results)
+```
+
+## Survival Analysis
+
+### Kaplan-Meier and Cox Regression
+
+```{r eval=FALSE}
+# Load survival data
+surv_data <- load_data("tcga_surv")
+
+# Perform survival analysis by cancer type
+result <- analyze_survival(
+  time = surv_data$OS.time,
+  status = surv_data$OS,
+  group = surv_data$Type,
+  analysis_type = "both"
+)
+
+# Access results
+print(result$km$pvalue)  # Log-rank test
+print(result$cox$hr)     # Hazard ratios
+```
+
+### Survival by Gene Expression
+
+```{r eval=FALSE}
+# Analyze survival by TP53 expression (median split)
+result <- analyze_survival_by_expression(
+  gene = "TP53",
+  cutoff_method = "median",
+  analysis_type = "both"
+)
+```
+
+## Visualization
+
+### Distribution Plots
+
+```{r eval=FALSE}
+# Create visualization engine
+viz <- Visualization$new()
+
+# Query data
+tp53_expr <- query_gene_expression("TP53")
+
+# Create histogram
+p <- viz$plot_distribution(tp53_expr, type = "histogram", title = "TP53 Expression")
+print(p)
+
+# Create boxplot by cancer type
+clinical <- load_data("tcga_clinical")
+# ... match samples and create grouped plot
+```
+
+### Correlation Plots
+
+```{r eval=FALSE}
+# Create scatter plot with regression line
+p <- viz$plot_correlation(
+  tp53_expr[common_samples],
+  brca1_expr[common_samples],
+  type = "scatter",
+  add_regression = TRUE
+)
+print(p)
+```
+
+### Survival Curves
+
+```{r eval=FALSE}
+# Create Kaplan-Meier plot
+surv_result <- analyze_survival(
+  time = surv_data$OS.time,
+  status = surv_data$OS,
+  group = surv_data$Type
+)
+
+p <- viz$plot_survival(surv_result, conf.int = TRUE)
+print(p)
+```
+
+## R6 Classes
+
+### Using XenaData Class
+
+```{r eval=FALSE}
+# Create XenaData instance
+xd <- XenaData$new(host = "toilHub")
+
+# Query data
+tp53_expr <- xd$get_gene_expression("TP53")
+tp53_mut <- xd$get_mutation_status("TP53")
+
+# Batch parallel query
+results <- xd$query_batch_parallel(
+  c("TP53", "BRCA1", "EGFR"),
+  data_type = "mRNA",
+  n_workers = 3
+)
+```
+
+### Using AnalysisEngine
+
+```{r eval=FALSE}
+# Create analysis engine
+engine <- AnalysisEngine$new(n_workers = 4)
+
+# Perform analyses
+result <- engine$correlation(x, y)
+result <- engine$survival(time, status, group)
+result <- engine$comparison(data, group, method = "t.test")
+result <- engine$dimension_reduction(data, method = "pca")
+```
+
+## Shiny Application
+
+Launch the interactive Shiny application:
+
+```{r eval=FALSE}
+# Start ZinaSuite Shiny app
+run_zinasuite()
+```
+
+The app provides:
+- Interactive data query
+- Real-time analysis
+- Dynamic visualization
+- Batch processing with progress tracking
+
+## Advanced Features
+
+### Caching
+
+ZinaSuite automatically caches query results to speed up repeated analyses:
+
+```{r eval=FALSE}
+# First query - fetches from Xena
+tp53_expr <- query_gene_expression("TP53")
+
+# Second query - loads from cache (much faster)
+tp53_expr <- query_gene_expression("TP53")
+```
+
+### Async Computing
+
+For long-running analyses, use the AsyncCompute engine:
+
+```{r eval=FALSE}
+# Create async compute engine
+ac <- AsyncCompute$new(n_workers = 4)
+ac$start()
+
+# Submit async task
+task_id <- ac$submit({
+  analyze_correlation_batch("TP53", c("BRCA1", "EGFR", "KRAS"))
+})
+
+# Check progress
+ac$get_progress(task_id)
+
+# Collect result when ready
+result <- ac$collect(task_id, wait = TRUE)
+
+# Stop engine
+ac$stop()
+```
+
+## Data Sources
+
+ZinaSuite supports multiple data sources:
+
+| Source | Description | Data Types |
+|--------|-------------|------------|
+| TCGA | The Cancer Genome Atlas | mRNA, mutation, CNV, protein |
+| PCAWG | Pan-Cancer Analysis of Whole Genomes | Expression, mutation, CNV |
+| CCLE | Cancer Cell Line Encyclopedia | Expression, mutation, CNV, protein |
+
+## Getting Help
+
+- View documentation: `?ZinaSuite`
+- Check examples: `example("query_gene_expression")`
+- Report issues: [GitHub Issues](https://github.com/yourusername/ZinaSuite/issues)
+
+## Citation
+
+If you use ZinaSuite in your research, please cite:
+
+```
+ZinaSuite: An R package for interactive analysis of UCSC Xena data.
+```

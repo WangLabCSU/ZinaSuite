@@ -1,0 +1,65 @@
+Package: ZinaSuite
+Title: ZinaSuite - A Modern R Package for UCSC Xena Data Analysis
+Version: 0.0.0.9000
+Authors@R: c(
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre")),
+    person("Second", "Author", , "second@example.com", role = "aut")
+  )
+Description: ZinaSuite is a modernized R package for interactively exploring 
+    UCSC Xena datasets. It provides a comprehensive framework for downloading, 
+    analyzing and visualizing datasets from UCSC Xena with enhanced performance 
+    through mirai-based asynchronous computing and modular Shiny application 
+    design. The package supports TCGA, PCAWG, and CCLE datasets with advanced 
+    molecular analysis capabilities.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 4.1.0)
+Imports:
+    R6 (>= 2.5.0),
+    rlang (>= 1.0.0),
+    lifecycle,
+    dplyr (>= 1.0.0),
+    tidyr,
+    tibble,
+    ggplot2 (>= 3.4.0),
+    mirai (>= 0.11.0),
+    nanonext,
+    UCSCXenaTools,
+    digest,
+    rappdirs,
+    magrittr,
+    utils,
+    stats,
+    methods,
+    broom
+Suggests:
+    shiny (>= 1.7.0),
+    shinydashboard,
+    shinyWidgets,
+    shinyjs,
+    shinyBS,
+    shinycssloaders,
+    waiter,
+    plotly,
+    survival,
+    survminer,
+    ggpubr,
+    ggstatsplot,
+    DT,
+    ComplexHeatmap,
+    RColorBrewer,
+    Rtsne,
+    umap,
+    testthat (>= 3.0.0),
+    roxytest,
+    devtools,
+    usethis,
+    pkgdown,
+    covr
+Config/testthat/edition: 3
+Config/testthat/parallel: true
+URL: https://github.com/username/ZinaSuite
+BugReports: https://github.com/username/ZinaSuite/issues

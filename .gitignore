@@ -1,0 +1,33 @@
+# R specific
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.renviron
+.Rprofile
+
+# Build artifacts
+*.tar.gz
+*.zip
+ZinaSuite.Rcheck/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Cache
+.cache/
+
+# Local data (large files not for git)
+inst/extdata/large/
+
+# OAuth tokens
+.httr-oauth
