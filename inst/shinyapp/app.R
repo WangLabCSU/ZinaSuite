@@ -5,8 +5,15 @@
 #' Features a modern bslib interface with comprehensive analysis modules.
 
 # Source all module files
-modules_dir <- file.path(dirname(sys.frame(1)$ofile), "modules")
-if (dir.exists(modules_dir)) {
+# Use tryCatch to handle different execution contexts
+modules_dir <- tryCatch({
+  file.path(dirname(sys.frame(1)$ofile), "modules")
+}, error = function(e) {
+  # Fallback for when sys.frame(1)$ofile is not available
+  file.path(system.file("shinyapp", package = "ZinaSuite"), "modules")
+})
+
+if (!is.null(modules_dir) && dir.exists(modules_dir)) {
   module_files <- list.files(modules_dir, pattern = "\\.R$", full.names = TRUE)
   for (f in module_files) {
     source(f, local = TRUE)
