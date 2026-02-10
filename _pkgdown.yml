@@ -1,0 +1,96 @@
+url: https://username.github.io/ZinaSuite
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+home:
+  title: ZinaSuite - Modern UCSC Xena Data Analysis
+  description: A modernized R package for interactively exploring UCSC Xena datasets with enhanced performance through mirai-based asynchronous computing.
+
+navbar:
+  structure:
+    left: [intro, reference, articles, tutorials, news]
+    right: [search, github]
+  components:
+    intro:
+      text: Get Started
+      href: articles/introduction.html
+    articles:
+      text: Articles
+      menu:
+      - text: Introduction
+        href: articles/introduction.html
+      - text: Data Query
+        href: articles/data-query.html
+      - text: Visualization
+        href: articles/visualization.html
+      - text: Analysis
+        href: articles/analysis.html
+
+reference:
+  - title: Data Query
+    desc: Functions for querying molecular data from UCSC Xena
+    contents:
+      - starts_with("query_")
+      - starts_with("get_pancan")
+  
+  - title: Visualization
+    desc: Functions for creating visualizations
+    contents:
+      - starts_with("vis_")
+      - theme_zinasuite
+      - get_palette
+      - save_plot
+  
+  - title: Analysis
+    desc: Functions for statistical analysis
+    contents:
+      - starts_with("analyze_")
+      - apply_filter
+      - merge_numeric_groups
+  
+  - title: R6 Classes
+    desc: Object-oriented programming interface
+    contents:
+      - XenaData
+      - DataSource
+      - CacheManager
+      - AsyncCompute
+      - AnalysisEngine
+      - Visualization
+      - CCLEData
+      - PCAWGData
+  
+  - title: Shiny Application
+    desc: Shiny app functions
+    contents:
+      - run_zinasuite
+  
+  - title: Utilities
+    desc: Helper functions
+    contents:
+      - load_data
+      - get_app_dir
+      - "%||%"
+
+articles:
+  - title: Getting Started
+    navbar: ~
+    contents:
+      - introduction
+  
+  - title: Detailed Guides
+    navbar: Detailed Guides
+    contents:
+      - data-query
+      - visualization
+      - analysis
+
+development:
+  mode: auto
+
+news:
+  releases:
+  - text: "Version 0.1.0"
+    href: https://github.com/username/ZinaSuite/releases/tag/v0.1.0

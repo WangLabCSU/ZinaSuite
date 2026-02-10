@@ -25,11 +25,8 @@ run_zinasuite <- function(port = getOption("shiny.port"),
                           host = getOption("shiny.host", "127.0.0.1"),
                           launch.browser = TRUE,
                           ...) {
-  # Check if shiny is installed
-  if (!requireNamespace("shiny", quietly = TRUE)) {
-    stop("Package 'shiny' is required to run the application. ",
-         "Please install it with: install.packages('shiny')")
-  }
+  # Check all Shiny dependencies
+  check_shiny_deps()
 
   # Get app directory
   app_dir <- system.file("shinyapp", package = "ZinaSuite")

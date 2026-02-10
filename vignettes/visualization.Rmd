@@ -1,0 +1,173 @@
+---
+title: "Visualization Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualization Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ZinaSuite)
+```
+
+## Overview
+
+This vignette demonstrates the visualization capabilities of ZinaSuite.
+
+## Gene Expression Visualizations
+
+### Expression Distribution
+
+```{r, eval = FALSE}
+# Visualize expression distribution
+p <- vis_gene_distribution("TP53", cancers = c("BRCA", "LUAD", "LUSC"))
+print(p)
+```
+
+### Pan-Cancer Expression
+
+```{r, eval = FALSE}
+# Visualize expression across all cancer types
+p <- vis_pancan_distribution("TP53")
+print(p)
+```
+
+## Correlation Visualizations
+
+### Gene-Gene Correlation
+
+```{r, eval = FALSE}
+# Create correlation plot
+p <- vis_gene_correlation("TP53", "BRCA1", color_by = "cancer")
+print(p)
+```
+
+### Correlation Matrix
+
+```{r, eval = FALSE}
+# Create correlation matrix heatmap
+genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
+expr_data <- sapply(genes, query_gene_expression, source = "tcga")
+p <- vis_correlation(expr_data, type = "heatmap")
+print(p)
+```
+
+## Survival Visualizations
+
+### Kaplan-Meier Curves
+
+```{r, eval = FALSE}
+# Load survival data
+surv_data <- load_data("tcga_surv")
+
+# Perform survival analysis
+result <- analyze_survival(
+  time = surv_data$OS.time,
+  status = surv_data$OS,
+  group = surv_data$Type
+)
+
+# Plot KM curve
+p <- vis_survival(result, type = "km")
+print(p)
+```
+
+### Survival by Gene Expression
+
+```{r, eval = FALSE}
+# Analyze survival by gene expression
+result <- analyze_survival_by_expression("TP53", cancer = "BRCA")
+p <- result$survival$km_plot
+print(p)
+```
+
+## Immune Analysis Visualizations
+
+### Immune Cell Correlation
+
+```{r, eval = FALSE}
+# Visualize gene-immune correlation
+p <- vis_gene_immune_cor("TP53", cancers = c("BRCA", "LUAD"))
+print(p)
+```
+
+### TIL Analysis
+
+```{r, eval = FALSE}
+# Visualize TIL correlation
+p <- vis_gene_TIL_cor("TP53", cell_type = "CD8_T_cells")
+print(p)
+```
+
+## Dimensionality Reduction
+
+### PCA Plot
+
+```{r, eval = FALSE}
+# Query multiple genes
+genes <- c("TP53", "BRCA1", "EGFR", "KRAS", "MYC")
+expr_list <- query_molecules(genes, data_type = "mRNA", source = "tcga")
+
+# Create expression matrix
+expr_matrix <- do.call(rbind, lapply(expr_list, as.numeric))
+
+# Create PCA plot
+p <- vis_identifier_dim_dist(expr_matrix, method = "pca")
+print(p)
+```
+
+### t-SNE Plot
+
+```{r, eval = FALSE}
+# Create t-SNE plot
+p <- vis_identifier_dim_dist(expr_matrix, method = "tsne")
+print(p)
+```
+
+## Anatomical Visualizations
+
+### Anatomical Expression Map
+
+```{r, eval = FALSE}
+# Create anatomical expression map
+p <- vis_pancan_anatomy("TP53", plot_type = "heatmap")
+print(p)
+```
+
+## Customizing Plots
+
+### Themes
+
+```{r, eval = FALSE}
+# Use ZinaSuite theme
+p <- vis_gene_correlation("TP53", "BRCA1") +
+  theme_zinasuite()
+print(p)
+```
+
+### Color Palettes
+
+```{r, eval = FALSE}
+# Get custom palette
+palette <- get_palette("nature", n = 5)
+```
+
+## Interactive Plots
+
+When `plotly` is available, you can create interactive plots:
+
+```{r, eval = FALSE}
+# Create interactive plot (requires plotly)
+if (requireNamespace("plotly", quietly = TRUE)) {
+  p <- vis_gene_correlation("TP53", "BRCA1")
+  plotly::ggplotly(p)
+}
+```

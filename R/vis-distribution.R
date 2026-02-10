@@ -254,6 +254,7 @@ vis_pancan_expression <- function(genes,
   if (plot_type == "heatmap") {
     # Create heatmap
     if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
+      check_vis_deps("heatmap")
       ComplexHeatmap::Heatmap(
         median_expr,
         name = "Expression",

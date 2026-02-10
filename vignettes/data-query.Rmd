@@ -1,0 +1,134 @@
+---
+title: "Data Query Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data Query Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ZinaSuite)
+```
+
+## Overview
+
+This vignette demonstrates how to query data from UCSC Xena using ZinaSuite.
+
+## Querying Gene Expression
+
+### Single Gene
+
+```{r, eval = FALSE}
+# Query TP53 expression from TCGA
+tp53_expr <- query_gene_expression("TP53", source = "tcga")
+head(tp53_expr)
+```
+
+### Multiple Genes
+
+```{r, eval = FALSE}
+# Query multiple genes
+genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
+expr_list <- query_molecules(
+  identifiers = genes,
+  data_type = "mRNA",
+  source = "tcga",
+  n_workers = 4
+)
+```
+
+## Querying Different Data Types
+
+### Protein Expression
+
+```{r, eval = FALSE}
+# Query protein expression
+tp53_protein <- query_protein("TP53", source = "tcga")
+```
+
+### Copy Number Variation
+
+```{r, eval = FALSE}
+# Query CNV data
+tp53_cnv <- query_cnv("TP53", source = "tcga")
+```
+
+### Mutation Data
+
+```{r, eval = FALSE}
+# Query mutation data
+tp53_mut <- query_mutation("TP53", source = "tcga")
+```
+
+## Querying Clinical Data
+
+### Survival Data
+
+```{r, eval = FALSE}
+# Load survival data
+surv_data <- load_data("tcga_surv")
+head(surv_data)
+```
+
+### Tumor Purity
+
+```{r, eval = FALSE}
+# Query tumor purity
+purity <- query_purity(source = "tcga")
+```
+
+### TMB
+
+```{r, eval = FALSE}
+# Query tumor mutation burden
+tmb <- query_tmb(source = "tcga")
+```
+
+## Parallel Processing
+
+ZinaSuite supports parallel processing for faster data queries:
+
+```{r, eval = FALSE}
+# Query multiple genes in parallel
+results <- query_molecules(
+  identifiers = c("TP53", "BRCA1", "EGFR", "KRAS", "MYC"),
+  data_type = "mRNA",
+  source = "tcga",
+  n_workers = 4,  # Use 4 parallel workers
+  .progress = TRUE  # Show progress bar
+)
+```
+
+## Caching
+
+ZinaSuite automatically caches data to speed up repeated queries:
+
+```{r, eval = FALSE}
+# First query - will fetch from UCSC Xena
+tp53_1 <- query_gene_expression("TP53", source = "tcga")
+
+# Second query - will use cached data (much faster!)
+tp53_2 <- query_gene_expression("TP53", source = "tcga")
+```
+
+## Data Sources
+
+ZinaSuite supports multiple data sources:
+
+- **TCGA**: The Cancer Genome Atlas
+- **PCAWG**: Pan-Cancer Analysis of Whole Genomes
+- **CCLE**: Cancer Cell Line Encyclopedia
+
+```{r, eval = FALSE}
+# Query from different sources
+tcga_data <- query_gene_expression("TP53", source = "tcga")
+ccle_data <- query_gene_expression("TP53", source = "ccle")
+```

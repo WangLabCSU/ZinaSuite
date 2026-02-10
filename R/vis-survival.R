@@ -52,6 +52,11 @@ vis_survival <- function(surv_result,
 #' @return ggplot object or ggsurvplot object
 #' @keywords internal
 vis_kaplan_meier <- function(km_result, title = NULL, conf.int = TRUE, risk.table = FALSE) {
+  # Check for required packages
+  if (!requireNamespace("survminer", quietly = TRUE)) {
+    check_vis_deps("survival")
+  }
+
   if (!requireNamespace("survminer", quietly = TRUE)) {
     # Fallback to basic ggplot2
     data <- km_result$surv_data

@@ -56,14 +56,16 @@ vis_identifier_dim_dist <- function(data,
   # Perform dimensionality reduction
   coords <- switch(method,
     "pca" = {
-      pca_result <- prcomp(data, scale. = TRUE, ...)
+      pca_result <- stats::prcomp(data, scale. = TRUE, ...)
       pca_result$x[, 1:min(n_components, ncol(pca_result$x))]
     },
     "tsne" = {
+      check_analysis_deps("dimension")
       tsne_result <- Rtsne::Rtsne(data, dims = n_components, ...)
       tsne_result$Y
     },
     "umap" = {
+      check_analysis_deps("dimension")
       umap_result <- umap::umap(data, n_components = n_components, ...)
       umap_result$layout
     }
