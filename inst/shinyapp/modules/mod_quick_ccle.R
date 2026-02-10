@@ -359,7 +359,7 @@ run_ccle_drug_response <- function(gene, data_type, drug) {
   # Get primary sites
   ccle_data <- load_data("ccle_expr_and_drug_response")
   available_sites <- unique(ccle_data$drug_info$`Site Primary`)
-  selected_site <- available_sites[1]  ' Use first available site
+  selected_site <- available_sites[1]  # Use first available site
 
   plot <- vis_gene_drug_response_diff(
     Gene = gene,

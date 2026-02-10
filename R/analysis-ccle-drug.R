@@ -17,8 +17,8 @@ NULL
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' # Analyze single gene
+#' \dontrun{
+#' # Analyze single gene (requires ccle_expr_and_drug_response data)
 #' result <- analyze_gene_drug_response_asso("TP53")
 #' head(result)
 #'
