@@ -328,77 +328,54 @@ run_ccle_correlation <- function(gene1, gene2, data_type) {
 ' Run CCLE Drug Sensitivity Analysis
 ' @keywords internal
 run_ccle_drug_sensitivity <- function(gene, data_type, drug) {
-  ' Query gene expression
-  gene_expr <- query_molecule(gene, data_type = data_type, source = "ccle")
+  ' Use the new drug response analysis function
+  ' This creates a volcano plot showing gene-drug associations
 
-  ' Load CCLE drug sensitivity data
-  ' Note: This is a placeholder - actual drug data integration needed
-  plot_data <- data.frame(
-    Sample = names(gene_expr),
-    Expression = as.numeric(gene_expr),
-    IC50 = runif(length(gene_expr), 0.001, 10),  ' Placeholder
-    stringsAsFactors = FALSE
+  plot <- vis_gene_drug_response_asso(
+    Gene = gene,
+    x_axis_type = "mean.diff",
+    output_form = "ggplot2"
   )
 
-  ' Calculate correlation
-  cor_test <- stats::cor.test(plot_data$Expression, log10(plot_data$IC50))
-
-  ' Create scatter plot
-  plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Expression, y = log10(.data$IC50))) +
-    ggplot2::geom_point(alpha = 0.6, color = "steelblue") +
-    ggplot2::geom_smooth(method = "lm", color = "red") +
-    ggplot2::labs(
-      title = paste(gene, "vs", drug, "Sensitivity (CCLE)"),
-      subtitle = sprintf("r = %.3f, p = %.2e", cor_test$estimate, cor_test$p.value),
-      x = paste(gene, "Expression"),
-      y = paste("log10(IC50)", drug)
-    ) +
-    theme_zinasuite()
+  ' Get the underlying data
+  data <- analyze_gene_drug_response_asso(gene)
 
   stats <- list(
-    correlation = cor_test$estimate,
-    p_value = cor_test$p.value,
-    n_samples = nrow(plot_data)
+    n_drugs = nrow(data),
+    significant_drugs = sum(data$p.value < 0.05),
+    top_correlation = data$cor[1],
+    top_drug = data$drugs[1]
   )
 
-  list(plot = plot, data = plot_data, stats = stats)
+  list(plot = plot, data = data, stats = stats)
 }
 
 ' Run CCLE Drug Response Analysis
 ' @keywords internal
 run_ccle_drug_response <- function(gene, data_type, drug) {
-  ' Query gene expression
-  gene_expr <- query_molecule(gene, data_type = data_type, source = "ccle")
+  ' Use the new drug response difference function
+  ' This creates a dot plot comparing IC50 between high/low expression groups
 
-  ' Load CCLE drug response data
-  ' Note: This is a placeholder - actual drug data integration needed
-  plot_data <- data.frame(
-    Sample = names(gene_expr),
-    Expression = as.numeric(gene_expr),
-    AUC = runif(length(gene_expr), 0.1, 1),  ' Placeholder
-    stringsAsFactors = FALSE
+  ' Get primary sites
+  ccle_data <- load_data("ccle_expr_and_drug_response")
+  available_sites <- unique(ccle_data$drug_info$`Site Primary`)
+  selected_site <- available_sites[1]  ' Use first available site
+
+  plot <- vis_gene_drug_response_diff(
+    Gene = gene,
+    tissue = selected_site,
+    Show.P.label = TRUE,
+    Method = "wilcox.test"
   )
 
-  ' Calculate correlation
-  cor_test <- stats::cor.test(plot_data$Expression, plot_data$AUC)
-
-  ' Create scatter plot
-  plot <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Expression, y = .data$AUC)) +
-    ggplot2::geom_point(alpha = 0.6, color = "steelblue") +
-    ggplot2::geom_smooth(method = "lm", color = "red") +
-    ggplot2::labs(
-      title = paste(gene, "vs", drug, "Response (CCLE)"),
-      subtitle = sprintf("r = %.3f, p = %.2e", cor_test$estimate, cor_test$p.value),
-      x = paste(gene, "Expression"),
-      y = paste("AUC", drug)
-    ) +
-    theme_zinasuite()
+  ' Get the underlying data
+  data <- analyze_gene_drug_response_diff(gene, tissue = selected_site)
 
   stats <- list(
-    correlation = cor_test$estimate,
-    p_value = cor_test$p.value,
-    n_samples = nrow(plot_data)
+    n_comparisons = length(unique(data$drug_target)),
+    n_cell_lines = length(unique(data$ccle_name)),
+    selected_site = selected_site
   )
 
-  list(plot = plot, data = plot_data, stats = stats)
+  list(plot = plot, data = data, stats = stats)
 }
