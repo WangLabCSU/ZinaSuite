@@ -28,6 +28,9 @@
 #'   - stat: Summary statistics of the grouping
 #' @export
 #'
+#' @importFrom stats quantile
+#' @importFrom rlang .data
+#'
 #' @examples
 #' \donttest{
 #' # Basic grouping by gender across all cancers

@@ -5,6 +5,9 @@
 #' These functions can be tested independently of Shiny.
 #'
 #' @name shiny-logic
+#'
+#' @importFrom utils capture.output
+#' @importFrom stats sd
 NULL
 
 # Data Query Logic --------------------------------------------------------
@@ -299,19 +302,19 @@ generate_distribution_plot <- function(data, title = "Distribution", plot_type =
 
   switch(plot_type,
     "histogram" = {
-      ggplot2::ggplot(df, ggplot2::aes(x = value)) +
+      ggplot2::ggplot(df, ggplot2::aes(x = .data$value)) +
         ggplot2::geom_histogram(bins = 30, fill = "steelblue", color = "white") +
         ggplot2::labs(title = title, x = "Value", y = "Count") +
         ggplot2::theme_minimal()
     },
     "density" = {
-      ggplot2::ggplot(df, ggplot2::aes(x = value)) +
+      ggplot2::ggplot(df, ggplot2::aes(x = .data$value)) +
         ggplot2::geom_density(fill = "steelblue", alpha = 0.5) +
         ggplot2::labs(title = title, x = "Value", y = "Density") +
         ggplot2::theme_minimal()
     },
     "boxplot" = {
-      ggplot2::ggplot(df, ggplot2::aes(y = value)) +
+      ggplot2::ggplot(df, ggplot2::aes(y = .data$value)) +
         ggplot2::geom_boxplot(fill = "steelblue") +
         ggplot2::labs(title = title, y = "Value") +
         ggplot2::theme_minimal()

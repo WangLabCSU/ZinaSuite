@@ -12,6 +12,8 @@
 #' @return Path to generated report
 #' @export
 #'
+#' @importFrom utils packageVersion
+#'
 #' @examples
 #' \dontrun{
 #' # Generate HTML report

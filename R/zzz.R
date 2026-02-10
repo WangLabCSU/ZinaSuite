@@ -3,6 +3,10 @@
 #' @keywords internal
 .ZinaSuiteEnv <- new.env(parent = emptyenv())
 
+#' @importFrom utils capture.output head packageVersion
+#' @importFrom stats quantile median mad sd cor.test aov lm
+#' @importFrom graphics par
+#' @importFrom grDevices dev.off png pdf svg
 .onLoad <- function(libname, pkgname) {
   # Initialize package environment
   assign(".zina_cache_manager", NULL, envir = .ZinaSuiteEnv)
