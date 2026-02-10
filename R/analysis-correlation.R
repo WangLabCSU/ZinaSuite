@@ -27,7 +27,7 @@ analyze_correlation <- function(x, y,
   method <- match.arg(method)
 
   # Remove NA values
-  complete_cases <- complete.cases(x, y)
+  complete_cases <- stats::complete.cases(x, y)
   x <- x[complete_cases]
   y <- y[complete_cases]
 
@@ -279,11 +279,11 @@ analyze_correlation_matrix <- function(genes,
   colnames(data_matrix) <- valid_genes
 
   # Remove rows with NA
-  complete_rows <- complete.cases(data_matrix)
+  complete_rows <- stats::complete.cases(data_matrix)
   data_matrix <- data_matrix[complete_rows, ]
 
   # Compute correlation matrix
-  cor_matrix <- cor(data_matrix, method = method, use = "pairwise.complete.obs")
+  cor_matrix <- stats::cor(data_matrix, method = method, use = "pairwise.complete.obs")
 
   # Compute p-value matrix
   n <- nrow(data_matrix)
@@ -293,7 +293,7 @@ analyze_correlation_matrix <- function(genes,
   for (i in seq_along(valid_genes)) {
     for (j in seq_along(valid_genes)) {
       if (i != j) {
-        test_result <- cor.test(data_matrix[, i], data_matrix[, j], method = method)
+        test_result <- stats::cor.test(data_matrix[, i], data_matrix[, j], method = method)
         p_matrix[i, j] <- test_result$p.value
       } else {
         p_matrix[i, j] <- 0
@@ -347,7 +347,7 @@ analyze_partial_correlation <- function(x, y, z,
   }
 
   # Find complete cases
-  complete_cases <- complete.cases(x, y, z)
+  complete_cases <- stats::complete.cases(x, y, z)
   x <- x[complete_cases]
   y <- y[complete_cases]
   z <- z[complete_cases, , drop = FALSE]
@@ -359,11 +359,11 @@ analyze_partial_correlation <- function(x, y, z,
   }
 
   # Residualize x and y on z
-  x_resid <- residuals(lm(x ~ z))
-  y_resid <- residuals(lm(y ~ z))
+  x_resid <- stats::residuals(stats::lm(x ~ z))
+  y_resid <- stats::residuals(stats::lm(y ~ z))
 
   # Correlate residuals
-  cor_result <- cor.test(x_resid, y_resid, method = "pearson")
+  cor_result <- stats::cor.test(x_resid, y_resid, method = "pearson")
 
   list(
     estimate = unname(cor_result$estimate),

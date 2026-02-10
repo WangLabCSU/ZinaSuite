@@ -52,7 +52,7 @@ vis_pancan_anatomy <- function(gene,
 
   # Get sample cancer types
   sample_info <- load_data("tcga_gtex")
-  sample_cancer <- setNames(
+  sample_cancer <- stats::setNames(
     sample_info$tissue[match(names(gene_expr), sample_info$sample)],
     names(gene_expr)
   )

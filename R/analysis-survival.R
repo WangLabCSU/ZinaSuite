@@ -171,15 +171,15 @@ analyze_survival_by_expression <- function(gene,
   # Create groups based on cutoff method
   group <- switch(cutoff_method,
     "median" = {
-      cutoff <- median(expr_values, na.rm = TRUE)
+      cutoff <- stats::median(expr_values, na.rm = TRUE)
       ifelse(expr_values > cutoff, "High", "Low")
     },
     "tertile" = {
-      tertiles <- quantile(expr_values, probs = c(0, 1/3, 2/3, 1), na.rm = TRUE)
+      tertiles <- stats::quantile(expr_values, probs = c(0, 1/3, 2/3, 1), na.rm = TRUE)
       cut(expr_values, breaks = tertiles, labels = c("Low", "Medium", "High"), include.lowest = TRUE)
     },
     "quartile" = {
-      quartiles <- quantile(expr_values, probs = c(0, 0.25, 0.75, 1), na.rm = TRUE)
+      quartiles <- stats::quantile(expr_values, probs = c(0, 0.25, 0.75, 1), na.rm = TRUE)
       ifelse(expr_values <= quartiles[2], "Low",
         ifelse(expr_values >= quartiles[3], "High", "Medium")
       )
@@ -197,7 +197,7 @@ analyze_survival_by_expression <- function(gene,
   status <- surv_data$OS[match(common_samples, surv_data$sample)]
 
   # Remove NA values
-  valid <- complete.cases(time, status, group)
+  valid <- stats::complete.cases(time, status, group)
   time <- time[valid]
   status <- status[valid]
   group <- group[valid]
@@ -208,7 +208,7 @@ analyze_survival_by_expression <- function(gene,
   list(
     gene = gene,
     cutoff_method = cutoff_method,
-    cutoff_value = if (cutoff_method == "custom") cutoff_value else median(expr_values, na.rm = TRUE),
+    cutoff_value = if (cutoff_method == "custom") cutoff_value else stats::median(expr_values, na.rm = TRUE),
     n_samples = length(common_samples),
     n_events = sum(status, na.rm = TRUE),
     group_sizes = table(group),
@@ -338,7 +338,7 @@ analyze_unicox_batch <- function(genes,
       status <- args$surv_data$OS[match(common_samples, args$surv_data$sample)]
 
       # Remove NA
-      valid <- complete.cases(expr, time, status)
+      valid <- stats::complete.cases(expr, time, status)
       if (sum(valid) < 10) {
         return(list(
           gene = args$gene,

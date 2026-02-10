@@ -133,7 +133,7 @@ query_purity <- function(source = "tcga") {
   # Try to load from built-in data or remote
   tryCatch({
     purity_data <- load_data("tcga_purity")
-    setNames(purity_data$purity, purity_data$sample)
+    stats::setNames(purity_data$purity, purity_data$sample)
   }, error = function(e) {
     warning("Purity data not available: ", conditionMessage(e))
     NULL
@@ -158,7 +158,7 @@ query_purity <- function(source = "tcga") {
 query_tmb <- function(source = "tcga") {
   tryCatch({
     tmb_data <- load_data("tcga_tmb")
-    setNames(tmb_data$tmb, tmb_data$sample)
+    stats::setNames(tmb_data$tmb, tmb_data$sample)
   }, error = function(e) {
     warning("TMB data not available: ", conditionMessage(e))
     NULL
@@ -183,7 +183,7 @@ query_tmb <- function(source = "tcga") {
 query_msi <- function(source = "tcga") {
   tryCatch({
     msi_data <- load_data("tcga_MSI")
-    setNames(msi_data$msi, msi_data$sample)
+    stats::setNames(msi_data$msi, msi_data$sample)
   }, error = function(e) {
     warning("MSI data not available: ", conditionMessage(e))
     NULL
@@ -208,7 +208,7 @@ query_msi <- function(source = "tcga") {
 query_stemness <- function(source = "tcga") {
   tryCatch({
     stemness_data <- load_data("tcga_stemness")
-    setNames(stemness_data$stemness, stemness_data$sample)
+    stats::setNames(stemness_data$stemness, stemness_data$sample)
   }, error = function(e) {
     warning("Stemness data not available: ", conditionMessage(e))
     NULL
@@ -237,7 +237,7 @@ query_til <- function(cell_type = NULL, source = "tcga") {
 
     if (!is.null(cell_type)) {
       if (cell_type %in% colnames(til_data)) {
-        setNames(til_data[[cell_type]], til_data$sample)
+        stats::setNames(til_data[[cell_type]], til_data$sample)
       } else {
         warning("Cell type '", cell_type, "' not found in TIL data")
         NULL
@@ -273,7 +273,7 @@ query_immune_infiltration <- function(cell_type = NULL, source = "tcga") {
 
     if (!is.null(cell_type)) {
       if (cell_type %in% colnames(immune_data)) {
-        setNames(immune_data[[cell_type]], immune_data$sample)
+        stats::setNames(immune_data[[cell_type]], immune_data$sample)
       } else {
         warning("Cell type '", cell_type, "' not found in immune data")
         NULL
