@@ -3,6 +3,7 @@ Title: ZinaSuite - A Modern R Package for UCSC Xena Data Analysis
 Version: 0.0.0.9000
 Authors@R: person("Shixiang", "Wang", , "w_shixiang@163.com", role = c("aut", "cre"),
             comment = c(ORCID = "0000-0001-9855-7357"))
+Author: Shixiang Wang [aut, cre]
 Maintainer: Shixiang Wang <w_shixiang@163.com>
 Description: ZinaSuite is a modernized R package for interactively exploring 
     UCSC Xena datasets. It provides a comprehensive framework for downloading, 
