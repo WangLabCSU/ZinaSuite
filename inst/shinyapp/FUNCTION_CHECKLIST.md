@@ -153,13 +153,13 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 
 | Feature | UCSCXenaShiny File | ZinaSuite Function | Status | Test Coverage |
 |---------|-------------------|-------------------|--------|---------------|
-| Add Signature | modules-z-add-signature.R | `add_custom_signature()` | ⏳ | ⏳ |
-| Custom Metadata | modules-z-custom-meta.R | `upload_custom_metadata()` | ⏳ | ⏳ |
-| Download Features | modules-z-download-feat.R | `download_feature_data()` | ⏳ | ⏳ |
-| Download Results | modules-z-download-res.R | `download_results()` | ⏳ | ⏳ |
-| Filter Samples | modules-z-filter-sample.R | `filter_samples()` | ⏳ | ⏳ |
-| Group Samples | modules-z-group-sample.R | `group_samples()` | ⏳ | ⏳ |
-| Molecular Origin | modules-z-mol-origin.R | `set_mol_origin()` | ⏳ | ⏳ |
+| Add Signature | modules-z-add-signature.R | `add_signature()` | ✅ | ✅ |
+| Custom Metadata | modules-z-custom-meta.R | `custom_metadata()` | ✅ | ✅ |
+| Download Features | modules-z-download-feat.R | `download_feature_data()` | ✅ | ✅ |
+| Download Results | modules-z-download-res.R | `download_results()` | ✅ | ✅ |
+| Filter Samples | modules-z-filter-sample.R | `filter_samples()` | ✅ | ✅ |
+| Group Samples | modules-z-group-sample.R | `group_samples()` | ✅ | ✅ |
+| Molecular Origin | modules-z-mol-origin.R | `set_mol_origin()` | ✅ | ✅ |
 | Multi Upload | modules-z-multi-upload.R | `batch_upload()` | ✅ | ✅ |
 
 ---
@@ -203,10 +203,10 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 | TCGA Deep | 11 | **10** | 0 | 1 | **91%** |
 | PCAWG Deep | 10 | **9** | 0 | 1 | **90%** |
 | CCLE Deep | 5 | **6** | 0 | 0 | **100%** |
-| TPC Functions | 8 | 1 | 0 | 7 | 12.5% |
+| TPC Functions | 8 | **8** | 0 | 0 | **100%** |
 | Pharmacogenomics | 5 | 5 | 0 | 0 | 100% |
 | Other Pages | 6 | 0 | 2 | 4 | 33% |
-| **TOTAL** | **69** | **51** | **8** | **10** | **78%** |
+| **TOTAL** | **69** | **58** | **8** | **3** | **88%** |
 
 ### By Priority
 
