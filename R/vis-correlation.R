@@ -47,12 +47,12 @@ vis_correlation <- function(x, y = NULL,
     }
 
     # Remove NA values
-    complete_cases <- complete.cases(x, y)
+    complete_cases <- stats::complete.cases(x, y)
     x <- x[complete_cases]
     y <- y[complete_cases]
 
     # Calculate correlation
-    cor_result <- cor.test(x, y, method = method)
+    cor_result <- stats::cor.test(x, y, method = method)
     cor_value <- cor_result$estimate
     p_value <- cor_result$p.value
 
@@ -75,11 +75,11 @@ vis_correlation <- function(x, y = NULL,
     # Heatmap
     if (is.null(y)) {
       # x is a data frame or matrix
-      cor_matrix <- cor(x, method = method, use = "pairwise.complete.obs")
+      cor_matrix <- stats::cor(x, method = method, use = "pairwise.complete.obs")
     } else {
       # Combine x and y into matrix
       data <- cbind(x, y)
-      cor_matrix <- cor(data, method = method, use = "pairwise.complete.obs")
+      cor_matrix <- stats::cor(data, method = method, use = "pairwise.complete.obs")
     }
 
     # Convert to long format
@@ -168,7 +168,7 @@ vis_gene_correlation <- function(gene1, gene2,
   }
 
   # Calculate correlation
-  cor_result <- cor.test(data$gene1, data$gene2, method = method)
+  cor_result <- stats::cor.test(data$gene1, data$gene2, method = method)
 
   # Build plot
   if (!is.null(color_by)) {

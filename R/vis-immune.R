@@ -303,12 +303,12 @@ vis_gene_TIL_cor <- function(gene,
       )
 
       plot_data$Expression <- gene_expr[plot_data$Sample]
-      plot_data <- plot_data[complete.cases(plot_data), ]
+      plot_data <- plot_data[stats::complete.cases(plot_data), ]
 
-      ggplot2::ggplot(plot_data, ggplot2::aes(x = Expression, y = TIL)) +
+      ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Expression, y = .data$TIL)) +
         ggplot2::geom_point(alpha = 0.5) +
         ggplot2::geom_smooth(method = "lm", color = "red") +
-        ggplot2::facet_wrap(~Cancer, scales = "free") +
+        ggplot2::facet_wrap(~.data$Cancer, scales = "free") +
         ggplot2::labs(
           title = paste(gene, "vs", cell_type),
           x = paste(gene, "Expression"),
@@ -330,23 +330,23 @@ vis_gene_TIL_cor <- function(gene,
       )
 
       plot_data$Expression <- gene_expr[plot_data$Sample]
-      plot_data <- plot_data[complete.cases(plot_data), ]
+      plot_data <- plot_data[stats::complete.cases(plot_data), ]
 
       # Create expression quartiles by cancer
       plot_data <- plot_data %>%
-        dplyr::group_by(Cancer) %>%
+        dplyr::group_by(.data$Cancer) %>%
         dplyr::mutate(
           Expr_Quartile = cut(
-            Expression,
-            breaks = quantile(Expression, probs = c(0, 0.25, 0.5, 0.75, 1)),
+            .data$Expression,
+            breaks = stats::quantile(.data$Expression, probs = c(0, 0.25, 0.5, 0.75, 1)),
             labels = c("Q1 (Low)", "Q2", "Q3", "Q4 (High)"),
             include.lowest = TRUE
           )
         )
 
-      ggplot2::ggplot(plot_data, ggplot2::aes(x = Expr_Quartile, y = TIL)) +
-        ggplot2::geom_boxplot(ggplot2::aes(fill = Expr_Quartile)) +
-        ggplot2::facet_wrap(~Cancer, scales = "free_y") +
+      ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Expr_Quartile, y = .data$TIL)) +
+        ggplot2::geom_boxplot(ggplot2::aes(fill = .data$Expr_Quartile)) +
+        ggplot2::facet_wrap(~.data$Cancer, scales = "free_y") +
         ggplot2::labs(
           title = paste(cell_type, "by", gene, "Expression Quartiles"),
           x = paste(gene, "Expression Quartile"),
@@ -401,7 +401,7 @@ vis_gene_tmb_cor <- function(gene,
   )
 
   plot_data$Expression <- gene_expr[plot_data$Sample]
-  plot_data <- plot_data[complete.cases(plot_data), ]
+  plot_data <- plot_data[stats::complete.cases(plot_data), ]
 
   # Filter by cancers
   if (!is.null(cancers)) {
@@ -410,19 +410,19 @@ vis_gene_tmb_cor <- function(gene,
 
   # Calculate correlation by cancer
   cor_by_cancer <- plot_data %>%
-    dplyr::group_by(Cancer) %>%
+    dplyr::group_by(.data$Cancer) %>%
     dplyr::summarise(
-      Correlation = cor(Expression, log1p(TMB), method = method),
-      Pvalue = cor.test(Expression, log1p(TMB), method = method)$p.value,
+      Correlation = stats::cor(.data$Expression, log1p(.data$TMB), method = method),
+      Pvalue = stats::cor.test(.data$Expression, log1p(.data$TMB), method = method)$p.value,
       N = dplyr::n(),
       .groups = "drop"
     )
 
   # Create combined plot
-  p1 <- ggplot2::ggplot(plot_data, ggplot2::aes(x = Expression, y = log1p(TMB))) +
+  p1 <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Expression, y = log1p(.data$TMB))) +
     ggplot2::geom_point(alpha = 0.3) +
     ggplot2::geom_smooth(method = "lm", color = "red") +
-    ggplot2::facet_wrap(~Cancer, scales = "free") +
+    ggplot2::facet_wrap(~.data$Cancer, scales = "free") +
     ggplot2::labs(
       title = paste(gene, "Expression vs TMB"),
       x = paste(gene, "Expression"),
@@ -432,7 +432,7 @@ vis_gene_tmb_cor <- function(gene,
 
   p2 <- ggplot2::ggplot(
     cor_by_cancer,
-    ggplot2::aes(x = reorder(Cancer, Correlation), y = Correlation, fill = Correlation > 0)
+    ggplot2::aes(x = stats::reorder(.data$Cancer, .data$Correlation), y = .data$Correlation, fill = .data$Correlation > 0)
   ) +
     ggplot2::geom_col() +
     ggplot2::coord_flip() +
@@ -489,7 +489,7 @@ vis_gene_msi_cor <- function(gene,
   )
 
   plot_data$Expression <- gene_expr[plot_data$Sample]
-  plot_data <- plot_data[complete.cases(plot_data), ]
+  plot_data <- plot_data[stats::complete.cases(plot_data), ]
 
   # Filter by cancers
   if (!is.null(cancers)) {
@@ -500,9 +500,9 @@ vis_gene_msi_cor <- function(gene,
   plot_data <- plot_data[!is.na(plot_data$MSI_Status), ]
 
   if (plot_type == "boxplot") {
-    ggplot2::ggplot(plot_data, ggplot2::aes(x = MSI_Status, y = Expression, fill = MSI_Status)) +
+    ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$MSI_Status, y = .data$Expression, fill = .data$MSI_Status)) +
       ggplot2::geom_boxplot() +
-      ggplot2::facet_wrap(~Cancer, scales = "free_y") +
+      ggplot2::facet_wrap(~.data$Cancer, scales = "free_y") +
       ggplot2::labs(
         title = paste(gene, "Expression by MSI Status"),
         x = "MSI Status",
@@ -511,10 +511,10 @@ vis_gene_msi_cor <- function(gene,
       ggplot2::theme_minimal() +
       ggplot2::theme(legend.position = "none")
   } else {
-    ggplot2::ggplot(plot_data, ggplot2::aes(x = MSI_Status, y = Expression, fill = MSI_Status)) +
+    ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$MSI_Status, y = .data$Expression, fill = .data$MSI_Status)) +
       ggplot2::geom_violin() +
       ggplot2::geom_boxplot(width = 0.2) +
-      ggplot2::facet_wrap(~Cancer, scales = "free_y") +
+      ggplot2::facet_wrap(~.data$Cancer, scales = "free_y") +
       ggplot2::labs(
         title = paste(gene, "Expression by MSI Status"),
         x = "MSI Status",
@@ -572,7 +572,7 @@ vis_gene_stemness_cor <- function(gene,
   )
 
   plot_data$Expression <- gene_expr[plot_data$Sample]
-  plot_data <- plot_data[complete.cases(plot_data), ]
+  plot_data <- plot_data[stats::complete.cases(plot_data), ]
 
   # Filter by cancers
   if (!is.null(cancers)) {
@@ -580,12 +580,12 @@ vis_gene_stemness_cor <- function(gene,
   }
 
   # Calculate correlation
-  cor_result <- cor.test(plot_data$Expression, plot_data$Stemness, method = "spearman")
+  cor_result <- stats::cor.test(plot_data$Expression, plot_data$Stemness, method = "spearman")
 
-  ggplot2::ggplot(plot_data, ggplot2::aes(x = Expression, y = Stemness)) +
+  ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Expression, y = .data$Stemness)) +
     ggplot2::geom_point(alpha = 0.3) +
     ggplot2::geom_smooth(method = "lm", color = "red") +
-    ggplot2::facet_wrap(~Cancer, scales = "free") +
+    ggplot2::facet_wrap(~.data$Cancer, scales = "free") +
     ggplot2::labs(
       title = paste(gene, "vs", stemness_type, "Stemness"),
       subtitle = paste(
