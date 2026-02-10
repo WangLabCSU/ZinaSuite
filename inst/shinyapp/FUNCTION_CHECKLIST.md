@@ -135,15 +135,17 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 
 | Mode | UCSCXenaShiny File | ZinaSuite Function | Status | Test Coverage |
 |------|-------------------|-------------------|--------|---------------|
-| One-to-One | modules-ccle-cor-o2o.R | `analyze_ccle_cor_o2o()` | ⏳ | ⏳ |
-| Many-to-One | modules-ccle-cor-m2o.R | `analyze_ccle_cor_m2o()` | ⏳ | ⏳ |
+| One-to-One | modules-ccle-cor-o2o.R | `run_ccle_cor_o2o()` | ✅ | ✅ |
+| One-to-Many | modules-ccle-cor-o2m.R | `run_ccle_cor_o2m()` | ✅ | ✅ |
+| Many-to-One | modules-ccle-cor-m2o.R | `run_ccle_cor_m2o()` | ✅ | ✅ |
 
 ### 5.2 Comparison Analysis
 
 | Mode | UCSCXenaShiny File | ZinaSuite Function | Status | Test Coverage |
 |------|-------------------|-------------------|--------|---------------|
-| One-to-One | modules-ccle-comp-o2o.R | `analyze_ccle_comp_o2o()` | ⏳ | ⏳ |
-| Many-to-One | modules-ccle-comp-m2o.R | `analyze_ccle_comp_m2o()` | ⏳ | ⏳ |
+| One-to-One | modules-ccle-comp-o2o.R | `run_ccle_comp_o2o()` | ✅ | ✅ |
+| One-to-Many | modules-ccle-comp-o2m.R | `run_ccle_comp_o2m()` | ✅ | ✅ |
+| Many-to-One | modules-ccle-comp-m2o.R | `run_ccle_comp_m2o()` | ✅ | ✅ |
 
 ---
 
@@ -200,11 +202,11 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 | CCLE Quick | 4 | 0 | 2 | 2 | 50% |
 | TCGA Deep | 11 | 0 | 0 | 11 | 0% |
 | PCAWG Deep | 10 | **9** | 0 | 1 | **90%** |
-| CCLE Deep | 5 | 0 | 0 | 5 | 0% |
+| CCLE Deep | 5 | **6** | 0 | 0 | **100%** |
 | TPC Functions | 8 | 1 | 0 | 7 | 12.5% |
 | Pharmacogenomics | 5 | 5 | 0 | 0 | 100% |
 | Other Pages | 6 | 0 | 2 | 4 | 33% |
-| **TOTAL** | **69** | **30** | **8** | **31** | **55%** |
+| **TOTAL** | **69** | **36** | **8** | **25** | **58%** |
 
 ### By Priority
 
