@@ -31,3 +31,4 @@ inst/extdata/large/
 
 # OAuth tokens
 .httr-oauth
+docs
