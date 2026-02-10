@@ -56,6 +56,7 @@ run_zinasuite <- function() {
         shinydashboard::menuItem("Mutation", tabName = "mutation", icon = shiny::icon("dna")),
         shinydashboard::menuItem("Dimension", tabName = "dimension", icon = shiny::icon("project-diagram")),
         shinydashboard::menuItem("Immune Analysis", tabName = "immune", icon = shiny::icon("shield-virus")),
+        shinydashboard::menuItem("PharmacoGenomics", tabName = "pharma", icon = shiny::icon("pills")),
         shinydashboard::menuItem("Batch Analysis", tabName = "batch", icon = shiny::icon("tasks")),
         shinydashboard::menuItem("About", tabName = "about", icon = shiny::icon("info-circle"))
       )
@@ -119,6 +120,12 @@ run_zinasuite <- function() {
           mod_immune_ui("immune")
         ),
 
+        # PharmacoGenomics tab
+        shinydashboard::tabItem(
+          tabName = "pharma",
+          mod_pharmacogenomics_ui("pharma")
+        ),
+
         # Batch Analysis tab
         shinydashboard::tabItem(
           tabName = "batch",
@@ -175,6 +182,7 @@ run_zinasuite <- function() {
     mod_mutation_server("mutation", app_state)
     mod_dimension_server("dimension", app_state)
     mod_immune_server("immune", app_state)
+    mod_pharmacogenomics_server("pharma", app_state)
     mod_batch_server("batch", app_state, async_compute)
     mod_about_server("about")
   }

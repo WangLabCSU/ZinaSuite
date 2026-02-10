@@ -39,6 +39,10 @@ test_that("Module UI functions return shiny tags", {
   immune_ui <- mod_immune_ui("immune")
   expect_s3_class(immune_ui, "shiny.tag")
 
+  # Test pharmacogenomics module UI
+  pharma_ui <- mod_pharmacogenomics_ui("pharma")
+  expect_s3_class(pharma_ui, "shiny.tag")
+
   # Test batch module UI
   batch_ui <- mod_batch_ui("batch")
   expect_s3_class(batch_ui, "shiny.tag")
