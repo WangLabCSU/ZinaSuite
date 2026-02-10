@@ -31,8 +31,11 @@ mod_quick_tcga_ui <- function(id) {
                 "Anatomy Map" = "anatomy",
                 "Gene Correlation" = "correlation",
                 "TIL Correlation" = "til",
-                "Immune Correlation" = "immune",
-                "Mutation Frequency" = "mutation",
+            "Immune Correlation" = "immune",
+            "TMB Correlation" = "tmb",
+            "MSI Correlation" = "msi",
+            "Stemness Correlation" = "stemness",
+            "Mutation Frequency" = "mutation",
                 "Survival (KM)" = "survival_km",
                 "Survival (Cox)" = "survival_cox",
                 "Dimension Reduction" = "dimension"
@@ -109,12 +112,23 @@ mod_quick_tcga_ui <- function(id) {
             ),
 
             shiny::conditionalPanel(
-              condition = sprintf("input['%s'] == 'til' || input['%s'] == 'immune'", ns("analysis_type"), ns("analysis_type")),
+              condition = sprintf("input['%s'] == 'til' || input['%s'] == 'immune' || input['%s'] == 'tmb' || input['%s'] == 'stemness'", ns("analysis_type"), ns("analysis_type"), ns("analysis_type"), ns("analysis_type")),
               shiny::selectInput(
                 ns("cor_method"),
                 "Correlation Method:",
                 choices = c("Spearman" = "spearman", "Pearson" = "pearson"),
                 selected = "spearman"
+              )
+            ),
+
+            shiny::conditionalPanel(
+              condition = sprintf("input['%s'] == 'tmb' || input['%s'] == 'msi' || input['%s'] == 'stemness'", ns("analysis_type"), ns("analysis_type"), ns("analysis_type")),
+              shiny::radioButtons(
+                ns("index_plot_type"),
+                "Plot Type:",
+                choices = c("Scatter" = "scatter", "Summary" = "summary"),
+                selected = "scatter",
+                inline = TRUE
               )
             ),
 
@@ -230,6 +244,18 @@ mod_quick_tcga_server <- function(id, app_state, async_compute) {
             "immune" = {
               shiny::incProgress(0.3, detail = "Querying immune data")
               run_immune_analysis(gene, data_type, input$cor_method)
+            },
+            "tmb" = {
+              shiny::incProgress(0.3, detail = "Querying TMB data")
+              run_index_analysis(gene, data_type, "tmb", input$cor_method, input$index_plot_type)
+            },
+            "msi" = {
+              shiny::incProgress(0.3, detail = "Querying MSI data")
+              run_index_analysis(gene, data_type, "msi", input$cor_method, input$index_plot_type)
+            },
+            "stemness" = {
+              shiny::incProgress(0.3, detail = "Querying stemness data")
+              run_index_analysis(gene, data_type, "stemness", input$cor_method, input$index_plot_type)
             },
             "mutation" = {
               shiny::incProgress(0.3, detail = "Querying mutation data")
@@ -446,6 +472,32 @@ run_immune_analysis <- function(gene, data_type, cor_method) {
   plot <- vis_gene_immune_cor(gene, data_type = data_type, method = cor_method)
   data <- plot$data
   stats <- summary(data$Correlation)
+
+  list(plot = plot, data = data, stats = stats)
+}
+
+#' Run Index Analysis (TMB/MSI/Stemness)
+#' @keywords internal
+run_index_analysis <- function(gene, data_type, index_type, cor_method, plot_type) {
+  # Map index type to visualization function
+  plot <- switch(index_type,
+    "tmb" = vis_gene_tmb_cor(gene, data_type = data_type, method = cor_method),
+    "msi" = vis_gene_msi_cor(gene, data_type = data_type, method = cor_method),
+    "stemness" = vis_gene_stemness_cor(gene, data_type = data_type, method = cor_method),
+    stop("Unknown index type: ", index_type)
+  )
+
+  data <- plot$data
+
+  # Calculate correlation statistics
+  cor_test <- stats::cor.test(data$Gene, data$Index, method = cor_method)
+
+  stats <- list(
+    correlation = cor_test$estimate,
+    p_value = cor_test$p.value,
+    n_samples = nrow(data),
+    index_type = index_type
+  )
 
   list(plot = plot, data = data, stats = stats)
 }
