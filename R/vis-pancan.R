@@ -230,3 +230,139 @@ vis_gene_cor <- function(gene1,
   p
 }
 
+#' Visualize Gene and Pathway Correlation
+#'
+#' @description
+#' Create scatter plot showing correlation between gene expression and pathway activity score.
+#'
+#' @param gene Gene symbol (e.g., "TP53")
+#' @param data_type Data type: "mRNA", "transcript", "protein", "methylation", "miRNA"
+#' @param pw_name Pathway name (e.g., "HALLMARK_APOPTOSIS")
+#' @param cancer_choose Cancer type(s) to include
+#' @param cor_method Correlation method: "spearman" or "pearson"
+#' @param use_regline Whether to add regression line (default: TRUE)
+#' @param alpha Point transparency (default: 0.5)
+#' @param color Point color (default: "#000000")
+#' @param filter_tumor Whether to filter to tumor samples only (default: TRUE)
+#' @return ggplot object
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' # Visualize TP53 correlation with apoptosis pathway
+#' p <- vis_gene_pw_cor(
+#'   gene = "TP53",
+#'   data_type = "mRNA",
+#'   pw_name = "HALLMARK_APOPTOSIS",
+#'   cancer_choose = "BRCA"
+#' )
+#' print(p)
+#' }
+vis_gene_pw_cor <- function(gene = "TP53",
+                            data_type = "mRNA",
+                            pw_name = "HALLMARK_APOPTOSIS",
+                            cancer_choose = "BRCA",
+                            cor_method = c("spearman", "pearson"),
+                            use_regline = TRUE,
+                            alpha = 0.5,
+                            color = "#000000",
+                            filter_tumor = TRUE) {
+  cor_method <- match.arg(cor_method)
+
+  # Load pathway data
+  tcga_pw <- load_data("tcga_PW")
+  tcga_pw_meta <- load_data("tcga_PW_meta")
+
+  # Validate pathway name
+  if (!is.null(pw_name)) {
+    if (!(pw_name %in% tcga_pw_meta$ID)) {
+      stop("Invalid pathway name. See load_data('tcga_PW_meta') for available pathways.")
+    }
+  }
+
+  # Query gene expression
+  gene_expr <- query_molecule_value(gene, data_type = data_type, source = "tcga")
+
+  if (is.null(gene_expr) || all(is.na(gene_expr))) {
+    warning("No gene expression data available for ", gene)
+    return(NULL)
+  }
+
+  message("Retrieved expression data for ", gene)
+
+  # Load sample information
+  tcga_gtex <- load_data("tcga_gtex")
+
+  # Filter samples
+  if (filter_tumor) {
+    sample_filter <- tcga_gtex$type2 == "tumor"
+  } else {
+    sample_filter <- TRUE
+  }
+
+  # Filter by cancer type
+  cancer_filter <- tcga_gtex$tissue %in% cancer_choose
+
+  # Get filtered samples
+  filtered_samples <- tcga_gtex$sample[sample_filter & cancer_filter]
+
+  # Prepare gene expression data
+  df <- data.frame(
+    Sample = names(gene_expr),
+    Gene = as.numeric(gene_expr),
+    stringsAsFactors = FALSE
+  )
+
+  # Add pathway scores
+  pw_samples <- rownames(tcga_pw)
+  common_samples <- intersect(df$Sample, pw_samples)
+  common_samples <- intersect(common_samples, filtered_samples)
+
+  if (length(common_samples) < 10) {
+    stop("Insufficient samples for analysis (need at least 10)")
+  }
+
+  # Extract pathway scores
+  pw_scores <- tcga_pw[common_samples, pw_name]
+
+  # Prepare final data
+  plot_data <- data.frame(
+    Sample = common_samples,
+    Gene = df$Gene[match(common_samples, df$Sample)],
+    Pathway = as.numeric(pw_scores),
+    Cancer = tcga_gtex$tissue[match(common_samples, tcga_gtex$sample)],
+    stringsAsFactors = FALSE
+  )
+
+  # Remove NAs
+  plot_data <- plot_data[stats::complete.cases(plot_data), ]
+
+  if (nrow(plot_data) < 10) {
+    stop("Insufficient valid samples after removing NAs")
+  }
+
+  # Calculate correlation
+  cor_res <- stats::cor.test(plot_data$Gene, plot_data$Pathway, method = cor_method)
+  cor_label <- sprintf("%s: r=%.3f, p=%.2e", cor_method, cor_res$estimate, cor_res$p.value)
+
+  # Create plot
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$Gene, y = .data$Pathway)) +
+    ggplot2::geom_point(alpha = alpha, color = color, size = 3) +
+    ggplot2::labs(
+      x = paste(gene, data_type),
+      y = pw_name,
+      title = paste(gene, "vs", pw_name),
+      subtitle = cor_label
+    ) +
+    theme_zinasuite()
+
+  if (use_regline) {
+    p <- p + ggplot2::geom_smooth(method = "lm", color = "red", se = TRUE)
+  }
+
+  # Store data as attribute for download
+  attr(p, "data") <- plot_data
+
+  p
+}
+

@@ -34,7 +34,7 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 | TIL Analysis | modules-1-tcga-04-TIL.R | mod_quick_tcga | ✅ | ✅ |
 | Immune Features | modules-1-tcga-05-Immune.R | mod_quick_tcga | ✅ | ✅ |
 | Index Analysis | modules-1-tcga-06-Idx.R | mod_quick_tcga | ✅ | ✅ |
-| Pathway Analysis | modules-1-tcga-07-PW.R | mod_quick_tcga | ⏳ | ⏳ |
+| Pathway Analysis | modules-1-tcga-07-PW.R | mod_quick_tcga | ✅ | ✅ |
 | Mutation Analysis | modules-1-tcga-08-Mut.R | mod_quick_tcga | ✅ | ✅ |
 | KM Survival | modules-1-tcga-09-KM.R | mod_quick_tcga | ✅ | ✅ |
 | Cox Regression | modules-1-tcga-10-Cox.R | mod_quick_tcga | ✅ | ✅ |
@@ -197,7 +197,7 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 | Category | Total | Complete | In Progress | Pending | Coverage |
 |----------|-------|----------|-------------|---------|----------|
 | General Analysis | 5 | 5 | 0 | 0 | 100% |
-| TCGA Quick | 11 | 10 | 0 | 1 | 91% |
+| TCGA Quick | 11 | **11** | 0 | 0 | **100%** |
 | PCAWG Quick | 4 | 0 | 4 | 0 | 100% |
 | CCLE Quick | 4 | 0 | 2 | 2 | 50% |
 | TCGA Deep | 11 | 0 | 0 | 11 | 0% |
@@ -206,7 +206,7 @@ This document tracks the implementation status of all UCSCXenaShiny features in 
 | TPC Functions | 8 | 1 | 0 | 7 | 12.5% |
 | Pharmacogenomics | 5 | 5 | 0 | 0 | 100% |
 | Other Pages | 6 | 0 | 2 | 4 | 33% |
-| **TOTAL** | **69** | **36** | **8** | **25** | **58%** |
+| **TOTAL** | **69** | **37** | **8** | **24** | **59%** |
 
 ### By Priority
 

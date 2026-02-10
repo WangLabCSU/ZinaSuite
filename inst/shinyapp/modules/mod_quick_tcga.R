@@ -35,6 +35,7 @@ mod_quick_tcga_ui <- function(id) {
             "TMB Correlation" = "tmb",
             "MSI Correlation" = "msi",
             "Stemness Correlation" = "stemness",
+            "Pathway Analysis" = "pathway",
             "Mutation Frequency" = "mutation",
                 "Survival (KM)" = "survival_km",
                 "Survival (Cox)" = "survival_cox",
@@ -133,7 +134,38 @@ mod_quick_tcga_ui <- function(id) {
             ),
 
             shiny::conditionalPanel(
-              condition = sprintf("input['%s'] == 'survival_km' || input['%s'] == 'survival_cox'", ns("analysis_type"), ns("analysis_type")),
+              condition = sprintf("input['%s'] == 'pathway'", ns("analysis_type")),
+              shiny::selectInput(
+                ns("pathway_name"),
+                "Pathway:",
+                choices = c(
+                  "HALLMARK_APOPTOSIS" = "HALLMARK_APOPTOSIS",
+                  "HALLMARK_DNA_REPAIR" = "HALLMARK_DNA_REPAIR",
+                  "HALLMARK_E2F_TARGETS" = "HALLMARK_E2F_TARGETS",
+                  "HALLMARK_G2M_CHECKPOINT" = "HALLMARK_G2M_CHECKPOINT",
+                  "HALLMARK_MYC_TARGETS_V1" = "HALLMARK_MYC_TARGETS_V1",
+                  "HALLMARK_P53_PATHWAY" = "HALLMARK_P53_PATHWAY",
+                  "HALLMARK_PI3K_AKT_MTOR_SIGNALING" = "HALLMARK_PI3K_AKT_MTOR_SIGNALING",
+                  "HALLMARK_TNFA_SIGNALING_VIA_NFKB" = "HALLMARK_TNFA_SIGNALING_VIA_NFKB",
+                  "HALLMARK_HYPOXIA" = "HALLMARK_HYPOXIA"
+                ),
+                selected = "HALLMARK_APOPTOSIS"
+              ),
+              shiny::selectInput(
+                ns("pw_cor_method"),
+                "Correlation Method:",
+                choices = c("Spearman" = "spearman", "Pearson" = "pearson"),
+                selected = "spearman"
+              ),
+              shiny::checkboxInput(
+                ns("use_regline"),
+                "Show Regression Line",
+                value = TRUE
+              )
+            ),
+
+            shiny::conditionalPanel(
+              condition = sprintf("input['%s'] == 'survival_km' || input['%s'] == 'survival_cox'", ns("analysis_type"), ns("analysis_type"))),
               shiny::selectInput(
                 ns("surv_measure"),
                 "Survival Measure:",
@@ -256,6 +288,10 @@ mod_quick_tcga_server <- function(id, app_state, async_compute) {
             "stemness" = {
               shiny::incProgress(0.3, detail = "Querying stemness data")
               run_index_analysis(gene, data_type, "stemness", input$cor_method, input$index_plot_type)
+            },
+            "pathway" = {
+              shiny::incProgress(0.3, detail = "Querying pathway data")
+              run_pathway_analysis(gene, data_type, input$pathway_name, input$cancer, input$pw_cor_method, input$use_regline)
             },
             "mutation" = {
               shiny::incProgress(0.3, detail = "Querying mutation data")
@@ -497,6 +533,36 @@ run_index_analysis <- function(gene, data_type, index_type, cor_method, plot_typ
     p_value = cor_test$p.value,
     n_samples = nrow(data),
     index_type = index_type
+  )
+
+  list(plot = plot, data = data, stats = stats)
+}
+
+#' Run Pathway Analysis
+#' @keywords internal
+run_pathway_analysis <- function(gene, data_type, pathway_name, cancer, cor_method, use_regline) {
+  # Use vis_gene_pw_cor for visualization
+  plot <- vis_gene_pw_cor(
+    gene = gene,
+    data_type = data_type,
+    pw_name = pathway_name,
+    cancer_choose = cancer,
+    cor_method = cor_method,
+    use_regline = use_regline
+  )
+
+  # Extract data from plot attribute
+  data <- attr(plot, "data")
+
+  # Calculate correlation statistics
+  cor_test <- stats::cor.test(data$Gene, data$Pathway, method = cor_method)
+
+  stats <- list(
+    correlation = cor_test$estimate,
+    p_value = cor_test$p.value,
+    method = cor_method,
+    n_samples = nrow(data),
+    pathway = pathway_name
   )
 
   list(plot = plot, data = data, stats = stats)
