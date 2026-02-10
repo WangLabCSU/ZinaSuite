@@ -56,7 +56,7 @@ vis_kaplan_meier <- function(km_result, title = NULL, conf.int = TRUE, risk.tabl
     # Fallback to basic ggplot2
     data <- km_result$surv_data
 
-    p <- ggplot2::ggplot(data, ggplot2::aes(x = time, y = surv)) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$time, y = .data$surv)) +
       ggplot2::geom_step() +
       ggplot2::labs(
         title = title %||% "Kaplan-Meier Survival Curve",
@@ -67,11 +67,11 @@ vis_kaplan_meier <- function(km_result, title = NULL, conf.int = TRUE, risk.tabl
       ggplot2::theme_minimal()
 
     if (conf.int && "lower" %in% names(data) && "upper" %in% names(data)) {
-      p <- p + ggplot2::geom_ribbon(ggplot2::aes(ymin = lower, ymax = upper), alpha = 0.2)
+      p <- p + ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lower, ymax = .data$upper), alpha = 0.2)
     }
 
     if ("group" %in% names(data)) {
-      p <- p + ggplot2::aes(color = group) +
+      p <- p + ggplot2::aes(color = .data$group) +
         ggplot2::theme(legend.position = "bottom")
     }
 
@@ -122,9 +122,9 @@ vis_forest_plot <- function(cox_result, title = NULL) {
   plot_data$variable <- gsub("group", "", plot_data$variable)
 
   # Create forest plot
-  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = hr, y = reorder(variable, hr))) +
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$hr, y = stats::reorder(.data$variable, .data$hr))) +
     ggplot2::geom_point(size = 3) +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmin = `lower .95`, xmax = `upper .95`), height = 0.2) +
+    ggplot2::geom_errorbarh(ggplot2::aes(xmin = .data$`lower .95`, xmax = .data$`upper .95`), height = 0.2) +
     ggplot2::geom_vline(xintercept = 1, linetype = "dashed", color = "red") +
     ggplot2::labs(
       title = title %||% "Cox Regression Forest Plot",
@@ -170,9 +170,9 @@ vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
   }
 
   # Create forest plot
-  p <- ggplot2::ggplot(data, ggplot2::aes(x = hr, y = reorder(gene, hr))) +
-    ggplot2::geom_point(ggplot2::aes(color = pvalue < 0.05), size = 3) +
-    ggplot2::geom_errorbarh(ggplot2::aes(xmin = lower, xmax = upper), height = 0.2) +
+  p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$hr, y = stats::reorder(.data$gene, .data$hr))) +
+    ggplot2::geom_point(ggplot2::aes(color = .data$pvalue < 0.05), size = 3) +
+    ggplot2::geom_errorbarh(ggplot2::aes(xmin = .data$lower, xmax = .data$upper), height = 0.2) +
     ggplot2::geom_vline(xintercept = 1, linetype = "dashed", color = "red") +
     ggplot2::scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black"), guide = "none") +
     ggplot2::labs(

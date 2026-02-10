@@ -60,7 +60,7 @@ vis_correlation <- function(x, y = NULL,
     data <- data.frame(x = x, y = y)
 
     # Build plot
-    p <- ggplot2::ggplot(data, ggplot2::aes(x = x, y = y)) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$x, y = .data$y)) +
       ggplot2::geom_point(alpha = 0.5, ...) +
       ggplot2::geom_smooth(method = "lm", se = TRUE, color = "red") +
       ggplot2::labs(
@@ -87,9 +87,9 @@ vis_correlation <- function(x, y = NULL,
     colnames(cor_df) <- c("Var1", "Var2", "Correlation")
 
     # Build plot
-    p <- ggplot2::ggplot(cor_df, ggplot2::aes(x = Var1, y = Var2, fill = Correlation)) +
+    p <- ggplot2::ggplot(cor_df, ggplot2::aes(x = .data$Var1, y = .data$Var2, fill = .data$Correlation)) +
       ggplot2::geom_tile() +
-      ggplot2::geom_text(ggplot2::aes(label = sprintf("%.2f", Correlation)), size = 3) +
+      ggplot2::geom_text(ggplot2::aes(label = sprintf("%.2f", .data$Correlation)), size = 3) +
       ggplot2::scale_fill_gradient2(
         low = "blue", mid = "white", high = "red",
         midpoint = 0, limits = c(-1, 1)
@@ -172,10 +172,10 @@ vis_gene_correlation <- function(gene1, gene2,
 
   # Build plot
   if (!is.null(color_by)) {
-    p <- ggplot2::ggplot(data, ggplot2::aes(x = gene1, y = gene2, color = .data[[color_by]])) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$gene1, y = .data$gene2, color = .data[[color_by]])) +
       ggplot2::geom_point(alpha = 0.6)
   } else {
-    p <- ggplot2::ggplot(data, ggplot2::aes(x = gene1, y = gene2)) +
+    p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$gene1, y = .data$gene2)) +
       ggplot2::geom_point(alpha = 0.5, color = "steelblue")
   }
 
@@ -248,17 +248,17 @@ vis_pancan_correlation <- function(gene1, gene2,
 
   # Calculate correlation by cancer type
   cor_by_cancer <- data %>%
-    dplyr::group_by(cancer) %>%
+    dplyr::group_by(.data$cancer) %>%
     dplyr::summarise(
-      cor = cor(gene1, gene2, method = method, use = "complete.obs"),
+      cor = cor(.data$gene1, .data$gene2, method = method, use = "complete.obs"),
       n = dplyr::n(),
       .groups = "drop"
     ) %>%
-    dplyr::filter(n >= 10) %>%
-    dplyr::arrange(cor)
+    dplyr::filter(.data$n >= 10) %>%
+    dplyr::arrange(.data$cor)
 
   # Create plot
-  p <- ggplot2::ggplot(cor_by_cancer, ggplot2::aes(x = reorder(cancer, cor), y = cor)) +
+  p <- ggplot2::ggplot(cor_by_cancer, ggplot2::aes(x = stats::reorder(.data$cancer, .data$cor), y = .data$cor)) +
     ggplot2::geom_bar(stat = "identity", fill = "steelblue") +
     ggplot2::geom_hline(yintercept = 0, linetype = "dashed") +
     ggplot2::coord_flip() +
