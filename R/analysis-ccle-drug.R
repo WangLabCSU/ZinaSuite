@@ -133,8 +133,8 @@ analyze_gene_drug_response_asso <- function(gene_list, combine = FALSE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' # Analyze TP53 in all tissues
+#' \dontrun{
+#' # Analyze TP53 in all tissues (requires ccle_expr_and_drug_response data)
 #' result <- analyze_gene_drug_response_diff("TP53")
 #'
 #' # Analyze in specific tissue

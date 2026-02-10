@@ -221,7 +221,6 @@ mod_quick_tcga_ui <- function(id) {
         )
       )
     )
-  )
 }
 
 #' TCGA Quick Analysis Module Server
