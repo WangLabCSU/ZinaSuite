@@ -26,7 +26,6 @@ ui <- bslib::page_navbar(
     htmltools::tags$img(src = "logo.png", height = "30px", style = "margin-right: 10px;"),
     "ZinaSuite"
   ),
-  bg = "#2C3E50",
   fillable = TRUE,
   window_title = "ZinaSuite - UCSC Xena Data Analysis",
   navbar_options = bslib::navbar_options(

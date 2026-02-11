@@ -87,7 +87,8 @@ mod_mutation_ui <- function(id) {
 #'
 #' @param id Module ID
 #' @param app_state Shared reactive state
-mod_mutation_server <- function(id, app_state) {
+#' @param async_compute Async compute engine (optional)
+mod_mutation_server <- function(id, app_state, async_compute = NULL) {
   shiny::moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
