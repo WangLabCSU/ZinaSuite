@@ -84,7 +84,7 @@ mod_pharmacogenomics_ui <- function(id) {
               # Main content
               bslib::navset_card_tab(
                 bslib::nav_panel(
-                  title = shiny::icon("chart-scatter"),
+                  title = shiny::icon("chart-line"),
                   shiny::plotOutput(ns("correlation_plot"), height = "500px")
                 ),
                 bslib::nav_panel(

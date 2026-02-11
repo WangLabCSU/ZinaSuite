@@ -27,9 +27,12 @@ ui <- bslib::page_navbar(
     "ZinaSuite"
   ),
   bg = "#2C3E50",
-  inverse = TRUE,
   fillable = TRUE,
   window_title = "ZinaSuite - UCSC Xena Data Analysis",
+  navbar_options = bslib::navbar_options(
+    bg = "#2C3E50",
+    theme = "dark"
+  ),
 
   # Home Tab
   bslib::nav_panel(
@@ -196,7 +199,7 @@ ui <- bslib::page_navbar(
     class = "bg-light py-3 mt-auto",
     shiny::tags$div(
       class = "container text-center text-muted",
-      "ZinaSuite v", packageVersion("ZinaSuite"),
+      paste0("ZinaSuite v", as.character(packageVersion("ZinaSuite"))),
       " | Powered by ",
       shiny::tags$a(href = "https://bioconductor.org", "Bioconductor"),
       " | Data from ",
