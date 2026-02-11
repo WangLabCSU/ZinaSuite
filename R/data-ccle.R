@@ -188,7 +188,7 @@ CCLEData <- R6::R6Class(
     #' @param gene Gene symbol
     #' @return Named numeric vector (0/1)
     get_mutation_status = function(gene) {
-      private$query_with_cache(gene, "mutation", private$dataset_map$mutation, use_probeMap = FALSE)
+      private$query_mutation_with_cache(gene)
     },
 
     #' @description
@@ -227,10 +227,11 @@ CCLEData <- R6::R6Class(
     dataset_map = NULL,
 
     init_dataset_map = function() {
+      # Use same dataset names as UCSCXenaShiny
       private$dataset_map <- list(
-        expression = "ccle/CCLE_RNAseq_genes_rpkm_20180929",
-        mutation = "ccle/CCLE_DepMap_18q3_maf_20180718",
-        cnv = "ccle/CCLE_gene_cn",
+        expression = "ccle/CCLE_DepMap_18Q2_RNAseq_RPKM_20180502",
+        mutation = "ccle/CCLE_DepMap_18Q2_maf_20180502",
+        cnv = "ccle/CCLE_copynumber_byGene_2013-12-03",
         protein = "ccle/CCLE_RPPA_20180123"
       )
     },
@@ -278,6 +279,43 @@ CCLEData <- R6::R6Class(
       values
     },
 
+    query_mutation_with_cache = function(gene) {
+      cache_key <- paste("ccle", "mutation", gene, sep = "_")
+
+      # Check cache
+      cached <- private$cache_manager$get(cache_key)
+      if (!is.null(cached)) {
+        return(cached)
+      }
+
+      # Query from Xena with retry using sparse values (CCLE mutation is in sparse format)
+      result <- NULL
+      max_try <- 3
+      for (i in seq_len(max_try)) {
+        result <- tryCatch({
+          private$fetch_mutation_from_xena(gene)
+        }, error = function(e) {
+          if (i == max_try) {
+            warning("Failed to fetch ", gene, " mutation from CCLE after ", max_try, " attempts: ", conditionMessage(e))
+            return(NULL)
+          }
+          Sys.sleep(0.5)
+          NULL
+        })
+        if (!is.null(result)) break
+      }
+
+      if (is.null(result)) {
+        warning("No mutation data returned for ", gene, " from CCLE")
+        return(NULL)
+      }
+
+      # Cache result
+      private$cache_manager$set(cache_key, result)
+
+      result
+    },
+
     fetch_from_xena = function(identifier, dataset, use_probeMap = TRUE) {
       if (!requireNamespace("UCSCXenaTools", quietly = TRUE)) {
         stop("Package 'UCSCXenaTools' is required")
@@ -303,6 +341,48 @@ CCLEData <- R6::R6Class(
       }
 
       result
+    },
+
+    fetch_mutation_from_xena = function(gene) {
+      if (!requireNamespace("UCSCXenaTools", quietly = TRUE)) {
+        stop("Package 'UCSCXenaTools' is required")
+      }
+
+      xe <- UCSCXenaTools::XenaData
+      host_url <- unique(xe$XenaHosts[xe$XenaHostNames == private$host])
+
+      if (length(host_url) == 0) {
+        stop("Host not found: ", private$host)
+      }
+
+      # CCLE mutation data is in sparse format (MAF-like)
+      dataset <- private$dataset_map$mutation
+
+      # Use fetch_sparse_values for mutation data
+      query_list <- UCSCXenaTools::fetch_sparse_values(
+        host = host_url[1],
+        dataset = dataset,
+        genes = gene
+      )
+
+      if (is.null(query_list) || length(query_list$samples) == 0) {
+        return(NULL)
+      }
+
+      # Convert to binary mutation status (0/1)
+      # query_list$samples contains all cell lines
+      # query_list$rows contains mutation info for mutated cell lines
+      all_cells <- query_list$samples
+      mutated_cells <- unique(query_list$rows$sampleID)
+
+      # Create binary vector
+      values <- ifelse(all_cells %in% mutated_cells, 1, 0)
+      names(values) <- all_cells
+      attr(values, "source") <- "CCLE"
+      attr(values, "type") <- "mutation"
+      attr(values, "maf_data") <- query_list$rows  # Store raw MAF data for advanced use
+
+      values
     }
   )
 )

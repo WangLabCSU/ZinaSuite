@@ -148,6 +148,18 @@ analyze_drug_gene_batch <- function(genes,
                                     cor_method = "spearman",
                                     n_workers = 4,
                                     .progress = TRUE) {
+  # Handle empty gene list
+  if (length(genes) == 0) {
+    return(data.frame(
+      gene = character(0),
+      correlation = numeric(0),
+      p_value = numeric(0),
+      n = integer(0),
+      error = character(0),
+      stringsAsFactors = FALSE
+    ))
+  }
+
   # Query drug sensitivity once
   drug_sens <- query_drug_sensitivity(drug, metric = metric, source = "ccle")
 
@@ -186,8 +198,8 @@ analyze_drug_gene_batch <- function(genes,
         if (is.null(gene_result) || nrow(gene_result) == 0) {
           return(list(
             gene = args$gene,
-            cor = NA,
-            pvalue = NA,
+            correlation = NA,
+            p_value = NA,
             n = 0,
             error = "Gene not found"
           ))
@@ -202,8 +214,8 @@ analyze_drug_gene_batch <- function(genes,
         if (length(common_cells) < 5) {
           return(list(
             gene = args$gene,
-            cor = NA,
-            pvalue = NA,
+            correlation = NA,
+            p_value = NA,
             n = length(common_cells),
             error = "Insufficient common cell lines"
           ))
@@ -217,8 +229,8 @@ analyze_drug_gene_batch <- function(genes,
         if (sum(valid) < 5) {
           return(list(
             gene = args$gene,
-            cor = NA,
-            pvalue = NA,
+            correlation = NA,
+            p_value = NA,
             n = sum(valid),
             error = "Insufficient complete cases"
           ))
@@ -228,16 +240,16 @@ analyze_drug_gene_batch <- function(genes,
 
         list(
           gene = args$gene,
-          cor = unname(cor_result$estimate),
-          pvalue = cor_result$p.value,
+          correlation = unname(cor_result$estimate),
+          p_value = cor_result$p.value,
           n = sum(valid),
           error = NULL
         )
       }, error = function(e) {
         list(
           gene = args$gene,
-          cor = NA,
-          pvalue = NA,
+          correlation = NA,
+          p_value = NA,
           n = 0,
           error = conditionMessage(e)
         )
@@ -253,8 +265,8 @@ analyze_drug_gene_batch <- function(genes,
   results_df <- do.call(rbind, lapply(results_list, function(r) {
     data.frame(
       gene = r$gene,
-      cor = r$cor,
-      pvalue = r$pvalue,
+      correlation = r$correlation,
+      p_value = r$p_value,
       n = r$n,
       error = r$error,
       stringsAsFactors = FALSE
@@ -262,17 +274,17 @@ analyze_drug_gene_batch <- function(genes,
   }))
 
   # Adjust p-values
-  valid_pvalues <- !is.na(results_df$pvalue)
+  valid_pvalues <- !is.na(results_df$p_value)
   if (any(valid_pvalues)) {
     results_df$padj <- NA
     results_df$padj[valid_pvalues] <- stats::p.adjust(
-      results_df$pvalue[valid_pvalues],
+      results_df$p_value[valid_pvalues],
       method = "fdr"
     )
   }
 
   # Sort by absolute correlation
-  results_df <- results_df[order(-abs(results_df$cor)), ]
+  results_df <- results_df[order(-abs(results_df$correlation)), ]
   rownames(results_df) <- NULL
 
   results_df

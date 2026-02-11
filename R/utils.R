@@ -48,8 +48,8 @@ get_data_source <- function(source = c("tcga", "pcawg", "ccle")) {
 
   switch(source,
     tcga = XenaData$new(host = "toilHub"),
-    pcawg = XenaData$new(host = "pcawgHub"),
-    ccle = XenaData$new(host = "publicHub")
+    pcawg = PCAWGData$new(),
+    ccle = CCLEData$new()
   )
 }
 

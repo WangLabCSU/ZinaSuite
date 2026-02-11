@@ -256,8 +256,8 @@ test_that("analyze_correlation_batch works with real data", {
 
   expect_s3_class(results, "data.frame")
   expect_true("gene" %in% colnames(results))
-  expect_true("cor" %in% colnames(results))
-  expect_true("pvalue" %in% colnames(results))
+  expect_true("correlation" %in% colnames(results))
+  expect_true("p_value" %in% colnames(results))
   expect_equal(nrow(results), 2)
 })
 

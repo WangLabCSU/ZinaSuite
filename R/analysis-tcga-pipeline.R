@@ -13,15 +13,12 @@ vis_gene_pair_cor <- function(gene1, gene2, data_type1 = "mRNA", data_type2 = "m
                                cancer_choose = NULL, cor_method = "pearson",
                                use_regline = TRUE, alpha = 0.6) {
   # Use the existing vis_gene_correlation function
+  # Note: vis_gene_correlation has different parameters
   vis_gene_correlation(
     gene1 = gene1,
     gene2 = gene2,
-    data_type1 = data_type1,
-    data_type2 = data_type2,
-    cancer = cancer_choose,
-    method = cor_method,
-    use_regline = use_regline,
-    alpha = alpha
+    data_type = data_type1,  # vis_gene_correlation only supports one data_type
+    method = cor_method
   )
 }
 
@@ -592,12 +589,11 @@ run_tcga_sur_m2o <- function(molecules_text, cancer, data_type, surv_measure = "
 #' @export
 run_tcga_cross_o2m <- function(molecule1, molecule2, cancer, data_type1, data_type2) {
   # Use existing cross-omics function
+  # Note: analyze_cross_gene expects target_gene and correlate_genes
   plot <- analyze_cross_gene(
-    gene1 = molecule1,
-    gene2 = molecule2,
-    cancer = cancer,
-    data_type1 = data_type1,
-    data_type2 = data_type2
+    target_gene = molecule1,
+    correlate_genes = molecule2,
+    cancer = cancer
   )
 
   # Extract data from plot attribute

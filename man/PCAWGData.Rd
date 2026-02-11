@@ -26,8 +26,10 @@ tp53_mut <- pcawg$get_mutation_status("TP53")
 \itemize{
 \item \href{#method-PCAWGData-new}{\code{PCAWGData$new()}}
 \item \href{#method-PCAWGData-get_gene_expression}{\code{PCAWGData$get_gene_expression()}}
-\item \href{#method-PCAWGData-get_mutation_status}{\code{PCAWGData$get_mutation_status()}}
-\item \href{#method-PCAWGData-get_cnv}{\code{PCAWGData$get_cnv()}}
+\item \href{#method-PCAWGData-get_fusion}{\code{PCAWGData$get_fusion()}}
+\item \href{#method-PCAWGData-get_mirna}{\code{PCAWGData$get_mirna()}}
+\item \href{#method-PCAWGData-get_promoter}{\code{PCAWGData$get_promoter()}}
+\item \href{#method-PCAWGData-get_apobec}{\code{PCAWGData$get_apobec()}}
 \item \href{#method-PCAWGData-query}{\code{PCAWGData$query()}}
 \item \href{#method-PCAWGData-clone}{\code{PCAWGData$clone()}}
 }
@@ -72,12 +74,12 @@ Named numeric vector
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PCAWGData-get_mutation_status"></a>}}
-\if{latex}{\out{\hypertarget{method-PCAWGData-get_mutation_status}{}}}
-\subsection{Method \code{get_mutation_status()}}{
-Get mutation status
+\if{html}{\out{<a id="method-PCAWGData-get_fusion"></a>}}
+\if{latex}{\out{\hypertarget{method-PCAWGData-get_fusion}{}}}
+\subsection{Method \code{get_fusion()}}{
+Get fusion data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$get_mutation_status(gene)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$get_fusion(gene)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -92,18 +94,65 @@ Named numeric vector (0/1)
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PCAWGData-get_cnv"></a>}}
-\if{latex}{\out{\hypertarget{method-PCAWGData-get_cnv}{}}}
-\subsection{Method \code{get_cnv()}}{
-Get CNV data
+\if{html}{\out{<a id="method-PCAWGData-get_mirna"></a>}}
+\if{latex}{\out{\hypertarget{method-PCAWGData-get_mirna}{}}}
+\subsection{Method \code{get_mirna()}}{
+Get miRNA expression data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$get_cnv(gene)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$get_mirna(mirna, norm = c("TMM", "UQ"))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{gene}}{Gene symbol}
+\item{\code{mirna}}{miRNA ID (e.g., "hsa-miR-21-5p")}
+
+\item{\code{norm}}{Normalization method: "TMM" (default) or "UQ"}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Named numeric vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PCAWGData-get_promoter"></a>}}
+\if{latex}{\out{\hypertarget{method-PCAWGData-get_promoter}{}}}
+\subsection{Method \code{get_promoter()}}{
+Get promoter activity data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$get_promoter(promoter, type = c("raw", "relative", "outlier"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{promoter}}{Promoter identifier (e.g., "prmtr.10000") or gene symbol}
+
+\item{\code{type}}{Promoter activity type: "raw" (default), "relative", or "outlier"}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Named numeric vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PCAWGData-get_apobec"></a>}}
+\if{latex}{\out{\hypertarget{method-PCAWGData-get_apobec}{}}}
+\subsection{Method \code{get_apobec()}}{
+Get APOBEC mutagenesis data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$get_apobec(
+  identifier = c("tCa_MutLoad_MinEstimate", "APOBECtCa_enrich", "A3A_or_A3B",
+    "APOBEC_tCa_enrich_quartile")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{identifier}}{APOBEC identifier}
 }
 \if{html}{\out{</div>}}
 }
@@ -117,15 +166,17 @@ Named numeric vector
 \subsection{Method \code{query()}}{
 Query data by type
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$query(identifier, data_type = "expression")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PCAWGData$query(identifier, data_type = "expression", ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{identifier}}{Gene symbol}
+\item{\code{identifier}}{Gene symbol or other identifier}
 
-\item{\code{data_type}}{Type of data}
+\item{\code{data_type}}{Type of data: "expression", "fusion", "miRNA", "promoter", "APOBEC"}
+
+\item{\code{...}}{Additional parameters (e.g., norm for miRNA)}
 }
 \if{html}{\out{</div>}}
 }

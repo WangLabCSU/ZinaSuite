@@ -7,9 +7,10 @@
 query_molecule(
   identifier,
   data_type = c("mRNA", "protein", "mutation", "cnv", "methylation", "miRNA",
-    "transcript"),
+    "transcript", "fusion", "promoter", "APOBEC"),
   source = c("tcga", "pcawg", "ccle"),
-  dataset = NULL
+  dataset = NULL,
+  ...
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ For gene expression, use official gene symbols (e.g., "TP53", "BRCA1").}
 \item{source}{Data source. One of "tcga", "pcawg", or "ccle".}
 
 \item{dataset}{Specific dataset name (optional). If NULL, uses default dataset.}
+
+\item{...}{Additional arguments passed to the query method (e.g., \code{norm} for miRNA normalization in PCAWG).}
 }
 \value{
 A named vector of values with sample IDs as names.

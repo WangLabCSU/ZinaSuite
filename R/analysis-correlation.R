@@ -192,25 +192,25 @@ analyze_correlation_batch <- function(target_gene,
   results_df <- do.call(rbind, lapply(results_list, function(r) {
     data.frame(
       gene = r$gene,
-      cor = r$cor,
-      pvalue = r$pvalue,
+      correlation = r$cor,
+      p_value = r$pvalue,
       n = r$n,
       stringsAsFactors = FALSE
     )
   }))
 
   # Adjust p-values
-  valid_pvalues <- !is.na(results_df$pvalue)
+  valid_pvalues <- !is.na(results_df$p_value)
   if (any(valid_pvalues)) {
     results_df$padj <- NA
     results_df$padj[valid_pvalues] <- stats::p.adjust(
-      results_df$pvalue[valid_pvalues],
+      results_df$p_value[valid_pvalues],
       method = adjust_method
     )
   }
 
   # Sort by absolute correlation
-  results_df <- results_df[order(-abs(results_df$cor)), ]
+  results_df <- results_df[order(-abs(results_df$correlation)), ]
   rownames(results_df) <- NULL
 
   results_df

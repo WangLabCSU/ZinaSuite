@@ -17,6 +17,7 @@
 #'   - "transcript": Transcript-level expression
 #' @param source Data source. One of "tcga", "pcawg", or "ccle".
 #' @param dataset Specific dataset name (optional). If NULL, uses default dataset.
+#' @param ... Additional arguments passed to the query method (e.g., `norm` for miRNA normalization in PCAWG).
 #' @return A named vector of values with sample IDs as names.
 #' @export
 #'
@@ -37,10 +38,10 @@
 #' mir21 <- query_molecule("hsa-miR-21-5p", data_type = "miRNA", source = "tcga")
 #' }
 query_molecule <- function(identifier,
-                           data_type = c("mRNA", "protein", "mutation", "cnv", "methylation", "miRNA", "transcript"),
+                           data_type = c("mRNA", "protein", "mutation", "cnv", "methylation", "miRNA", "transcript", "fusion", "promoter", "APOBEC"),
                            source = c("tcga", "pcawg", "ccle"),
-                           dataset = NULL) {
-  data_type <- match.arg(data_type)
+                           dataset = NULL,
+                           ...) {
   source <- match.arg(source)
 
   # Validate identifier
@@ -51,8 +52,21 @@ query_molecule <- function(identifier,
   # Get data source instance
   ds <- get_data_source(source)
 
+  # Map data_type to source-specific type
+  if (source == "tcga") {
+    data_type <- match.arg(data_type, choices = c("mRNA", "protein", "mutation", "cnv", "methylation", "miRNA", "transcript"))
+  } else if (source == "pcawg") {
+    data_type <- match.arg(data_type, choices = c("mRNA", "miRNA", "fusion", "promoter", "APOBEC"))
+    # Map mRNA to expression for PCAWG
+    if (data_type == "mRNA") data_type <- "expression"
+  } else if (source == "ccle") {
+    data_type <- match.arg(data_type, choices = c("mRNA", "protein", "mutation", "cnv"))
+    # Map mRNA to expression for CCLE
+    if (data_type == "mRNA") data_type <- "expression"
+  }
+
   # Query data
-  ds$query(identifier, data_type, dataset)
+  ds$query(identifier, data_type, ...)
 }
 
 #' Query Gene Expression

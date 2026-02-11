@@ -4,6 +4,17 @@
 #' Main Shiny application for ZinaSuite - Interactive analysis of UCSC Xena data.
 #' Features a modern bslib interface with comprehensive analysis modules.
 
+# Load required packages
+# In test environment, ensure ZinaSuite is loaded
+if (!requireNamespace("ZinaSuite", quietly = TRUE)) {
+  stop("ZinaSuite package is required but not installed")
+}
+
+# Explicitly load ZinaSuite to make its functions available in module files
+if (!"ZinaSuite" %in% .packages()) {
+  library(ZinaSuite)
+}
+
 # Source all module files
 # Use tryCatch to handle different execution contexts
 modules_dir <- tryCatch({

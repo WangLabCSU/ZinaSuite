@@ -33,3 +33,6 @@ inst/extdata/large/
 .httr-oauth
 docs
 Rplots.pdf
+
+
+data/ccle_expr_and_drug_response.rda

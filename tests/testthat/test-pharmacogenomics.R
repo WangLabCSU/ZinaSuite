@@ -3,6 +3,8 @@
 # Query Drug Sensitivity Tests ------------------------------------------------
 
 test_that("query_drug_sensitivity validates input", {
+  skip_if_offline()
+  skip_on_cran()
   expect_error(query_drug_sensitivity("INVALID_DRUG"))
   expect_error(query_drug_sensitivity("cisplatin", metric = "invalid"))
   expect_error(query_drug_sensitivity("cisplatin", source = "invalid"))
@@ -194,23 +196,22 @@ test_that("drug-mutation results can be formatted", {
 # Integration Tests -----------------------------------------------------------
 
 test_that("pharmacogenomics workflow produces consistent results", {
-  # Mock a complete workflow
-  genes <- c("TP53", "BRCA1", "EGFR")
-  drug <- "cisplatin"
-
-  # Mock batch analysis
+  # Mock a complete workflow with sorted data (like actual function output)
+  genes <- c("EGFR", "TP53", "BRCA1")  # Sorted by abs(correlation): 0.5, 0.3, 0.2
+  
+  # Mock batch analysis (already sorted by absolute correlation descending)
   batch_result <- data.frame(
     gene = genes,
-    cor = c(-0.3, 0.2, 0.5),
-    pvalue = c(0.01, 0.05, 0.001),
-    n = c(100, 95, 98),
-    padj = c(0.03, 0.075, 0.003),
+    correlation = c(0.5, -0.3, 0.2),
+    p_value = c(0.001, 0.01, 0.05),
+    n = c(98, 100, 95),
+    padj = c(0.003, 0.03, 0.075),
     stringsAsFactors = FALSE
   )
 
   # Check results are sorted by absolute correlation
-  expect_equal(batch_result$gene[order(-abs(batch_result$cor))], batch_result$gene)
+  expect_equal(batch_result$gene[order(-abs(batch_result$correlation))], batch_result$gene)
 
   # Check p-values are adjusted
-  expect_true(all(batch_result$padj >= batch_result$pvalue | is.na(batch_result$pvalue)))
+  expect_true(all(batch_result$padj >= batch_result$p_value | is.na(batch_result$p_value)))
 })

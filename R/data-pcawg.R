@@ -149,31 +149,58 @@ PCAWGData <- R6::R6Class(
     },
 
     #' @description
-    #' Get mutation status
+    #' Get fusion data
     #' @param gene Gene symbol
     #' @return Named numeric vector (0/1)
-    get_mutation_status = function(gene) {
-      private$query_with_cache(gene, "mutation", private$dataset_map$mutation, use_probeMap = FALSE)
+    get_fusion = function(gene) {
+      private$query_with_cache(gene, "fusion", private$dataset_map$fusion, use_probeMap = FALSE)
     },
 
     #' @description
-    #' Get CNV data
-    #' @param gene Gene symbol
+    #' Get miRNA expression data
+    #' @param mirna miRNA ID (e.g., "hsa-miR-21-5p")
+    #' @param norm Normalization method: "TMM" (default) or "UQ"
     #' @return Named numeric vector
-    get_cnv = function(gene) {
-      private$query_with_cache(gene, "cnv", private$dataset_map$cnv, use_probeMap = FALSE)
+    get_mirna = function(mirna, norm = c("TMM", "UQ")) {
+      norm <- match.arg(norm)
+      dataset <- private$dataset_map[[paste0("mirna_", tolower(norm))]]
+      private$query_with_cache(mirna, "miRNA", dataset)
+    },
+
+    #' @description
+    #' Get promoter activity data
+    #' @param promoter Promoter identifier (e.g., "prmtr.10000") or gene symbol
+    #' @param type Promoter activity type: "raw" (default), "relative", or "outlier"
+    #' @return Named numeric vector
+    get_promoter = function(promoter, type = c("raw", "relative", "outlier")) {
+      type <- match.arg(type)
+      dataset <- private$dataset_map[[paste0("promoter_", type)]]
+      private$query_with_cache(promoter, "promoter", dataset, use_probeMap = FALSE)
+    },
+
+    #' @description
+    #' Get APOBEC mutagenesis data
+    #' @param identifier APOBEC identifier
+    #' @return Named numeric vector
+    get_apobec = function(identifier = c("tCa_MutLoad_MinEstimate", "APOBECtCa_enrich",
+                                         "A3A_or_A3B", "APOBEC_tCa_enrich_quartile")) {
+      identifier <- match.arg(identifier)
+      private$query_with_cache(identifier, "APOBEC", private$dataset_map$apobec, use_probeMap = FALSE)
     },
 
     #' @description
     #' Query data by type
-    #' @param identifier Gene symbol
-    #' @param data_type Type of data
+    #' @param identifier Gene symbol or other identifier
+    #' @param data_type Type of data: "expression", "fusion", "miRNA", "promoter", "APOBEC"
+    #' @param ... Additional parameters (e.g., norm for miRNA)
     #' @return Named numeric vector
-    query = function(identifier, data_type = "expression") {
+    query = function(identifier, data_type = "expression", ...) {
       switch(data_type,
         "expression" = self$get_gene_expression(identifier),
-        "mutation" = self$get_mutation_status(identifier),
-        "cnv" = self$get_cnv(identifier),
+        "fusion" = self$get_fusion(identifier),
+        "miRNA" = self$get_mirna(identifier, ...),
+        "promoter" = self$get_promoter(identifier, ...),
+        "APOBEC" = self$get_apobec(identifier),
         stop("Unknown data type: ", data_type)
       )
     }
@@ -183,10 +210,16 @@ PCAWGData <- R6::R6Class(
     dataset_map = NULL,
 
     init_dataset_map = function() {
+      # Use same dataset names as UCSCXenaShiny
       private$dataset_map <- list(
-        expression = "PCAWG.rnaseq.transcript.expr.FPKM.tsv",
-        mutation = "PCAWG.consensus.2016.12.16.somaticSNV_subset_xena.tsv",
-        cnv = "PCAWG.consensus.2016.12.16.somaticCNV.tsv"
+        expression = "tophat_star_fpkm_uq.v2_aliquot_gl.sp.log",
+        fusion = "pcawg3_fusions_PKU_EBI.gene_centric.sp.xena",
+        mirna_tmm = "x3t2m1.mature.TMM.mirna.matrix.log",
+        mirna_uq = "x3t2m1.mature.UQ.mirna.matrix.log",
+        promoter_raw = "rawPromoterActivity.sp",
+        promoter_relative = "relativePromoterActivity.sp",
+        promoter_outlier = "promoterCentricTable_0.2_1.0.sp",
+        apobec = "MAF_Aug31_2016_sorted_A3A_A3B_comparePlus.sp"
       )
     },
 

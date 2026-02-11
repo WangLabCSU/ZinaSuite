@@ -1,28 +1,29 @@
-#' ZinaSuite Package Environment
+#' ZinaSuite: A Modern R Package for UCSC Xena Data Analysis
+#'
+#' @description
+#' Provides a modernized framework for interactively exploring
+#' UCSC Xena datasets. It enables downloading, analyzing and visualizing
+#' datasets from UCSC Xena with enhanced performance through mirai-based
+#' asynchronous computing and modular Shiny application design.
 #'
 #' @keywords internal
-.ZinaSuiteEnv <- new.env(parent = emptyenv())
-
-#' @importFrom utils capture.output head packageVersion
-#' @importFrom stats quantile median mad sd cor.test aov lm
+#' @importFrom stats aggregate aov complete.cases cor cor.test fisher.test
+#' @importFrom stats kruskal.test kmeans lm median p.adjust pchisq prcomp quantile
+#' @importFrom stats reorder residuals rnorm sd setNames t.test wilcox.test
+#' @importFrom utils head read.csv read.delim
+#' @importFrom methods new
+#' @importFrom R6 R6Class
+#' @importFrom digest digest
+#' @importFrom lifecycle deprecated
+#' @importFrom tibble tibble
+#' @importFrom nanonext msleep
+#' @importFrom rlang .data :=
+#' @importFrom grDevices dev.off pdf png svg
 #' @importFrom graphics par
-#' @importFrom grDevices dev.off png pdf svg
-.onLoad <- function(libname, pkgname) {
-  # Initialize package environment
-  assign(".zina_cache_manager", NULL, envir = .ZinaSuiteEnv)
-  assign(".zina_async_engine", NULL, envir = .ZinaSuiteEnv)
-}
+#' @importFrom magrittr %>%
+#'
+"_PACKAGE"
 
-.onUnload <- function(libpath) {
-  # Clean up async engine if running
-  if (exists(".zina_async_engine", envir = .ZinaSuiteEnv)) {
-    engine <- get(".zina_async_engine", envir = .ZinaSuiteEnv)
-    if (!is.null(engine) && engine$is_active()) {
-      engine$stop()
-    }
-  }
-}
-
-.onAttach <- function(libname, pkgname) {
-  packageStartupMessage("ZinaSuite loaded. Use query_molecule() to fetch data from UCSC Xena.")
-}
+## usethis namespace: start
+## usethis namespace: end
+NULL
