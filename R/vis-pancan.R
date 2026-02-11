@@ -36,33 +36,36 @@ vis_toil_TvsN <- function(gene,
   # Load sample information
   sample_info <- load_data("tcga_gtex")
 
-  # Match samples
-  common_samples <- intersect(names(gene_expr), sample_info$Sample)
+  # Match samples using barcode matching
+  match_result <- match_samples(names(gene_expr), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
 
-  if (length(common_samples) == 0) {
+  if (match_result$n_matched == 0) {
     stop("No matching samples found between expression data and sample info")
   }
 
   # Prepare data
   df <- data.frame(
-    Sample = common_samples,
-    Expression = as.numeric(gene_expr[common_samples]),
+    Sample = match_result$common_ids,
+    Expression = as.numeric(gene_expr[match_result$idx1]),
     stringsAsFactors = FALSE
   )
 
   # Add type information
-  df$Type <- sample_info$Type[match(df$Sample, sample_info$Sample)]
-  df$Tissue <- sample_info$Tissue[match(df$Sample, sample_info$Sample)]
+  df$Dataset <- sample_info$Dataset[match_result$idx2]
+  df$Tissue <- sample_info$Tissue[match_result$idx2]
 
-  # Filter for tumor and normal only
-  df <- df[df$Type %in% c("Tumor", "Normal"), ]
+  # Filter for tumor and normal only (using Dataset column which has "tumor" or "normal")
+  df <- df[df$Dataset %in% c("tumor", "normal"), ]
 
   if (nrow(df) == 0) {
     stop("No tumor or normal samples found")
   }
 
+  # Capitalize for display
+  df$Dataset <- ifelse(df$Dataset == "tumor", "Tumor", "Normal")
+
   # Create plot
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Tissue, y = .data$Expression, fill = .data$Type))
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Tissue, y = .data$Expression, fill = .data$Dataset))
 
   if (plot_type == "boxplot") {
     p <- p + ggplot2::geom_boxplot(alpha = 0.7, outlier.size = 0.5)
