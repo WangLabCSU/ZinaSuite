@@ -38,7 +38,7 @@ locations (organs) based on TCGA cancer types. This provides an intuitive
 overview of where a gene is highly expressed in the human body.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create anatomical expression map for TP53
 p <- vis_pancan_anatomy("TP53")
 print(p)

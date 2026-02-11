@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create immune correlation heatmap for TP53
 #' p <- vis_gene_immune_cor("TP53")
 #' print(p)
@@ -234,7 +234,7 @@ plot_immune_barplot <- function(data, gene) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Analyze TP53 correlation with all TIL types
 #' p <- vis_gene_TIL_cor("TP53")
 #'
@@ -374,7 +374,7 @@ vis_gene_TIL_cor <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Analyze TP53 correlation with TMB
 #' p <- vis_gene_tmb_cor("TP53")
 #'
@@ -464,7 +464,7 @@ vis_gene_tmb_cor <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Analyze TP53 expression by MSI status
 #' p <- vis_gene_msi_cor("TP53")
 #' }
@@ -538,7 +538,7 @@ vis_gene_msi_cor <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Analyze TP53 correlation with stemness
 #' p <- vis_gene_stemness_cor("TP53")
 #'

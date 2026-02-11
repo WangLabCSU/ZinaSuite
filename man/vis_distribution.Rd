@@ -42,7 +42,7 @@ ggplot object
 Create distribution plots (boxplot, violin plot, or histogram) for molecular data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query gene expression data
 tp53_expr <- query_gene_expression("TP53", source = "tcga")
 

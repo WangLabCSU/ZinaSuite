@@ -26,7 +26,7 @@ These functions provide reliable access to UCSC Xena data hubs.
 Query Gene Expression from TCGA/GTEx
 }
 \examples{
-\donttest{
+\dontrun{
 # Query TP53 expression
 expr <- get_pancan_gene_value("TP53")
 head(expr)

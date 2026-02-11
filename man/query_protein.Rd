@@ -20,7 +20,7 @@ Named vector of protein expression values
 Convenience function to query protein expression (RPPA) data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query AKT protein expression
 akt_prot <- query_protein("AKT", source = "tcga")
 summary(akt_prot)

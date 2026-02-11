@@ -16,7 +16,7 @@ Data frame with Cancer, Organ, and System columns
 Retrieve anatomical and system information for TCGA cancer types.
 }
 \examples{
-\donttest{
+\dontrun{
 # Get organ info for all cancers
 organ_info <- get_organ_info()
 

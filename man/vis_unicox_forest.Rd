@@ -20,7 +20,7 @@ ggplot object
 Create a forest plot for univariate Cox regression results across multiple genes.
 }
 \examples{
-\donttest{
+\dontrun{
 # Perform univariate Cox analysis
 genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
 surv_data <- load_data("tcga_surv")

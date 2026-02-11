@@ -21,7 +21,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Compare TP53 expression in TP53 mutant vs wild-type samples
 #' p <- vis_toil_Mut("TP53")
 #'
@@ -268,7 +268,7 @@ vis_toil_Mut <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Show mutation frequency of key genes
 #' p <- vis_mutation_frequency(c("TP53", "KRAS", "PIK3CA", "PTEN"))
 #'
@@ -400,7 +400,7 @@ vis_mutation_frequency <- function(genes,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Analyze TP53 and KRAS co-occurrence
 #' result <- vis_mutation_cooccurrence("TP53", "KRAS")
 #' print(result$plot)

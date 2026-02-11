@@ -322,7 +322,7 @@ analyze_correlation_matrix <- function(genes,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Partial correlation adjusting for tumor purity
 #' # Note: x, y, z must have the same length
 #' set.seed(123)

@@ -39,7 +39,7 @@ ggplot object
 Create scatter plots and heatmaps for correlation visualization.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query gene expression data
 tp53_expr <- query_gene_expression("TP53", source = "tcga")
 brca1_expr <- query_gene_expression("BRCA1", source = "tcga")

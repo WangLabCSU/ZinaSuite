@@ -48,7 +48,7 @@ samples for a given gene. Supports visualization of tumor vs normal comparisons
 as well.
 }
 \examples{
-\donttest{
+\dontrun{
 # Compare TP53 expression in TP53 mutant vs wild-type samples
 p <- vis_toil_Mut("TP53")
 

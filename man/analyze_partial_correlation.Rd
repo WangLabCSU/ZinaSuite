@@ -22,7 +22,7 @@ Partial correlation results
 Perform partial correlation analysis adjusting for confounding variables.
 }
 \examples{
-\donttest{
+\dontrun{
 # Partial correlation adjusting for tumor purity
 # Note: x, y, z must have the same length
 set.seed(123)

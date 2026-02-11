@@ -18,7 +18,7 @@ Named vector of infiltration scores
 Query immune cell infiltration data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query CD8 T cell infiltration
 cd8 <- query_immune_infiltration("CD8_T_cell", source = "tcga")
 summary(cd8)

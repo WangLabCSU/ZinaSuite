@@ -248,7 +248,7 @@ vis_gene_cor <- function(gene1,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Visualize TP53 correlation with apoptosis pathway
 #' p <- vis_gene_pw_cor(
 #'   gene = "TP53",

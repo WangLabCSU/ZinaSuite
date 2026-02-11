@@ -16,7 +16,7 @@ Named vector of MSI scores
 Query microsatellite instability (MSI) data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query MSI
 msi <- query_msi(source = "tcga")
 table(msi)

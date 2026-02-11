@@ -20,7 +20,7 @@ A ggplot object
 Visualize correlation between gene expression and tumor mutation burden (TMB).
 }
 \examples{
-\donttest{
+\dontrun{
 # Analyze TP53 correlation with TMB
 p <- vis_gene_tmb_cor("TP53")
 

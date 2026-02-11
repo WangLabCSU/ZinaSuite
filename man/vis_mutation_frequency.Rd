@@ -27,7 +27,7 @@ A ggplot object
 Create a barplot showing mutation frequency across cancer types.
 }
 \examples{
-\donttest{
+\dontrun{
 # Show mutation frequency of key genes
 p <- vis_mutation_frequency(c("TP53", "KRAS", "PIK3CA", "PTEN"))
 

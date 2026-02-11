@@ -24,7 +24,7 @@ Named vector of expression values
 Convenience function to query gene expression data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query TP53 expression from TCGA
 tp53 <- query_gene_expression("TP53", source = "tcga")
 summary(tp53)

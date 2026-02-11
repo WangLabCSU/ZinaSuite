@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Load survival data
 #' surv_data <- load_data("tcga_surv")
 #'
@@ -147,7 +147,7 @@ vis_forest_plot <- function(cox_result, title = NULL) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Perform univariate Cox analysis
 #' genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
 #' surv_data <- load_data("tcga_surv")
@@ -198,7 +198,7 @@ vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create survival plot by TP53 expression
 #' p <- vis_survival_by_gene(
 #'   gene = "TP53",

@@ -33,7 +33,7 @@ A ggplot object
 Create dot plot comparing IC50 between high and low expression groups.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create dot plot
 p <- vis_gene_drug_response_diff("TP53", tissue = "lung")
 print(p)

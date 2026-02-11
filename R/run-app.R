@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Run the application with default settings
 #' run_zinasuite()
 #'
@@ -54,7 +54,7 @@ run_zinasuite <- function(port = getOption("shiny.port"),
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' app_dir <- get_app_dir()
 #' list.files(app_dir)
 #' }

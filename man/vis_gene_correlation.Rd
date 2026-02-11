@@ -33,7 +33,7 @@ ggplot object
 Create a scatter plot showing correlation between two genes.
 }
 \examples{
-\donttest{
+\dontrun{
 # Plot correlation between TP53 and BRCA1
 p <- vis_gene_correlation("TP53", "BRCA1", method = "pearson")
 print(p)

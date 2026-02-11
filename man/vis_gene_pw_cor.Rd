@@ -42,7 +42,7 @@ ggplot object
 Create scatter plot showing correlation between gene expression and pathway activity score.
 }
 \examples{
-\donttest{
+\dontrun{
 # Visualize TP53 correlation with apoptosis pathway
 p <- vis_gene_pw_cor(
   gene = "TP53",

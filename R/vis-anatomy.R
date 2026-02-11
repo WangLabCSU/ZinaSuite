@@ -17,7 +17,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create anatomical expression map for TP53
 #' p <- vis_pancan_anatomy("TP53")
 #' print(p)
@@ -227,7 +227,7 @@ plot_anatomy_barplot <- function(data, gene, color_palette, text_size) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Get organ info for all cancers
 #' organ_info <- get_organ_info()
 #'

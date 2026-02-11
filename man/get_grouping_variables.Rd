@@ -16,7 +16,7 @@ Character vector of available grouping variables
 List all available grouping variables for a database.
 }
 \examples{
-\donttest{
+\dontrun{
 # Get TCGA grouping variables
 vars <- get_grouping_variables("tcga")
 head(vars)

@@ -27,7 +27,7 @@ ggsurvplot object or ggplot object
 Create Kaplan-Meier curves comparing survival between high and low expression groups.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create survival plot by TP53 expression
 p <- vis_survival_by_gene(
   gene = "TP53",

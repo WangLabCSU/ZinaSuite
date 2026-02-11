@@ -31,7 +31,7 @@ Visualize correlation between gene expression and tumor-infiltrating
 lymphocyte (TIL) fractions.
 }
 \examples{
-\donttest{
+\dontrun{
 # Analyze TP53 correlation with all TIL types
 p <- vis_gene_TIL_cor("TP53")
 

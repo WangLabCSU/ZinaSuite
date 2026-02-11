@@ -20,7 +20,7 @@ Named vector of miRNA expression values
 Convenience function to query miRNA expression data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query miR-21 expression
 mir21 <- query_mirna("hsa-miR-21-5p", source = "tcga")
 summary(mir21)

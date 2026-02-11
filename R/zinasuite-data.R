@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query TP53 expression
 #' expr <- get_pancan_gene_value("TP53")
 #' head(expr)
@@ -277,7 +277,7 @@ try_query_value <- function(host, dataset, identifier, max_try = 5L, use_probeMa
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query gene expression
 #' expr <- query_pancan_value("TP53", data_type = "mRNA")
 #'

@@ -29,8 +29,8 @@ NULL
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' # Basic correlation plot
+#' \dontrun{
+#' # Basic correlation plot (requires data)
 #' p <- ga_scatter_correlation(
 #'   dataset1 = "TcgaTargetGtex_rsem_gene_tpm",
 #'   id1 = "TP53",
@@ -156,8 +156,8 @@ ga_scatter_correlation <- function(dataset1, id1, dataset2, id2,
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' # Correlation matrix for multiple genes
+#' \dontrun{
+#' # Correlation matrix for multiple genes (requires data)
 #' p <- ga_matrix_correlation(
 #'   dataset = "TcgaTargetGtex_rsem_gene_tpm",
 #'   ids = c("TP53", "KRAS", "PTEN", "BRCA1")
@@ -263,7 +263,7 @@ ga_matrix_correlation <- function(dataset, ids,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create sample grouping data
 #' grp_df <- data.frame(
 #'   sample = c("S1", "S2", "S3", "S4", "S5", "S6"),
@@ -392,7 +392,7 @@ ga_group_comparison <- function(dataset = NULL,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create sample survival data
 #' surv_df <- data.frame(
 #'   sample = c("S1", "S2", "S3", "S4", "S5", "S6"),
@@ -496,7 +496,7 @@ ga_survival_analysis <- function(dataset = NULL,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create sample data
 #' set.seed(123)
 #' data <- matrix(rnorm(1000), nrow = 100)

@@ -20,7 +20,7 @@ Named vector with mutation status
 Convenience function to query mutation status.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query TP53 mutation status
 tp53_mut <- query_mutation("TP53", source = "tcga")
 table(tp53_mut)

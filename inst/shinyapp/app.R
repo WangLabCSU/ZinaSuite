@@ -22,10 +22,9 @@ if (!is.null(modules_dir) && dir.exists(modules_dir)) {
 
 # UI Definition
 ui <- bslib::page_navbar(
-  title = bslib::brand(
-    "ZinaSuite",
-    href = "#",
-    htmltools::tags$img(src = "logo.png", height = "30px", style = "margin-right: 10px;")
+  title = htmltools::tags$span(
+    htmltools::tags$img(src = "logo.png", height = "30px", style = "margin-right: 10px;"),
+    "ZinaSuite"
   ),
   bg = "#2C3E50",
   inverse = TRUE,

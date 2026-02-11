@@ -15,7 +15,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query gene expression data
 #' tp53_expr <- query_gene_expression("TP53", source = "tcga")
 #' brca1_expr <- query_gene_expression("BRCA1", source = "tcga")
@@ -123,7 +123,7 @@ vis_correlation <- function(x, y = NULL,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Plot correlation between TP53 and BRCA1
 #' p <- vis_gene_correlation("TP53", "BRCA1", method = "pearson")
 #' print(p)
@@ -206,7 +206,7 @@ vis_gene_correlation <- function(gene1, gene2,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Plot pan-cancer correlation
 #' p <- vis_pancan_correlation("TP53", "BRCA1")
 #' print(p)

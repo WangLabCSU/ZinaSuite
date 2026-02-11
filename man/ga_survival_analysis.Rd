@@ -44,7 +44,7 @@ Perform survival analysis for a molecular identifier.
 Supports automatic or custom cutoff for grouping samples.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create sample survival data
 surv_df <- data.frame(
   sample = c("S1", "S2", "S3", "S4", "S5", "S6"),

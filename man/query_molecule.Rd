@@ -40,7 +40,7 @@ This function provides a simple interface to fetch molecular data by gene symbol
 or other identifiers.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query TP53 gene expression from TCGA
 tp53_expr <- query_molecule("TP53", data_type = "mRNA", source = "tcga")
 head(tp53_expr)

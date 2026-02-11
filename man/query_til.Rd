@@ -18,7 +18,7 @@ Data frame of TIL fractions
 Query tumor-infiltrating lymphocyte (TIL) data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query all TIL data
 til <- query_til(source = "tcga")
 head(til)

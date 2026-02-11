@@ -238,7 +238,7 @@ analyze_gene_drug_response_diff <- function(gene_list,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create volcano plot
 #' p <- vis_gene_drug_response_asso("TP53")
 #' print(p)
@@ -322,7 +322,7 @@ vis_gene_drug_response_asso <- function(Gene = "TP53",
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create dot plot
 #' p <- vis_gene_drug_response_diff("TP53", tissue = "lung")
 #' print(p)

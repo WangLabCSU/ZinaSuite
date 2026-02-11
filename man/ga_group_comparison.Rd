@@ -51,7 +51,7 @@ Perform group comparison analysis for a molecular identifier.
 Supports both between-group and within-group comparisons.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create sample grouping data
 grp_df <- data.frame(
   sample = c("S1", "S2", "S3", "S4", "S5", "S6"),

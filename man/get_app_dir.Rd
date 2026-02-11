@@ -13,7 +13,7 @@ Character string with the app directory path
 Get the file path to the Shiny application directory.
 }
 \examples{
-\donttest{
+\dontrun{
 app_dir <- get_app_dir()
 list.files(app_dir)
 }

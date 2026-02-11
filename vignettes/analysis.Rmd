@@ -1,0 +1,420 @@
+---
+title: "Statistical Analysis Guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Statistical Analysis Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ZinaSuite)
+```
+
+## Overview
+
+This vignette demonstrates the statistical analysis capabilities of ZinaSuite for cancer genomics data.
+
+## Correlation Analysis
+
+### Gene-Gene Correlation
+
+Analyze correlation between two genes across samples:
+
+```{r, eval = FALSE}
+# Pearson correlation between TP53 and BRCA1
+cor_result <- analyze_correlation(
+  gene1 = "TP53",
+  gene2 = "BRCA1",
+  cancer = "BRCA",
+  method = "pearson"
+)
+
+print(cor_result)
+```
+
+### Multi-Gene Correlation Matrix
+
+Analyze correlations among multiple genes:
+
+```{r, eval = FALSE}
+# Correlation matrix for multiple genes
+genes <- c("TP53", "BRCA1", "EGFR", "MYC", "KRAS")
+cor_matrix <- analyze_correlation_matrix(
+  genes = genes,
+  cancer = "BRCA",
+  method = "spearman"
+)
+
+# Visualize
+ggplot2::ggplot(cor_matrix, ggplot2::aes(x = Gene1, y = Gene2, fill = Correlation)) +
+  ggplot2::geom_tile() +
+  ggplot2::scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0)
+```
+
+### Partial Correlation
+
+Control for confounding variables:
+
+```{r, eval = FALSE}
+# Partial correlation controlling for age
+partial_cor <- analyze_partial_correlation(
+  gene1 = "TP53",
+  gene2 = "BRCA1",
+  control_genes = c("AGE", "GENDER"),
+  cancer = "BRCA"
+)
+```
+
+## Survival Analysis
+
+### Kaplan-Meier Analysis
+
+Analyze survival by gene expression:
+
+```{r, eval = FALSE}
+# Survival analysis by TP53 expression
+surv_result <- analyze_survival_by_expression(
+  gene = "TP53",
+  cancer = "BRCA",
+  measure = "OS",  # Overall survival
+  cutoff_mode = "Auto"
+)
+
+# Visualize
+p <- vis_survival_by_gene("TP53", cancer = "BRCA")
+print(p)
+```
+
+### Cox Proportional Hazards
+
+Univariate Cox regression:
+
+```{r, eval = FALSE}
+# Cox regression for single gene
+cox_result <- analyze_unicox_batch(
+  genes = c("TP53", "BRCA1", "EGFR"),
+  cancer = "BRCA",
+  measure = "OS"
+)
+
+# Forest plot
+vis_unicox_forest(cox_result)
+```
+
+### Multi-Gene Survival
+
+Survival analysis with gene signature:
+
+```{r, eval = FALSE}
+# Create gene signature
+signature_genes <- c("TP53", "BRCA1", "EGFR")
+
+# Analyze signature
+surv_signature <- analyze_survival_by_expression(
+  gene = signature_genes,
+  cancer = "BRCA",
+  combine = TRUE,  # Combine genes into signature
+  measure = "OS"
+)
+```
+
+## Group Comparison
+
+### Tumor vs Normal
+
+Compare gene expression between tumor and normal samples:
+
+```{r, eval = FALSE}
+# Tumor vs Normal comparison
+comp_result <- analyze_group_comparison(
+  gene = "TP53",
+  cancer = "BRCA",
+  group_col = "Type"  # tumor vs normal
+)
+
+# Visualization
+vis_tumor_normal("TP53", cancer = "BRCA")
+```
+
+### Multi-Group Comparison
+
+Compare across multiple groups:
+
+```{r, eval = FALSE}
+# Compare across cancer stages
+stage_comparison <- analyze_group_comparison(
+  gene = "TP53",
+  cancer = "BRCA",
+  group_col = "Stage",
+  method = "anova"
+)
+```
+
+## Dimension Reduction
+
+### Principal Component Analysis
+
+Perform PCA on gene expression data:
+
+```{r, eval = FALSE}
+# PCA on multiple genes
+genes <- c("TP53", "BRCA1", "EGFR", "MYC", "KRAS", "PTEN")
+pca_result <- analyze_dimension_reduction(
+  genes = genes,
+  cancer = "BRCA",
+  method = "pca"
+)
+
+# Visualize
+plot(pca_result$coordinates[, 1:2], col = pca_result$groups)
+```
+
+### t-SNE
+
+Non-linear dimension reduction:
+
+```{r, eval = FALSE}
+# t-SNE analysis
+tsne_result <- analyze_dimension_reduction(
+  genes = genes,
+  cancer = "BRCA",
+  method = "tsne",
+  perplexity = 30
+)
+```
+
+### UMAP
+
+Uniform Manifold Approximation:
+
+```{r, eval = FALSE}
+# UMAP analysis
+umap_result <- analyze_dimension_reduction(
+  genes = genes,
+  cancer = "BRCA",
+  method = "umap",
+  n_neighbors = 15
+)
+```
+
+## Pathway Analysis
+
+### Pathway Activity
+
+Analyze pathway activity scores:
+
+```{r, eval = FALSE}
+# Query pathway activity
+pathway_activity <- query_pathway_activity(
+  pathway = "HALLMARK_APOPTOSIS",
+  cancer = "BRCA"
+)
+
+# Correlate with gene expression
+cor_pathway <- analyze_pathway_gene_cor(
+  pathway = "HALLMARK_APOPTOSIS",
+  gene = "TP53",
+  cancer = "BRCA"
+)
+```
+
+### GSEA Analysis
+
+Gene Set Enrichment Analysis:
+
+```{r, eval = FALSE}
+# GSEA for differentially expressed genes
+gsea_result <- analyze_pathway(
+  gene_list = deg_results$gene,
+  stat_value = deg_results$logFC,
+  pathway_db = "hallmark"
+)
+```
+
+## Cross-Omics Analysis
+
+### Gene-Mutation Correlation
+
+Analyze correlation between gene expression and mutation:
+
+```{r, eval = FALSE}
+# Cross-omics analysis
+cross_result <- analyze_cross_gene(
+  gene1 = "TP53",
+  gene2 = "BRCA1",
+  cancer = "BRCA",
+  data_type1 = "mRNA",
+  data_type2 = "mutation"
+)
+```
+
+### Multi-Omics Integration
+
+Integrate multiple data types:
+
+```{r, eval = FALSE}
+# Multi-omics integration
+multi_omics <- analyze_cross_pathway(
+  pathway = "HALLMARK_APOPTOSIS",
+  cancer = "BRCA",
+  data_types = c("mRNA", "protein", "methylation")
+)
+```
+
+## Pharmacogenomics
+
+### Drug Sensitivity
+
+Analyze drug sensitivity correlations:
+
+```{r, eval = FALSE}
+# Drug-gene correlation
+drug_cor <- analyze_drug_gene_cor(
+  gene = "TP53",
+  drug = "Cisplatin",
+  tissue = "BRCA"
+)
+
+# Visualize
+vis_gene_drug_response_asso("TP53", drug = "Cisplatin")
+```
+
+### Drug Response Comparison
+
+Compare drug response between groups:
+
+```{r, eval = FALSE}
+# Compare drug response
+drug_comp <- analyze_gene_drug_response_diff(
+  gene_list = "TP53",
+  drug = "Cisplatin",
+  tissue = "BRCA"
+)
+```
+
+## Advanced Features
+
+### Batch Analysis
+
+Analyze multiple genes simultaneously:
+
+```{r, eval = FALSE}
+# Batch correlation analysis
+genes <- c("TP53", "BRCA1", "EGFR", "MYC")
+batch_result <- analyze_correlation_batch(
+  genes = genes,
+  cancer = "BRCA",
+  n_workers = 4
+)
+```
+
+### Custom Grouping
+
+Create custom sample groups:
+
+```{r, eval = FALSE}
+# Define custom groups
+custom_groups <- data.frame(
+  Sample = c("TCGA-01", "TCGA-02", "TCGA-03"),
+  Group = c("High", "Low", "Medium")
+)
+
+# Analyze with custom groups
+custom_result <- analyze_group_comparison(
+  gene = "TP53",
+  grp_df = custom_groups
+)
+```
+
+### Progress Tracking
+
+Monitor analysis progress:
+
+```{r, eval = FALSE}
+# Create progress tracker
+progress <- create_progress_tracker(
+  total = length(genes),
+  name = "Batch Analysis"
+)
+
+# Update progress
+for (i in seq_along(genes)) {
+  result <- analyze_correlation(genes[i], "TP53", cancer = "BRCA")
+  update_progress(progress, i)
+}
+```
+
+## Best Practices
+
+### 1. Data Validation
+
+Always validate inputs before analysis:
+
+```{r, eval = FALSE}
+# Validate gene symbol
+validate_gene_symbol("TP53")
+
+# Validate cancer type
+validate_cancer_type("BRCA")
+
+# Validate sample IDs
+validate_sample_ids(sample_ids)
+```
+
+### 2. Error Handling
+
+Use try-catch for robust analysis:
+
+```{r, eval = FALSE}
+results <- lapply(genes, function(gene) {
+  tryCatch({
+    analyze_correlation(gene, "TP53", cancer = "BRCA")
+  }, error = function(e) {
+    message("Failed for ", gene, ": ", e$message)
+    NULL
+  })
+})
+```
+
+### 3. Caching
+
+Use caching for repeated analyses:
+
+```{r, eval = FALSE}
+# Cached analysis
+cached_result <- cached_query(
+  function() analyze_correlation("TP53", "BRCA1", cancer = "BRCA"),
+  cache_key = "TP53_BRCA1_BRCA_correlation",
+  ttl = 3600
+)
+```
+
+### 4. Reproducibility
+
+Set random seeds for reproducible results:
+
+```{r, eval = FALSE}
+# Set seed for reproducibility
+set.seed(123)
+
+# Run analysis
+result <- analyze_dimension_reduction(
+  genes = genes,
+  cancer = "BRCA",
+  method = "tsne"
+)
+```
+
+## Learn More
+
+- `vignette("introduction")` - Package overview
+- `vignette("data-query")` - Data querying guide
+- `vignette("visualization")` - Visualization techniques

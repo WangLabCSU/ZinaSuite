@@ -20,7 +20,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Load TCGA/GTEx sample information
 #' sample_info <- load_data("tcga_gtex")
 #' head(sample_info)
@@ -125,7 +125,7 @@ try_load_remote_data <- function(data_name, force_download = FALSE) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query tumor purity
 #' purity <- query_purity(source = "tcga")
 #' summary(purity)
@@ -151,7 +151,7 @@ query_purity <- function(source = "tcga") {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query TMB
 #' tmb <- query_tmb(source = "tcga")
 #' summary(tmb)
@@ -176,7 +176,7 @@ query_tmb <- function(source = "tcga") {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query MSI
 #' msi <- query_msi(source = "tcga")
 #' table(msi)
@@ -201,7 +201,7 @@ query_msi <- function(source = "tcga") {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query stemness
 #' stemness <- query_stemness(source = "tcga")
 #' summary(stemness)
@@ -227,7 +227,7 @@ query_stemness <- function(source = "tcga") {
 #' @export
 #'
 #' @examples
-    #' \donttest{
+    #' \dontrun{
     #' # Query all TIL data
     #' til <- query_til(source = "tcga")
     #' head(til)
@@ -263,7 +263,7 @@ query_til <- function(cell_type = NULL, source = "tcga") {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query CD8 T cell infiltration
 #' cd8 <- query_immune_infiltration("CD8_T_cell", source = "tcga")
 #' summary(cd8)

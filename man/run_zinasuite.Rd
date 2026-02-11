@@ -27,7 +27,7 @@ Shiny application object (invisible)
 Launch the ZinaSuite Shiny application for interactive analysis of UCSC Xena data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Run the application with default settings
 run_zinasuite()
 

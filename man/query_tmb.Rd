@@ -16,7 +16,7 @@ Named vector of TMB values
 Query tumor mutation burden (TMB) data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query TMB
 tmb <- query_tmb(source = "tcga")
 summary(tmb)

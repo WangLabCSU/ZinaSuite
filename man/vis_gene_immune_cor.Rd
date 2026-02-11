@@ -37,7 +37,7 @@ Create a heatmap showing correlation between gene expression and immune cell
 infiltration levels across cancer types.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create immune correlation heatmap for TP53
 p <- vis_gene_immune_cor("TP53")
 print(p)

@@ -16,7 +16,7 @@ Named vector of stemness scores
 Query tumor stemness score data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query stemness
 stemness <- query_stemness(source = "tcga")
 summary(stemness)

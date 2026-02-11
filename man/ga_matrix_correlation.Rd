@@ -50,8 +50,8 @@ Perform correlation analysis for multiple molecular identifiers.
 Creates a correlation matrix visualization.
 }
 \examples{
-\donttest{
-# Correlation matrix for multiple genes
+\dontrun{
+# Correlation matrix for multiple genes (requires data)
 p <- ga_matrix_correlation(
   dataset = "TcgaTargetGtex_rsem_gene_tpm",
   ids = c("TP53", "KRAS", "PTEN", "BRCA1")

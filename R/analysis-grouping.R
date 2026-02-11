@@ -32,7 +32,7 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Basic grouping by gender across all cancers
 #' result <- query_tcga_group(group = "Gender")
 #' head(result$data)
@@ -343,7 +343,7 @@ merge_categorical_groups <- function(values, merge_by) {
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Get TCGA grouping variables
 #' vars <- get_grouping_variables("tcga")
 #' head(vars)

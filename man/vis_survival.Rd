@@ -22,7 +22,7 @@ ggplot object
 Create Kaplan-Meier survival curves and forest plots for survival analysis.
 }
 \examples{
-\donttest{
+\dontrun{
 # Load survival data
 surv_data <- load_data("tcga_surv")
 

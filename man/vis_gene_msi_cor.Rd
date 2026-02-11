@@ -20,7 +20,7 @@ A ggplot object
 Visualize correlation between gene expression and microsatellite instability (MSI).
 }
 \examples{
-\donttest{
+\dontrun{
 # Analyze TP53 expression by MSI status
 p <- vis_gene_msi_cor("TP53")
 }

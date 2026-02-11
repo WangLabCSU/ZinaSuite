@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query gene expression data
 #' tp53_expr <- query_gene_expression("TP53", source = "tcga")
 #'
@@ -105,7 +105,7 @@ vis_distribution <- function(data,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create tumor vs normal plot for TP53
 #' p <- vis_tumor_normal("TP53", mode = "Boxplot")
 #' print(p)
@@ -213,7 +213,7 @@ vis_tumor_normal <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Create heatmap for multiple genes
 #' genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
 #' p <- vis_pancan_expression(genes, plot_type = "heatmap")

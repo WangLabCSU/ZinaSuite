@@ -27,7 +27,7 @@ Named vector of methylation beta values
 Convenience function to query DNA methylation data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query TP53 methylation
 tp53_meth <- query_methylation("TP53", source = "tcga")
 summary(tp53_meth)

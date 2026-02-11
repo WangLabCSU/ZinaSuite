@@ -27,7 +27,7 @@ ggplot object or complex heatmap object
 Create a heatmap or bar plot showing gene expression across cancer types.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create heatmap for multiple genes
 genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
 p <- vis_pancan_expression(genes, plot_type = "heatmap")

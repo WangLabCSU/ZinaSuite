@@ -46,8 +46,8 @@ Perform scatter correlation analysis between two molecular identifiers.
 This function extracts the core logic from UCSCXenaShiny's general analysis module.
 }
 \examples{
-\donttest{
-# Basic correlation plot
+\dontrun{
+# Basic correlation plot (requires data)
 p <- ga_scatter_correlation(
   dataset1 = "TcgaTargetGtex_rsem_gene_tpm",
   id1 = "TP53",

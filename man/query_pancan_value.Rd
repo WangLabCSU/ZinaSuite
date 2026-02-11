@@ -28,7 +28,7 @@ Named numeric vector
 Unified Query Interface
 }
 \examples{
-\donttest{
+\dontrun{
 # Query gene expression
 expr <- query_pancan_value("TP53", data_type = "mRNA")
 

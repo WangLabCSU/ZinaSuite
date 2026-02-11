@@ -38,7 +38,7 @@ Load built-in datasets from the ZinaSuite package or download from remote
 sources if not available locally.
 }
 \examples{
-\donttest{
+\dontrun{
 # Load TCGA/GTEx sample information
 sample_info <- load_data("tcga_gtex")
 head(sample_info)

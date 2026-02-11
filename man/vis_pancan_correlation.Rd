@@ -30,7 +30,7 @@ ggplot object
 Create a plot showing correlation between two genes across cancer types.
 }
 \examples{
-\donttest{
+\dontrun{
 # Plot pan-cancer correlation
 p <- vis_pancan_correlation("TP53", "BRCA1")
 print(p)

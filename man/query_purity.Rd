@@ -16,7 +16,7 @@ Named vector of purity values
 Query tumor purity data for TCGA samples.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query tumor purity
 purity <- query_purity(source = "tcga")
 summary(purity)

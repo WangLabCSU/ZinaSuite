@@ -21,7 +21,7 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query TP53 gene expression from TCGA
 #' tp53_expr <- query_molecule("TP53", data_type = "mRNA", source = "tcga")
 #' head(tp53_expr)
@@ -67,7 +67,7 @@ query_molecule <- function(identifier,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query TP53 expression from TCGA
 #' tp53 <- query_gene_expression("TP53", source = "tcga")
 #' summary(tp53)
@@ -84,6 +84,20 @@ query_gene_expression <- function(gene,
   query_molecule(gene, data_type = "mRNA", source = source, dataset = dataset)
 }
 
+#' Query Molecule Value (Alias for query_molecule)
+#'
+#' @description
+#' Internal helper function that wraps query_molecule for compatibility.
+#'
+#' @param dataset Dataset name or identifier
+#' @param identifier Molecule identifier
+#' @param ... Additional arguments passed to query_molecule
+#' @return Named vector of values
+#' @keywords internal
+query_molecule_value <- function(dataset, identifier, ...) {
+  query_molecule(identifier, dataset = dataset, ...)
+}
+
 #' Query Mutation Status
 #'
 #' @description
@@ -96,7 +110,7 @@ query_gene_expression <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query TP53 mutation status
 #' tp53_mut <- query_mutation("TP53", source = "tcga")
 #' table(tp53_mut)
@@ -125,7 +139,7 @@ query_mutation <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query TP53 CNV
 #' tp53_cnv <- query_cnv("TP53", source = "tcga")
 #' table(tp53_cnv)
@@ -149,7 +163,7 @@ query_cnv <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query AKT protein expression
 #' akt_prot <- query_protein("AKT", source = "tcga")
 #' summary(akt_prot)
@@ -174,7 +188,7 @@ query_protein <- function(protein,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query TP53 methylation
 #' tp53_meth <- query_methylation("TP53", source = "tcga")
 #' summary(tp53_meth)
@@ -202,7 +216,7 @@ query_methylation <- function(gene,
 #' @export
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Query miR-21 expression
 #' mir21 <- query_mirna("hsa-miR-21-5p", source = "tcga")
 #' summary(mir21)

@@ -58,7 +58,7 @@ Group TCGA/PCAWG/CCLE samples by built-in phenotypes or custom criteria.
 Supports filtering, merging operations, and custom group definitions.
 }
 \examples{
-\donttest{
+\dontrun{
 # Basic grouping by gender across all cancers
 result <- query_tcga_group(group = "Gender")
 head(result$data)

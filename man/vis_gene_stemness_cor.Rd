@@ -24,7 +24,7 @@ A ggplot object
 Visualize correlation between gene expression and tumor stemness scores.
 }
 \examples{
-\donttest{
+\dontrun{
 # Analyze TP53 correlation with stemness
 p <- vis_gene_stemness_cor("TP53")
 

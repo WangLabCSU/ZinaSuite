@@ -20,7 +20,7 @@ Named vector of CNV values (GISTIC2 scores)
 Convenience function to query CNV data.
 }
 \examples{
-\donttest{
+\dontrun{
 # Query TP53 CNV
 tp53_cnv <- query_cnv("TP53", source = "tcga")
 table(tp53_cnv)

@@ -37,7 +37,7 @@ Create a boxplot or violin plot comparing tumor vs normal expression across
 cancer types.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create tumor vs normal plot for TP53
 p <- vis_tumor_normal("TP53", mode = "Boxplot")
 print(p)

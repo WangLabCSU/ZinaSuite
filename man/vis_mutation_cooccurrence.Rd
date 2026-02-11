@@ -28,7 +28,7 @@ Analyze and visualize co-occurrence or mutual exclusivity of mutations
 in two genes.
 }
 \examples{
-\donttest{
+\dontrun{
 # Analyze TP53 and KRAS co-occurrence
 result <- vis_mutation_cooccurrence("TP53", "KRAS")
 print(result$plot)

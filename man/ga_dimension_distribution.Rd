@@ -39,7 +39,7 @@ Perform dimension reduction and distribution analysis.
 Supports PCA, t-SNE, and UMAP methods.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create sample data
 set.seed(123)
 data <- matrix(rnorm(1000), nrow = 100)

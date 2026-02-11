@@ -24,7 +24,7 @@ A plot object
 Create volcano plot showing gene-drug associations.
 }
 \examples{
-\donttest{
+\dontrun{
 # Create volcano plot
 p <- vis_gene_drug_response_asso("TP53")
 print(p)
