@@ -629,10 +629,14 @@ run_mutation_analysis <- function(gene, data_type) {
 
   # Calculate frequencies by cancer
   sample_info <- load_data("tcga_gtex")
+
+  # Match samples using barcode matching
+  match_result <- match_samples(names(mut_data), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
+
   plot_data <- data.frame(
-    Sample = names(mut_data),
-    Mutation = as.character(mut_data),
-    Cancer = sample_info$tissue[match(names(mut_data), sample_info$sample)],
+    Sample = match_result$common_ids,
+    Mutation = as.character(mut_data[match_result$idx1]),
+    Cancer = sample_info$Tissue[match_result$idx2],
     stringsAsFactors = FALSE
   )
 
@@ -668,15 +672,18 @@ run_survival_km_analysis <- function(gene, data_type, measure) {
   # Get survival data
   surv_data <- load_data("tcga_surv")
 
+  # Match samples using barcode matching
+  match_result <- match_samples(names(gene_expr), surv_data$Sample, "tcga", "tcga", match_by = "barcode")
+
   # Prepare data
   plot_data <- data.frame(
-    Sample = names(gene_expr),
-    Expression = as.numeric(gene_expr),
+    Sample = match_result$common_ids,
+    Expression = as.numeric(gene_expr[match_result$idx1]),
+    Time = surv_data[[paste0(measure, ".time")]][match_result$idx2],
+    Status = surv_data[[measure]][match_result$idx2],
     stringsAsFactors = FALSE
   )
 
-  plot_data$Time <- surv_data[[paste0(measure, ".time")]][match(plot_data$Sample, surv_data$sample)]
-  plot_data$Status <- surv_data[[measure]][match(plot_data$Sample, surv_data$sample)]
   plot_data <- plot_data[stats::complete.cases(plot_data), ]
 
   # Create expression groups
@@ -718,13 +725,16 @@ run_dimension_analysis <- function(gene, data_type) {
   # Get sample info
   sample_info <- load_data("tcga_gtex")
 
+  # Match samples using barcode matching
+  match_result <- match_samples(names(gene_expr), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
+
   # Prepare data for PCA
   # For single gene, we'll show distribution across cancers
   plot_data <- data.frame(
-    Sample = names(gene_expr),
-    Expression = as.numeric(gene_expr),
-    Cancer = sample_info$tissue[match(names(gene_expr), sample_info$sample)],
-    Type = sample_info$type2[match(names(gene_expr), sample_info$sample)],
+    Sample = match_result$common_ids,
+    Expression = as.numeric(gene_expr[match_result$idx1]),
+    Cancer = sample_info$Tissue[match_result$idx2],
+    Type = sample_info$Dataset[match_result$idx2],
     stringsAsFactors = FALSE
   )
 

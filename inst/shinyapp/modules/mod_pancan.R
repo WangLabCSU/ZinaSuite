@@ -128,10 +128,14 @@ mod_pancan_server <- function(id, app_state, async_compute = NULL) {
               expr <- query_gene_expression(gene, source = "tcga")
               sample_info <- load_data("tcga_gtex")
 
+              # Match samples using barcode matching
+              match_result <- match_samples(names(expr), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
+
               # Create comparison data
               plot_data <- data.frame(
-                Expression = as.numeric(expr),
-                Cancer = sample_info$tissue[match(names(expr), sample_info$sample)]
+                Sample = match_result$common_ids,
+                Expression = as.numeric(expr[match_result$idx1]),
+                Cancer = sample_info$Tissue[match_result$idx2]
               )
               plot_data <- plot_data[!is.na(plot_data$Cancer), ]
 

@@ -153,9 +153,11 @@ mod_dimension_server <- function(id, app_state, async_compute = NULL) {
           if (color_by != "none") {
             sample_info <- load_data("tcga_gtex")
             if (color_by == "cancer") {
+              # Match samples using barcode matching
+              match_result <- match_samples(colnames(expr_matrix), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
               color_var <- stats::setNames(
-                sample_info$tissue[match(colnames(expr_matrix), sample_info$sample)],
-                colnames(expr_matrix)
+                sample_info$Tissue[match_result$idx2],
+                match_result$common_ids
               )
             }
           }
