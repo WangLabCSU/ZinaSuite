@@ -373,15 +373,12 @@ run_tumor_normal_analysis <- function(gene, data_type, mode, cancer, include_gte
   # Query gene expression
   gene_expr <- query_molecule(gene, data_type = data_type, source = "tcga")
 
-  # Load sample information
-  sample_info <- load_data("tcga_gtex")
+  # Prepare data using sample ID parsing
+  plot_data <- prepare_tumor_normal_data_from_ids(gene_expr, include_gtex)
 
-  # Prepare data
-  plot_data <- prepare_tumor_normal_data(gene_expr, sample_info, include_gtex)
-
-  if (mode == "single" && !is.null(cancer)) {
-    plot_data <- plot_data[plot_data$Cancer == cancer, ]
-  }
+  # For now, aggregate all cancer types together since we don't have cancer type mapping
+  # This shows pan-cancer tumor vs normal comparison
+  plot_data$Cancer <- "Pan-Cancer"
 
   # Create plot
   plot_fn <- if (plot_type == "boxplot") create_tumor_normal_boxplot else create_tumor_normal_violin
@@ -393,21 +390,78 @@ run_tumor_normal_analysis <- function(gene, data_type, mode, cancer, include_gte
   list(plot = plot, data = plot_data, stats = stats)
 }
 
-#' Prepare Tumor vs Normal Data
+#' Extract Cancer Type from TCGA Sample ID
+#' TCGA sample format: TCGA-XX-XXXX-XXX-XXX-XXXX-XX
+#' The second part (XX) indicates cancer type
 #' @keywords internal
-prepare_tumor_normal_data <- function(gene_expr, sample_info, include_gtex) {
-  common_samples <- intersect(names(gene_expr), sample_info$sample)
+extract_cancer_type <- function(sample_id) {
+  parts <- strsplit(sample_id, "-")[[1]]
+  if (length(parts) >= 2 && grepl("^TCGA", sample_id)) {
+    return(parts[2])
+  }
+  return(NA)
+}
 
-  data.frame(
-    Sample = common_samples,
-    Expression = as.numeric(gene_expr[common_samples]),
-    Type = sample_info$type2[match(common_samples, sample_info$sample)],
-    Cancer = sample_info$tissue[match(common_samples, sample_info$sample)],
-    Dataset = ifelse(substr(common_samples, 1, 4) == "TCGA", "TCGA", "GTEx"),
+#' Determine Sample Type from TCGA Sample ID
+#' TCGA sample format: TCGA-XX-XXXX-SSS
+#' SSS (4th part): 01-09 = Tumor, 10-19 = Normal, 20-29 = Control
+#' @keywords internal
+determine_sample_type <- function(sample_id) {
+  parts <- strsplit(sample_id, "-")[[1]]
+  if (length(parts) >= 4 && grepl("^TCGA", sample_id)) {
+    sample_code <- parts[4]
+    # Extract first 2 digits
+    code_num <- as.numeric(substr(sample_code, 1, 2))
+    if (!is.na(code_num)) {
+      if (code_num >= 1 && code_num <= 9) return("tumor")
+      if (code_num >= 10 && code_num <= 19) return("normal")
+      if (code_num >= 20 && code_num <= 29) return("control")
+    }
+  }
+  return(NA)
+}
+
+#' Prepare Tumor vs Normal Data from Sample IDs
+#' @keywords internal
+prepare_tumor_normal_data_from_ids <- function(gene_expr, include_gtex) {
+  samples <- names(gene_expr)
+
+  # Determine dataset and type for each sample
+  is_tcga <- grepl("^TCGA", samples)
+  is_gtex <- grepl("^GTEX", samples)
+
+  # Extract cancer types
+  cancer_types <- sapply(samples, extract_cancer_type)
+
+  # Determine sample types for TCGA samples
+  sample_types <- sapply(samples, determine_sample_type)
+
+  # For GTEx samples, mark as normal
+  sample_types[is_gtex] <- "normal"
+  cancer_types[is_gtex] <- "GTEx"
+
+  # Create data frame
+  data <- data.frame(
+    Sample = samples,
+    Expression = as.numeric(gene_expr),
+    Type = sample_types,
+    Cancer = cancer_types,
+    Dataset = ifelse(is_tcga, "TCGA", ifelse(is_gtex, "GTEx", "Other")),
     stringsAsFactors = FALSE
-  ) %>%
-    dplyr::filter(.data$Type %in% c("tumor", "normal")) %>%
-    dplyr::filter(include_gtex | .data$Dataset == "TCGA")
+  )
+
+  # Filter for tumor and normal only
+  data <- data[data$Type %in% c("tumor", "normal"), ]
+
+  # Filter out GTEx if not included
+  if (!include_gtex) {
+    data <- data[data$Dataset == "TCGA", ]
+  }
+
+  # Remove rows with NA
+  data <- data[complete.cases(data), ]
+
+  return(data)
 }
 
 #' Create Tumor vs Normal Boxplot
