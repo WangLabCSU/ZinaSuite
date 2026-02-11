@@ -4,7 +4,13 @@
 \alias{match_samples}
 \title{Match Samples Between Different Data Sources}
 \usage{
-match_samples(ids1, ids2, source1 = "auto", source2 = "auto")
+match_samples(
+  ids1,
+  ids2,
+  source1 = "auto",
+  source2 = "auto",
+  match_by = "full_id"
+)
 }
 \arguments{
 \item{ids1}{First set of sample IDs}
@@ -14,12 +20,15 @@ match_samples(ids1, ids2, source1 = "auto", source2 = "auto")
 \item{source1}{Source of first set ("tcga", "ccle", "pcawg", "auto")}
 
 \item{source2}{Source of second set ("tcga", "ccle", "pcawg", "auto")}
+
+\item{match_by}{Method to match samples: "full_id" (default) or "barcode"}
 }
 \value{
 List with matched IDs and indices
 }
 \description{
 Match samples between two datasets with potentially different ID formats.
+Supports matching by full sample ID or by barcode (first 12 characters).
 Returns the intersection of standardized sample IDs.
 }
 \examples{
@@ -27,5 +36,10 @@ Returns the intersection of standardized sample IDs.
 ids1 <- c("TCGA-19-1787-01A", "TCGA-B2-5641-11A")
 ids2 <- c("TCGA-19-1787-01", "TCGA-B2-5641-11")
 match <- match_samples(ids1, ids2)
+
+# Match by barcode (useful when clinical and expression data use different ID formats)
+ids1 <- c("TCGA-19-1787-01A", "TCGA-B2-5641-11A")  # expression data
+ids2 <- c("TCGA-19-1787-01B", "TCGA-B2-5641-11C")  # clinical data
+match <- match_samples(ids1, ids2, match_by = "barcode")
 }
 }

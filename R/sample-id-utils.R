@@ -179,12 +179,14 @@ determine_tcga_cancer <- function(id) {
 #'
 #' @description
 #' Match samples between two datasets with potentially different ID formats.
+#' Supports matching by full sample ID or by barcode (first 12 characters).
 #' Returns the intersection of standardized sample IDs.
 #'
 #' @param ids1 First set of sample IDs
 #' @param ids2 Second set of sample IDs
 #' @param source1 Source of first set ("tcga", "ccle", "pcawg", "auto")
 #' @param source2 Source of second set ("tcga", "ccle", "pcawg", "auto")
+#' @param match_by Method to match samples: "full_id" (default) or "barcode"
 #' @return List with matched IDs and indices
 #' @export
 #'
@@ -193,18 +195,88 @@ determine_tcga_cancer <- function(id) {
 #' ids1 <- c("TCGA-19-1787-01A", "TCGA-B2-5641-11A")
 #' ids2 <- c("TCGA-19-1787-01", "TCGA-B2-5641-11")
 #' match <- match_samples(ids1, ids2)
+#'
+#' # Match by barcode (useful when clinical and expression data use different ID formats)
+#' ids1 <- c("TCGA-19-1787-01A", "TCGA-B2-5641-11A")  # expression data
+#' ids2 <- c("TCGA-19-1787-01B", "TCGA-B2-5641-11C")  # clinical data
+#' match <- match_samples(ids1, ids2, match_by = "barcode")
 #' }
-match_samples <- function(ids1, ids2, source1 = "auto", source2 = "auto") {
+match_samples <- function(ids1, ids2, source1 = "auto", source2 = "auto", match_by = "full_id") {
   # Standardize both sets
   std1 <- standardize_sample_id(ids1, source1)
   std2 <- standardize_sample_id(ids2, source2)
 
-  # Find intersection
-  common <- intersect(std1, std2)
+  if (match_by == "barcode") {
+    # Match by barcode (first 12 characters: TCGA-XX-XXXX)
+    bc1 <- substr(std1, 1, 12)
+    bc2 <- substr(std2, 1, 12)
 
-  # Get indices
-  idx1 <- match(common, std1)
-  idx2 <- match(common, std2)
+    # Find intersection of barcodes
+    common_bc <- intersect(bc1, bc2)
+
+    if (length(common_bc) == 0) {
+      return(list(
+        common_ids = character(0),
+        idx1 = integer(0),
+        idx2 = integer(0),
+        n_matched = 0
+      ))
+    }
+
+    # Get indices for matched barcodes
+    idx1 <- which(bc1 %in% common_bc)
+    idx2 <- which(bc2 %in% common_bc)
+
+    # If multiple samples from same patient, prefer "A" suffix
+    if (length(idx1) > length(common_bc)) {
+      # Handle duplicates in ids1
+      dup_bc <- bc1[idx1][duplicated(bc1[idx1])]
+      if (length(dup_bc) > 0) {
+        for (db in unique(dup_bc)) {
+          dup_idx <- idx1[bc1[idx1] == db]
+          # Prefer "A" suffix
+          has_a <- grepl("A$", std1[dup_idx])
+          if (any(has_a)) {
+            idx1 <- setdiff(idx1, dup_idx[!has_a])
+          } else {
+            # Keep first one if no "A" suffix
+            idx1 <- setdiff(idx1, dup_idx[-1])
+          }
+        }
+      }
+    }
+
+    if (length(idx2) > length(common_bc)) {
+      # Handle duplicates in ids2
+      dup_bc <- bc2[idx2][duplicated(bc2[idx2])]
+      if (length(dup_bc) > 0) {
+        for (db in unique(dup_bc)) {
+          dup_idx <- idx2[bc2[idx2] == db]
+          # Prefer "A" suffix
+          has_a <- grepl("A$", std2[dup_idx])
+          if (any(has_a)) {
+            idx2 <- setdiff(idx2, dup_idx[!has_a])
+          } else {
+            # Keep first one if no "A" suffix
+            idx2 <- setdiff(idx2, dup_idx[-1])
+          }
+        }
+      }
+    }
+
+    # Ensure same order
+    bc1_matched <- bc1[idx1]
+    bc2_matched <- bc2[idx2]
+    order2 <- match(bc1_matched, bc2_matched)
+    idx2 <- idx2[order2]
+
+    common <- std1[idx1]
+  } else {
+    # Match by full sample ID
+    common <- intersect(std1, std2)
+    idx1 <- match(common, std1)
+    idx2 <- match(common, std2)
+  }
 
   list(
     common_ids = common,

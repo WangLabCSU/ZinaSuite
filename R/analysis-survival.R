@@ -158,15 +158,17 @@ analyze_survival_by_expression <- function(gene,
   # Load survival data
   surv_data <- load_data("tcga_surv")
 
-  # Find common samples
-  common_samples <- intersect(names(gene_expr), surv_data$sample)
+  # Find common samples using barcode matching
+  # (expression and survival data may have slightly different ID formats)
+  match_result <- match_samples(names(gene_expr), surv_data$Sample, "tcga", "tcga", match_by = "barcode")
 
-  if (length(common_samples) < 10) {
+  if (match_result$n_matched < 10) {
     stop("Insufficient samples with both expression and survival data")
   }
 
   # Get expression values for common samples
-  expr_values <- gene_expr[common_samples]
+  expr_values <- gene_expr[match_result$idx1]
+  names(expr_values) <- match_result$common_ids
 
   # Create groups based on cutoff method
   group <- switch(cutoff_method,
@@ -193,8 +195,8 @@ analyze_survival_by_expression <- function(gene,
   )
 
   # Get survival data for common samples
-  time <- surv_data$OS.time[match(common_samples, surv_data$sample)]
-  status <- surv_data$OS[match(common_samples, surv_data$sample)]
+  time <- surv_data$OS.time[match_result$idx2]
+  status <- surv_data$OS[match_result$idx2]
 
   # Remove NA values
   valid <- stats::complete.cases(time, status, group)
@@ -209,7 +211,7 @@ analyze_survival_by_expression <- function(gene,
     gene = gene,
     cutoff_method = cutoff_method,
     cutoff_value = if (cutoff_method == "custom") cutoff_value else stats::median(expr_values, na.rm = TRUE),
-    n_samples = length(common_samples),
+    n_samples = match_result$n_matched,
     n_events = sum(status, na.rm = TRUE),
     group_sizes = table(group),
     survival = surv_result,

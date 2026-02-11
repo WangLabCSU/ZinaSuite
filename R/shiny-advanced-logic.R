@@ -464,8 +464,9 @@ analyze_group_comparison <- function(gene, group_var, cancer = NULL) {
     # Create named vector of groups
     groups <- setNames(groups_data[[group_var]], groups_data$Sample)
 
-    # Match samples using standardized IDs
-    match_result <- match_samples(names(expr), names(groups), "tcga", "tcga")
+    # Match samples using barcode (first 12 characters)
+    # This handles cases where clinical and expression data use different ID formats
+    match_result <- match_samples(names(expr), names(groups), "tcga", "tcga", match_by = "barcode")
 
     if (match_result$n_matched == 0) {
       stop("No matching samples found between expression and grouping data")
