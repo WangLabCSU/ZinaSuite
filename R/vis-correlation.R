@@ -147,23 +147,28 @@ vis_gene_correlation <- function(gene1, gene2,
     stop("Failed to retrieve data for one or both genes")
   }
 
-  # Match samples
-  common_samples <- intersect(names(expr1), names(expr2))
-  expr1 <- expr1[common_samples]
-  expr2 <- expr2[common_samples]
+  # Match samples using barcode matching
+  match_result <- match_samples(names(expr1), names(expr2), "tcga", "tcga", match_by = "barcode")
+
+  if (match_result$n_matched == 0) {
+    stop("No common samples found between the two genes")
+  }
 
   # Create data frame
   data <- data.frame(
-    gene1 = as.numeric(expr1),
-    gene2 = as.numeric(expr2),
-    sample = common_samples
+    gene1 = as.numeric(expr1[match_result$idx1]),
+    gene2 = as.numeric(expr2[match_result$idx2]),
+    sample = match_result$common_ids
   )
 
   # Add color variable if specified
   if (!is.null(color_by)) {
     if (color_by == "cancer") {
       sample_info <- load_data("tcga_gtex")
-      data$cancer <- sample_info$tissue[match(common_samples, sample_info$sample)]
+      # Match using barcode
+      sample_bc <- substr(sample_info$Sample, 1, 12)
+      data_bc <- substr(data$sample, 1, 12)
+      data$cancer <- sample_info$Tissue[match(data_bc, sample_bc)]
     }
   }
 
