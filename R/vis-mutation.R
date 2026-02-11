@@ -78,19 +78,20 @@ vis_toil_Mut <- function(gene,
     stop("Failed to retrieve ", data_type, " data for gene: ", target_gene)
   }
 
-  # Get sample cancer types
+  # Get sample cancer types using barcode matching
   sample_info <- load_data("tcga_gtex")
-  sample_cancer <- setNames(
-    sample_info$tissue[match(names(target_data), sample_info$sample)],
-    names(target_data)
-  )
+  match_result <- match_samples(names(target_data), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
+
+  if (match_result$n_matched == 0) {
+    stop("No matching samples found")
+  }
 
   # Create plot data
   plot_data <- data.frame(
-    Sample = names(target_data),
-    Value = as.numeric(target_data),
-    Mutation = mut_binary[match(names(target_data), names(mut_binary))],
-    Cancer = sample_cancer[names(target_data)],
+    Sample = match_result$common_ids,
+    Value = as.numeric(target_data[match_result$idx1]),
+    Mutation = mut_binary[match(match_result$common_ids, names(mut_binary))],
+    Cancer = sample_info$Tissue[match_result$idx2],
     stringsAsFactors = FALSE
   )
 

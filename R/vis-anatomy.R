@@ -50,11 +50,13 @@ vis_pancan_anatomy <- function(gene,
     stop("Failed to retrieve expression data for gene: ", gene)
   }
 
-  # Get sample cancer types
+  # Get sample cancer types using barcode matching
   sample_info <- load_data("tcga_gtex")
+  match_result <- match_samples(names(gene_expr), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
+
   sample_cancer <- stats::setNames(
-    sample_info$tissue[match(names(gene_expr), sample_info$sample)],
-    names(gene_expr)
+    sample_info$Tissue[match_result$idx2],
+    match_result$common_ids
   )
 
   # Get organ mapping

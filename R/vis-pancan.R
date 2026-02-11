@@ -184,18 +184,18 @@ vis_gene_cor <- function(gene1,
   expr1 <- query_gene_expression(gene1, source = source)
   expr2 <- query_gene_expression(gene2, source = source)
 
-  # Find common samples
-  common_samples <- intersect(names(expr1), names(expr2))
+  # Match samples using barcode matching
+  match_result <- match_samples(names(expr1), names(expr2), "tcga", "tcga", match_by = "barcode")
 
-  if (length(common_samples) < 10) {
+  if (match_result$n_matched < 10) {
     stop("Insufficient common samples between genes")
   }
 
   # Prepare data
   df <- data.frame(
-    Gene1 = as.numeric(expr1[common_samples]),
-    Gene2 = as.numeric(expr2[common_samples]),
-    Sample = common_samples,
+    Gene1 = as.numeric(expr1[match_result$idx1]),
+    Gene2 = as.numeric(expr2[match_result$idx2]),
+    Sample = match_result$common_ids,
     stringsAsFactors = FALSE
   )
 
@@ -203,7 +203,10 @@ vis_gene_cor <- function(gene1,
   if (!is.null(color_by)) {
     if (color_by == "Type") {
       sample_info <- load_data("tcga_gtex")
-      df$Color <- sample_info$Type[match(df$Sample, sample_info$Sample)]
+      # Match using barcode
+      sample_bc <- substr(sample_info$Sample, 1, 12)
+      data_bc <- substr(df$Sample, 1, 12)
+      df$Color <- sample_info$Dataset[match(data_bc, sample_bc)]
     }
   }
 

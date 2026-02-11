@@ -52,12 +52,21 @@ vis_gene_immune_cor <- function(gene,
     immune_features <- setdiff(colnames(immune_data), c("Sample", "Cancer"))
   }
 
-  # Get sample cancer types
+  # Get sample cancer types using barcode matching
   sample_info <- load_data("tcga_gtex")
+  match_result <- match_samples(names(gene_expr), sample_info$Sample, "tcga", "tcga", match_by = "barcode")
+
+  if (match_result$n_matched == 0) {
+    stop("No matching samples found")
+  }
+
   sample_cancer <- stats::setNames(
-    sample_info$tissue[match(names(gene_expr), sample_info$sample)],
-    names(gene_expr)
+    sample_info$Tissue[match_result$idx2],
+    match_result$common_ids
   )
+
+  # Use matched expression data
+  gene_expr <- stats::setNames(gene_expr[match_result$idx1], match_result$common_ids)
 
   # Filter by cancers if specified
   if (!is.null(cancers)) {
@@ -80,19 +89,18 @@ vis_gene_immune_cor <- function(gene,
 
     if (length(cancer_expr) < 10) next
 
-    # Get immune data for these samples
-    cancer_immune <- immune_data[immune_data$Sample %in% cancer_samples, ]
+    # Get immune data for these samples using barcode matching
+    immune_match <- match_samples(names(cancer_expr), immune_data$Sample, "tcga", "tcga", match_by = "barcode")
+    if (immune_match$n_matched < 10) next
+
+    cancer_immune_matched <- immune_data[immune_match$idx2, ]
 
     # Calculate correlations for each immune feature
     for (feature in immune_features) {
-      if (!feature %in% colnames(cancer_immune)) next
+      if (!feature %in% colnames(cancer_immune_matched)) next
 
-      # Match samples
-      common_samples <- intersect(names(cancer_expr), cancer_immune$Sample)
-      if (length(common_samples) < 10) next
-
-      x <- cancer_expr[common_samples]
-      y <- stats::setNames(cancer_immune[[feature]], cancer_immune$Sample)[common_samples]
+      x <- cancer_expr[immune_match$idx1]
+      y <- stats::setNames(cancer_immune_matched[[feature]], cancer_immune_matched$Sample)[immune_match$common_ids]
 
       # Remove NA
       valid <- stats::complete.cases(x, y)
