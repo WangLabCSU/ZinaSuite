@@ -13,6 +13,7 @@
 \alias{mod_pharmacogenomics_server}
 \alias{mod_batch_server}
 \alias{mod_about_server}
+\alias{mod_quick_tcga_server}
 \title{Shiny Module Server Functions}
 \usage{
 mod_home_server(id)
@@ -36,6 +37,8 @@ mod_pharmacogenomics_server(id, app_state)
 mod_batch_server(id, app_state, async_compute)
 
 mod_about_server(id)
+
+mod_quick_tcga_server(id, app_state, async_compute)
 }
 \description{
 Server functions for all Shiny modules in ZinaSuite.

@@ -85,6 +85,13 @@ mod_about_ui <- function(id) {
   mod_about_ui(id)
 }
 
+#' @rdname shiny-module-ui
+#' @export
+mod_quick_tcga_ui <- function(id) {
+  source(system.file("shinyapp", "modules", "mod_quick_tcga.R", package = "ZinaSuite"), local = TRUE)
+  mod_quick_tcga_ui(id)
+}
+
 #' Shiny Module Server Functions
 #'
 #' @description
@@ -169,4 +176,11 @@ mod_batch_server <- function(id, app_state, async_compute) {
 mod_about_server <- function(id) {
   source(system.file("shinyapp", "modules", "mod_about.R", package = "ZinaSuite"), local = TRUE)
   mod_about_server(id)
+}
+
+#' @rdname shiny-module-server
+#' @export
+mod_quick_tcga_server <- function(id, app_state, async_compute) {
+  source(system.file("shinyapp", "modules", "mod_quick_tcga.R", package = "ZinaSuite"), local = TRUE)
+  mod_quick_tcga_server(id, app_state, async_compute)
 }

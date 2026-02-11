@@ -13,6 +13,7 @@
 \alias{mod_pharmacogenomics_ui}
 \alias{mod_batch_ui}
 \alias{mod_about_ui}
+\alias{mod_quick_tcga_ui}
 \title{Shiny Module UI Functions}
 \usage{
 mod_home_ui(id)
@@ -36,6 +37,8 @@ mod_pharmacogenomics_ui(id)
 mod_batch_ui(id)
 
 mod_about_ui(id)
+
+mod_quick_tcga_ui(id)
 }
 \description{
 UI functions for all Shiny modules in ZinaSuite.
