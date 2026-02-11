@@ -453,22 +453,38 @@ analyze_group_comparison <- function(gene, group_var, cancer = NULL) {
     expr <- query_gene_expression(gene)
 
     # Query grouping variable
-    groups <- query_tcga_group(group_var, cancer = cancer)
+    groups_result <- query_tcga_group(database = "tcga", cancer = cancer, group = group_var)
 
-    # Match samples
-    common <- intersect(names(expr), names(groups))
-    expr_matched <- expr[common]
-    groups_matched <- groups[common]
+    # Extract group data
+    groups_data <- groups_result$data
+    if (nrow(groups_data) == 0) {
+      stop("No grouping data available")
+    }
+
+    # Create named vector of groups
+    groups <- setNames(groups_data[[group_var]], groups_data$Sample)
+
+    # Match samples using standardized IDs
+    match_result <- match_samples(names(expr), names(groups), "tcga", "tcga")
+
+    if (match_result$n_matched == 0) {
+      stop("No matching samples found between expression and grouping data")
+    }
+
+    expr_matched <- expr[match_result$idx1]
+    groups_matched <- groups[match_result$idx2]
 
     # Statistical test
     if (length(unique(groups_matched)) == 2) {
       # T-test for 2 groups
       test_result <- t.test(expr_matched ~ groups_matched)
       test_type <- "t-test"
+      p_value <- test_result$p.value
     } else {
       # ANOVA for >2 groups
       test_result <- summary(aov(expr_matched ~ groups_matched))
       test_type <- "ANOVA"
+      p_value <- test_result[[1]]$`Pr(>F)`[1]
     }
 
     # Group statistics
@@ -482,9 +498,9 @@ analyze_group_comparison <- function(gene, group_var, cancer = NULL) {
       group_var = group_var,
       cancer = cancer,
       test_type = test_type,
-      p_value = ifelse(test_type == "t-test", test_result$p.value, test_result[[1]]$`Pr(>F)`[1]),
+      p_value = p_value,
       group_stats = group_stats,
-      sample_count = length(common)
+      sample_count = match_result$n_matched
     )
   }, error = function(e) {
     list(success = FALSE, error = conditionMessage(e))

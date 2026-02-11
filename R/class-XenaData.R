@@ -381,6 +381,14 @@ XenaData <- R6::R6Class(
           # Convert to named vector
           values <- as.numeric(result[1, ])
           names(values) <- colnames(result)
+
+          # Standardize sample IDs for TCGA data
+          if (grepl("TCGA", names(values)[1])) {
+            names(values) <- standardize_sample_id(names(values), "tcga")
+            # Deduplicate samples, preferring "A" suffix
+            values <- deduplicate_samples(values, prefer_suffix = "A")
+          }
+
           return(values)
         }
       }

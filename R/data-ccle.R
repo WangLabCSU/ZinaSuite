@@ -244,8 +244,22 @@ CCLEData <- R6::R6Class(
         return(cached)
       }
 
-      # Query from Xena
-      result <- private$fetch_from_xena(identifier, dataset, use_probeMap)
+      # Query from Xena with retry
+      result <- NULL
+      max_try <- 3
+      for (i in seq_len(max_try)) {
+        result <- tryCatch({
+          private$fetch_from_xena(identifier, dataset, use_probeMap)
+        }, error = function(e) {
+          if (i == max_try) {
+            warning("Failed to fetch ", identifier, " from CCLE after ", max_try, " attempts: ", conditionMessage(e))
+            return(NULL)
+          }
+          Sys.sleep(0.5)
+          NULL
+        })
+        if (!is.null(result)) break
+      }
 
       if (is.null(result)) {
         warning("No data returned for ", identifier, " from CCLE ", data_type)

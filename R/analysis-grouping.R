@@ -103,6 +103,11 @@ query_tcga_group <- function(database = c("tcga", "pcawg", "ccle"),
   # Standardize column names
   colnames(meta_data)[1:2] <- c("Sample", "Cancer")
 
+  # Standardize sample IDs for TCGA data
+  if (database == "tcga") {
+    meta_data$Sample <- standardize_sample_id(meta_data$Sample, "tcga")
+  }
+
   # Step 2: Merge custom phenotype data if provided
   if (!is.null(custom)) {
     dup_names <- intersect(colnames(meta_data)[-1:-2], colnames(custom)[-1])
