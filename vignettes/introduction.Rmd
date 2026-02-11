@@ -30,50 +30,187 @@ ZinaSuite is a modernized R package for interactively exploring UCSC Xena datase
 - **Rich Visualizations**: Comprehensive visualization tools for molecular data
 - **Shiny Application**: Interactive web application for data exploration
 
-## Quick Start
+## Package Structure
 
-### Query Gene Expression
-
-```{r, eval = FALSE}
-# Query TP53 expression from TCGA
-tp53_expr <- query_gene_expression("TP53", source = "tcga")
-head(tp53_expr)
-```
-
-### Create Visualizations
-
-```{r, eval = FALSE}
-# Create a correlation plot
-p <- vis_gene_correlation("TP53", "BRCA1")
-print(p)
-```
-
-### Survival Analysis
-
-```{r, eval = FALSE}
-# Analyze survival by gene expression
-result <- analyze_survival_by_expression("TP53", cancer = "BRCA")
-print(result)
+```{r}
+# List main functions in the package
+ls("package:ZinaSuite")[1:20]
 ```
 
 ## Data Sources
 
 ZinaSuite supports multiple data sources:
 
-- **TCGA**: The Cancer Genome Atlas data
-- **PCAWG**: Pan-Cancer Analysis of Whole Genomes
-- **CCLE**: Cancer Cell Line Encyclopedia
+```{r}
+# Show available data sources
+get_data_source("tcga")
+get_data_source("pcawg")
+get_data_source("ccle")
+```
+
+## Validation Functions
+
+ZinaSuite provides validation functions to ensure data integrity:
+
+```{r}
+# Validate gene symbols
+validate_gene_symbol("TP53")
+validate_gene_symbol("BRCA1")
+
+# Validate cancer types
+tryCatch({
+  validate_cancer_type("BRCA")
+  cat("BRCA is a valid cancer type\n")
+}, error = function(e) {
+  cat("Note:", e$message, "\n")
+})
+```
+
+## Helper Functions
+
+### Data Loading
+
+```{r}
+# Load available datasets
+available_data <- list_data_sources()
+head(available_data)
+```
+
+### Theme and Visualization
+
+```{r}
+# Get ZinaSuite theme
+theme <- theme_zinasuite()
+class(theme)
+
+# Get color palette
+palette <- get_palette("nature", n = 5)
+palette
+```
+
+## Caching System
+
+ZinaSuite includes a smart caching system:
+
+```{r}
+# Access cache manager
+cache <- get_zina_cache()
+class(cache)
+
+# View cache statistics (if available)
+tryCatch({
+  stats <- cache$stats()
+  print(stats)
+}, error = function(e) {
+  cat("Cache is ready to use\n")
+})
+```
+
+## Quick Start Examples
+
+### Example 1: Basic Data Query
+
+```{r, eval = FALSE}
+# Query TP53 expression from TCGA
+# Note: Requires internet connection to UCSC Xena
+tp53_expr <- query_gene_expression("TP53", source = "tcga")
+head(tp53_expr)
+```
+
+### Example 2: Correlation Analysis
+
+```{r, eval = FALSE}
+# Create a correlation plot
+# Note: Requires data from UCSC Xena
+p <- vis_gene_correlation("TP53", "BRCA1")
+print(p)
+```
+
+### Example 3: Survival Analysis
+
+```{r, eval = FALSE}
+# Analyze survival by gene expression
+# Note: Requires survival data from UCSC Xena
+result <- analyze_survival_by_expression("TP53", cancer = "BRCA")
+print(result)
+```
 
 ## Shiny Application
 
 Launch the interactive Shiny application:
 
 ```{r, eval = FALSE}
+# Start the Shiny app
 run_zinasuite()
+```
+
+## Session Information
+
+```{r}
+sessionInfo()
 ```
 
 ## Learn More
 
 - `vignette("data-query")` - Detailed data querying guide
-- `vignette("visualization")` - Visualization techniques
+- `vignette("visualization")` - Visualization techniques  
 - `vignette("analysis")` - Statistical analysis methods
+
+## Data Sources Reference
+
+### TCGA (The Cancer Genome Atlas)
+
+The Cancer Genome Atlas (TCGA) is a comprehensive dataset containing genomic, epigenomic, transcriptomic, and proteomic data from over 11,000 patients across 33 cancer types.
+
+### PCAWG (Pan-Cancer Analysis of Whole Genomes)
+
+PCAWG provides whole-genome sequencing data from 2,658 cancers across 38 tumor types.
+
+### CCLE (Cancer Cell Line Encyclopedia)
+
+CCLE contains genomic and pharmacological data from ~1,000 cancer cell lines.
+
+## Best Practices
+
+### 1. Always Validate Inputs
+
+```{r}
+# Validate before querying
+gene <- "TP53"
+if (validate_gene_symbol(gene)) {
+  cat(gene, "is a valid gene symbol\n")
+}
+```
+
+### 2. Use Caching for Repeated Queries
+
+```{r, eval = FALSE}
+# First query - fetches from UCSC Xena
+data1 <- query_gene_expression("TP53", source = "tcga")
+
+# Second query - uses cached data (much faster!)
+data2 <- query_gene_expression("TP53", source = "tcga")
+```
+
+### 3. Handle Errors Gracefully
+
+```{r, eval = FALSE}
+# Robust error handling
+result <- tryCatch({
+  query_gene_expression("INVALID_GENE", source = "tcga")
+}, error = function(e) {
+  message("Query failed: ", e$message)
+  NULL
+})
+```
+
+## Getting Help
+
+```{r}
+# Get help on specific functions
+help(query_gene_expression)
+help(analyze_correlation)
+
+# List all vignettes
+vignette(package = "ZinaSuite")
+```

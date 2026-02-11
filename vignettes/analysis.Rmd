@@ -16,401 +16,447 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(ZinaSuite)
+library(ggplot2)
 ```
 
 ## Overview
 
 This vignette demonstrates the statistical analysis capabilities of ZinaSuite for cancer genomics data.
 
-## Correlation Analysis
+## Basic Statistical Functions
 
-### Gene-Gene Correlation
+### Correlation Analysis
 
-Analyze correlation between two genes across samples:
+```{r}
+# Create sample data for correlation analysis
+set.seed(123)
+n <- 100
+gene1_expr <- rnorm(n, mean = 5, sd = 1)
+gene2_expr <- gene1_expr * 0.6 + rnorm(n, mean = 0, sd = 0.8)
 
-```{r, eval = FALSE}
-# Pearson correlation between TP53 and BRCA1
-cor_result <- analyze_correlation(
-  gene1 = "TP53",
-  gene2 = "BRCA1",
-  cancer = "BRCA",
-  method = "pearson"
-)
-
+# Calculate correlation
+cor_result <- cor.test(gene1_expr, gene2_expr, method = "pearson")
 print(cor_result)
+
+# Create correlation plot
+cor_data <- data.frame(
+  Gene1 = gene1_expr,
+  Gene2 = gene2_expr
+)
+
+p_cor <- ggplot(cor_data, aes(x = Gene1, y = Gene2)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  annotate("text", x = min(gene1_expr), y = max(gene2_expr), 
+           label = sprintf("r = %.3f, p = %.3f", cor_result$estimate, cor_result$p.value),
+           hjust = 0, size = 5) +
+  theme_zinasuite() +
+  labs(
+    title = "Gene Correlation Analysis",
+    x = "Gene 1 Expression",
+    y = "Gene 2 Expression"
+  )
+
+print(p_cor)
 ```
 
-### Multi-Gene Correlation Matrix
+### Multiple Correlation Tests
 
-Analyze correlations among multiple genes:
-
-```{r, eval = FALSE}
-# Correlation matrix for multiple genes
+```{r}
+# Create correlation matrix for multiple genes
+set.seed(123)
 genes <- c("TP53", "BRCA1", "EGFR", "MYC", "KRAS")
-cor_matrix <- analyze_correlation_matrix(
-  genes = genes,
-  cancer = "BRCA",
-  method = "spearman"
+n <- 50
+expr_matrix <- matrix(rnorm(n * length(genes)), nrow = n)
+colnames(expr_matrix) <- genes
+
+# Calculate correlation matrix
+cor_matrix <- cor(expr_matrix)
+print(round(cor_matrix, 3))
+
+# Visualize correlation matrix
+cor_long <- data.frame(
+  Gene1 = rep(genes, each = length(genes)),
+  Gene2 = rep(genes, length(genes)),
+  Correlation = as.vector(cor_matrix)
 )
 
-# Visualize
-ggplot2::ggplot(cor_matrix, ggplot2::aes(x = Gene1, y = Gene2, fill = Correlation)) +
-  ggplot2::geom_tile() +
-  ggplot2::scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0)
-```
+p_cor_matrix <- ggplot(cor_long, aes(x = Gene1, y = Gene2, fill = Correlation)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
+  theme_zinasuite() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Gene Expression Correlation Matrix")
 
-### Partial Correlation
-
-Control for confounding variables:
-
-```{r, eval = FALSE}
-# Partial correlation controlling for age
-partial_cor <- analyze_partial_correlation(
-  gene1 = "TP53",
-  gene2 = "BRCA1",
-  control_genes = c("AGE", "GENDER"),
-  cancer = "BRCA"
-)
-```
-
-## Survival Analysis
-
-### Kaplan-Meier Analysis
-
-Analyze survival by gene expression:
-
-```{r, eval = FALSE}
-# Survival analysis by TP53 expression
-surv_result <- analyze_survival_by_expression(
-  gene = "TP53",
-  cancer = "BRCA",
-  measure = "OS",  # Overall survival
-  cutoff_mode = "Auto"
-)
-
-# Visualize
-p <- vis_survival_by_gene("TP53", cancer = "BRCA")
-print(p)
-```
-
-### Cox Proportional Hazards
-
-Univariate Cox regression:
-
-```{r, eval = FALSE}
-# Cox regression for single gene
-cox_result <- analyze_unicox_batch(
-  genes = c("TP53", "BRCA1", "EGFR"),
-  cancer = "BRCA",
-  measure = "OS"
-)
-
-# Forest plot
-vis_unicox_forest(cox_result)
-```
-
-### Multi-Gene Survival
-
-Survival analysis with gene signature:
-
-```{r, eval = FALSE}
-# Create gene signature
-signature_genes <- c("TP53", "BRCA1", "EGFR")
-
-# Analyze signature
-surv_signature <- analyze_survival_by_expression(
-  gene = signature_genes,
-  cancer = "BRCA",
-  combine = TRUE,  # Combine genes into signature
-  measure = "OS"
-)
+print(p_cor_matrix)
 ```
 
 ## Group Comparison
 
-### Tumor vs Normal
+### T-Test
 
-Compare gene expression between tumor and normal samples:
+```{r}
+# Create sample data for two groups
+set.seed(123)
+group1 <- rnorm(50, mean = 5, sd = 1)
+group2 <- rnorm(50, mean = 6.5, sd = 1.2)
 
-```{r, eval = FALSE}
-# Tumor vs Normal comparison
-comp_result <- analyze_group_comparison(
-  gene = "TP53",
-  cancer = "BRCA",
-  group_col = "Type"  # tumor vs normal
+# Perform t-test
+t_test_result <- t.test(group1, group2)
+print(t_test_result)
+
+# Visualize
+test_data <- data.frame(
+  Expression = c(group1, group2),
+  Group = rep(c("Control", "Treatment"), each = 50)
 )
 
-# Visualization
-vis_tumor_normal("TP53", cancer = "BRCA")
+p_ttest <- ggplot(test_data, aes(x = Group, y = Expression, fill = Group)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("Control" = "#56B4E9", "Treatment" = "#E69F00")) +
+  annotate("text", x = 1.5, y = max(test_data$Expression),
+           label = sprintf("p = %.4f", t_test_result$p.value), size = 5) +
+  theme_zinasuite() +
+  labs(title = "Group Comparison (T-Test)")
+
+print(p_ttest)
 ```
 
-### Multi-Group Comparison
+### ANOVA
 
-Compare across multiple groups:
+```{r}
+# Create sample data for multiple groups
+set.seed(123)
+group_a <- rnorm(30, mean = 5, sd = 1)
+group_b <- rnorm(30, mean = 6, sd = 1)
+group_c <- rnorm(30, mean = 7, sd = 1)
 
-```{r, eval = FALSE}
-# Compare across cancer stages
-stage_comparison <- analyze_group_comparison(
-  gene = "TP53",
-  cancer = "BRCA",
-  group_col = "Stage",
-  method = "anova"
+anova_data <- data.frame(
+  Value = c(group_a, group_b, group_c),
+  Group = rep(c("A", "B", "C"), each = 30)
 )
+
+# Perform ANOVA
+anova_result <- aov(Value ~ Group, data = anova_data)
+summary(anova_result)
+
+# Post-hoc test
+tukey_result <- TukeyHSD(anova_result)
+print(tukey_result)
+
+# Visualize
+p_anova <- ggplot(anova_data, aes(x = Group, y = Value, fill = Group)) +
+  geom_boxplot() +
+  scale_fill_manual(values = get_palette("nature", n = 3)) +
+  theme_zinasuite() +
+  labs(title = "ANOVA: Multiple Group Comparison")
+
+print(p_anova)
+```
+
+## Survival Analysis
+
+### Survival Data Preparation
+
+```{r}
+# Create sample survival data
+set.seed(123)
+n <- 200
+surv_data <- data.frame(
+  time = rexp(n, rate = 0.1),
+  status = sample(0:1, n, replace = TRUE, prob = c(0.3, 0.7)),
+  group = sample(c("High", "Low"), n, replace = TRUE)
+)
+
+# Summary statistics
+summary(surv_data)
+```
+
+### Kaplan-Meier Estimation
+
+```{r}
+# Calculate survival probabilities by group
+surv_by_group <- aggregate(time ~ group, data = surv_data, 
+                           FUN = function(x) c(mean = mean(x), median = median(x)))
+print(surv_by_group)
+
+# Create survival curve visualization
+p_surv <- ggplot(surv_data, aes(x = time, color = group)) +
+  stat_ecdf(geom = "step", size = 1.2) +
+  scale_color_manual(values = c("High" = "#E69F00", "Low" = "#56B4E9")) +
+  theme_zinasuite() +
+  labs(
+    title = "Survival Curve by Group",
+    x = "Time",
+    y = "Survival Probability",
+    color = "Risk Group"
+  )
+
+print(p_surv)
+```
+
+### Log-Rank Test
+
+```{r}
+# Compare survival between groups
+high_risk <- surv_data$time[surv_data$group == "High"]
+low_risk <- surv_data$time[surv_data$group == "Low"]
+
+# Wilcoxon test as approximation
+log_rank_approx <- wilcox.test(high_risk, low_risk)
+print(log_rank_approx)
 ```
 
 ## Dimension Reduction
 
-### Principal Component Analysis
+### Principal Component Analysis (PCA)
 
-Perform PCA on gene expression data:
+```{r}
+# Create sample high-dimensional data
+set.seed(123)
+n_samples <- 100
+n_genes <- 20
+expr_data <- matrix(rnorm(n_samples * n_genes), nrow = n_samples)
+colnames(expr_data) <- paste0("Gene", 1:n_genes)
 
-```{r, eval = FALSE}
-# PCA on multiple genes
-genes <- c("TP53", "BRCA1", "EGFR", "MYC", "KRAS", "PTEN")
-pca_result <- analyze_dimension_reduction(
-  genes = genes,
-  cancer = "BRCA",
-  method = "pca"
+# Add group structure
+groups <- sample(c("Cancer", "Normal"), n_samples, replace = TRUE)
+expr_data[groups == "Cancer", 1:10] <- expr_data[groups == "Cancer", 1:10] + 2
+
+# Perform PCA
+pca_result <- prcomp(expr_data, scale. = TRUE)
+
+# Extract PC scores
+pca_scores <- data.frame(
+  PC1 = pca_result$x[, 1],
+  PC2 = pca_result$x[, 2],
+  Group = groups
 )
 
-# Visualize
-plot(pca_result$coordinates[, 1:2], col = pca_result$groups)
+# Calculate variance explained
+var_explained <- summary(pca_result)$importance[2, 1:2] * 100
+
+# Visualize PCA
+p_pca <- ggplot(pca_scores, aes(x = PC1, y = PC2, color = Group)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = c("Cancer" = "#E69F00", "Normal" = "#56B4E9")) +
+  theme_zinasuite() +
+  labs(
+    title = "PCA of Gene Expression Data",
+    x = sprintf("PC1 (%.1f%%)", var_explained[1]),
+    y = sprintf("PC2 (%.1f%%)", var_explained[2])
+  )
+
+print(p_pca)
+
+# Scree plot
+scree_data <- data.frame(
+  PC = 1:10,
+  Variance = summary(pca_result)$importance[2, 1:10] * 100
+)
+
+p_scree <- ggplot(scree_data, aes(x = PC, y = Variance)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_line(aes(group = 1), color = "red", size = 1) +
+  geom_point(color = "red", size = 3) +
+  theme_zinasuite() +
+  labs(
+    title = "Scree Plot",
+    x = "Principal Component",
+    y = "Variance Explained (%)"
+  )
+
+print(p_scree)
 ```
 
-### t-SNE
+## Regression Analysis
 
-Non-linear dimension reduction:
+### Linear Regression
 
-```{r, eval = FALSE}
-# t-SNE analysis
-tsne_result <- analyze_dimension_reduction(
-  genes = genes,
-  cancer = "BRCA",
-  method = "tsne",
-  perplexity = 30
-)
+```{r}
+# Create sample data for regression
+set.seed(123)
+n <- 100
+x <- rnorm(n, mean = 5, sd = 2)
+y <- 2 + 0.5 * x + rnorm(n, mean = 0, sd = 1)
+
+# Fit linear model
+lm_model <- lm(y ~ x)
+summary(lm_model)
+
+# Create regression plot
+reg_data <- data.frame(x = x, y = y)
+
+p_reg <- ggplot(reg_data, aes(x = x, y = y)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  geom_smooth(method = "lm", color = "red", se = TRUE, fill = "pink") +
+  annotate("text", x = min(x), y = max(y),
+           label = sprintf("y = %.2f + %.2fx\nR² = %.3f",
+                          coef(lm_model)[1], coef(lm_model)[2],
+                          summary(lm_model)$r.squared),
+           hjust = 0, size = 4) +
+  theme_zinasuite() +
+  labs(
+    title = "Linear Regression",
+    x = "Predictor",
+    y = "Response"
+  )
+
+print(p_reg)
 ```
 
-### UMAP
+### Multiple Regression
 
-Uniform Manifold Approximation:
+```{r}
+# Create sample data with multiple predictors
+set.seed(123)
+n <- 100
+x1 <- rnorm(n)
+x2 <- rnorm(n)
+y <- 1 + 0.5 * x1 - 0.3 * x2 + rnorm(n, sd = 0.5)
 
-```{r, eval = FALSE}
-# UMAP analysis
-umap_result <- analyze_dimension_reduction(
-  genes = genes,
-  cancer = "BRCA",
-  method = "umap",
-  n_neighbors = 15
+# Fit multiple regression
+multi_lm <- lm(y ~ x1 + x2)
+summary(multi_lm)
+
+# Coefficient plot
+coef_data <- data.frame(
+  Variable = names(coef(multi_lm))[-1],
+  Coefficient = coef(multi_lm)[-1],
+  CI_lower = confint(multi_lm)[-1, 1],
+  CI_upper = confint(multi_lm)[-1, 2]
 )
+
+p_coef <- ggplot(coef_data, aes(x = Variable, y = Coefficient)) +
+  geom_point(size = 3, color = "steelblue") +
+  geom_errorbar(aes(ymin = CI_lower, ymax = CI_upper), width = 0.2) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  theme_zinasuite() +
+  labs(title = "Regression Coefficients with 95% CI")
+
+print(p_coef)
 ```
 
-## Pathway Analysis
+## Statistical Tests Summary
 
-### Pathway Activity
+### Test Selection Guide
 
-Analyze pathway activity scores:
-
-```{r, eval = FALSE}
-# Query pathway activity
-pathway_activity <- query_pathway_activity(
-  pathway = "HALLMARK_APOPTOSIS",
-  cancer = "BRCA"
+```{r}
+# Create a summary table of statistical tests
+test_summary <- data.frame(
+  Test = c("T-Test", "ANOVA", "Wilcoxon", "Kruskal-Wallis", 
+           "Chi-Square", "Correlation", "Linear Regression"),
+  Purpose = c("Compare 2 groups (parametric)",
+              "Compare 3+ groups (parametric)",
+              "Compare 2 groups (non-parametric)",
+              "Compare 3+ groups (non-parametric)",
+              "Test independence of categorical variables",
+              "Test association between continuous variables",
+              "Model relationship between variables"),
+  Data_Type = c("Continuous", "Continuous", "Continuous/Rank",
+                "Continuous/Rank", "Categorical", "Continuous", "Continuous")
 )
 
-# Correlate with gene expression
-cor_pathway <- analyze_pathway_gene_cor(
-  pathway = "HALLMARK_APOPTOSIS",
-  gene = "TP53",
-  cancer = "BRCA"
-)
+print(test_summary)
 ```
 
-### GSEA Analysis
+## Power Analysis
 
-Gene Set Enrichment Analysis:
+### Sample Size Calculation
 
-```{r, eval = FALSE}
-# GSEA for differentially expressed genes
-gsea_result <- analyze_pathway(
-  gene_list = deg_results$gene,
-  stat_value = deg_results$logFC,
-  pathway_db = "hallmark"
-)
-```
-
-## Cross-Omics Analysis
-
-### Gene-Mutation Correlation
-
-Analyze correlation between gene expression and mutation:
-
-```{r, eval = FALSE}
-# Cross-omics analysis
-cross_result <- analyze_cross_gene(
-  gene1 = "TP53",
-  gene2 = "BRCA1",
-  cancer = "BRCA",
-  data_type1 = "mRNA",
-  data_type2 = "mutation"
-)
-```
-
-### Multi-Omics Integration
-
-Integrate multiple data types:
-
-```{r, eval = FALSE}
-# Multi-omics integration
-multi_omics <- analyze_cross_pathway(
-  pathway = "HALLMARK_APOPTOSIS",
-  cancer = "BRCA",
-  data_types = c("mRNA", "protein", "methylation")
-)
-```
-
-## Pharmacogenomics
-
-### Drug Sensitivity
-
-Analyze drug sensitivity correlations:
-
-```{r, eval = FALSE}
-# Drug-gene correlation
-drug_cor <- analyze_drug_gene_cor(
-  gene = "TP53",
-  drug = "Cisplatin",
-  tissue = "BRCA"
-)
-
-# Visualize
-vis_gene_drug_response_asso("TP53", drug = "Cisplatin")
-```
-
-### Drug Response Comparison
-
-Compare drug response between groups:
-
-```{r, eval = FALSE}
-# Compare drug response
-drug_comp <- analyze_gene_drug_response_diff(
-  gene_list = "TP53",
-  drug = "Cisplatin",
-  tissue = "BRCA"
-)
-```
-
-## Advanced Features
-
-### Batch Analysis
-
-Analyze multiple genes simultaneously:
-
-```{r, eval = FALSE}
-# Batch correlation analysis
-genes <- c("TP53", "BRCA1", "EGFR", "MYC")
-batch_result <- analyze_correlation_batch(
-  genes = genes,
-  cancer = "BRCA",
-  n_workers = 4
-)
-```
-
-### Custom Grouping
-
-Create custom sample groups:
-
-```{r, eval = FALSE}
-# Define custom groups
-custom_groups <- data.frame(
-  Sample = c("TCGA-01", "TCGA-02", "TCGA-03"),
-  Group = c("High", "Low", "Medium")
-)
-
-# Analyze with custom groups
-custom_result <- analyze_group_comparison(
-  gene = "TP53",
-  grp_df = custom_groups
-)
-```
-
-### Progress Tracking
-
-Monitor analysis progress:
-
-```{r, eval = FALSE}
-# Create progress tracker
-progress <- create_progress_tracker(
-  total = length(genes),
-  name = "Batch Analysis"
-)
-
-# Update progress
-for (i in seq_along(genes)) {
-  result <- analyze_correlation(genes[i], "TP53", cancer = "BRCA")
-  update_progress(progress, i)
+```{r}
+# Calculate effect size (Cohen's d)
+cohens_d <- function(x, y) {
+  pooled_sd <- sqrt(((length(x) - 1) * var(x) + (length(y) - 1) * var(y)) / 
+                    (length(x) + length(y) - 2))
+  (mean(x) - mean(y)) / pooled_sd
 }
+
+# Example calculation
+set.seed(123)
+group1 <- rnorm(50, mean = 5, sd = 1)
+group2 <- rnorm(50, mean = 6, sd = 1)
+
+effect_size <- cohens_d(group1, group2)
+cat(sprintf("Cohen's d = %.3f\n", effect_size))
+
+# Interpret effect size
+if (abs(effect_size) < 0.2) {
+  interpretation <- "Small effect"
+} else if (abs(effect_size) < 0.5) {
+  interpretation <- "Small to medium effect"
+} else if (abs(effect_size) < 0.8) {
+  interpretation <- "Medium to large effect"
+} else {
+  interpretation <- "Large effect"
+}
+cat(sprintf("Interpretation: %s\n", interpretation))
 ```
 
 ## Best Practices
 
-### 1. Data Validation
+### 1. Check Assumptions
 
-Always validate inputs before analysis:
+```{r}
+# Normality test
+shapiro_test <- shapiro.test(gene1_expr)
+cat(sprintf("Shapiro-Wilk test p-value: %.4f\n", shapiro_test$p.value))
 
-```{r, eval = FALSE}
-# Validate gene symbol
-validate_gene_symbol("TP53")
-
-# Validate cancer type
-validate_cancer_type("BRCA")
-
-# Validate sample IDs
-validate_sample_ids(sample_ids)
+# Equal variance test (Levene's test approximation)
+var_test <- var.test(group1, group2)
+cat(sprintf("F-test for equal variances p-value: %.4f\n", var_test$p.value))
 ```
 
-### 2. Error Handling
+### 2. Handle Multiple Testing
 
-Use try-catch for robust analysis:
+```{r}
+# Example: Multiple correlation tests
+genes <- paste0("Gene", 1:10)
+p_values <- runif(10, 0.001, 0.1)  # Simulated p-values
 
-```{r, eval = FALSE}
-results <- lapply(genes, function(gene) {
-  tryCatch({
-    analyze_correlation(gene, "TP53", cancer = "BRCA")
-  }, error = function(e) {
-    message("Failed for ", gene, ": ", e$message)
-    NULL
-  })
-})
-```
+# Bonferroni correction
+p_adjusted_bonf <- p.adjust(p_values, method = "bonferroni")
 
-### 3. Caching
+# FDR correction (Benjamini-Hochberg)
+p_adjusted_fdr <- p.adjust(p_values, method = "fdr")
 
-Use caching for repeated analyses:
-
-```{r, eval = FALSE}
-# Cached analysis
-cached_result <- cached_query(
-  function() analyze_correlation("TP53", "BRCA1", cancer = "BRCA"),
-  cache_key = "TP53_BRCA1_BRCA_correlation",
-  ttl = 3600
+# Summary table
+mult_test_summary <- data.frame(
+  Gene = genes,
+  Raw_P = round(p_values, 4),
+  Bonferroni = round(p_adjusted_bonf, 4),
+  FDR = round(p_adjusted_fdr, 4)
 )
+
+print(mult_test_summary)
 ```
 
-### 4. Reproducibility
+### 3. Report Effect Sizes
 
-Set random seeds for reproducible results:
+```{r}
+# Calculate and report effect sizes
+report_effect_size <- function(group1, group2) {
+  d <- cohens_d(group1, group2)
+  r <- cor(group1, group2)
+  
+  list(
+    cohens_d = d,
+    correlation = r,
+    interpretation = ifelse(abs(d) < 0.2, "Small",
+                           ifelse(abs(d) < 0.5, "Small-Medium",
+                                  ifelse(abs(d) < 0.8, "Medium-Large", "Large")))
+  )
+}
 
-```{r, eval = FALSE}
-# Set seed for reproducibility
-set.seed(123)
+# Example usage
+effect_report <- report_effect_size(group1, group2)
+print(effect_report)
+```
 
-# Run analysis
-result <- analyze_dimension_reduction(
-  genes = genes,
-  cancer = "BRCA",
-  method = "tsne"
-)
+## Session Information
+
+```{r}
+sessionInfo()
 ```
 
 ## Learn More
@@ -418,3 +464,5 @@ result <- analyze_dimension_reduction(
 - `vignette("introduction")` - Package overview
 - `vignette("data-query")` - Data querying guide
 - `vignette("visualization")` - Visualization techniques
+- [R for Data Science](https://r4ds.had.co.nz/)
+- [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf)

@@ -16,158 +16,349 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(ZinaSuite)
+library(ggplot2)
 ```
 
 ## Overview
 
 This vignette demonstrates the visualization capabilities of ZinaSuite.
 
-## Gene Expression Visualizations
+## Visualization Themes
 
-### Expression Distribution
+### ZinaSuite Theme
 
-```{r, eval = FALSE}
-# Visualize expression distribution
-p <- vis_gene_distribution("TP53", cancers = c("BRCA", "LUAD", "LUSC"))
-print(p)
-```
+```{r}
+# Get the ZinaSuite theme
+theme <- theme_zinasuite()
+class(theme)
 
-### Pan-Cancer Expression
-
-```{r, eval = FALSE}
-# Visualize expression across all cancer types
-p <- vis_pancan_distribution("TP53")
-print(p)
-```
-
-## Correlation Visualizations
-
-### Gene-Gene Correlation
-
-```{r, eval = FALSE}
-# Create correlation plot
-p <- vis_gene_correlation("TP53", "BRCA1", color_by = "cancer")
-print(p)
-```
-
-### Correlation Matrix
-
-```{r, eval = FALSE}
-# Create correlation matrix heatmap
-genes <- c("TP53", "BRCA1", "EGFR", "KRAS")
-expr_data <- sapply(genes, query_gene_expression, source = "tcga")
-p <- vis_correlation(expr_data, type = "heatmap")
-print(p)
-```
-
-## Survival Visualizations
-
-### Kaplan-Meier Curves
-
-```{r, eval = FALSE}
-# Load survival data
-surv_data <- load_data("tcga_surv")
-
-# Perform survival analysis
-result <- analyze_survival(
-  time = surv_data$OS.time,
-  status = surv_data$OS,
-  group = surv_data$Type
+# The theme can be applied to any ggplot
+# Example with dummy data
+dummy_data <- data.frame(
+  x = 1:10,
+  y = rnorm(10),
+  group = rep(c("A", "B"), each = 5)
 )
 
-# Plot KM curve
-p <- vis_survival(result, type = "km")
+p <- ggplot(dummy_data, aes(x = x, y = y, color = group)) +
+  geom_point(size = 3) +
+  theme_zinasuite() +
+  labs(title = "Example with ZinaSuite Theme")
+
 print(p)
 ```
 
-### Survival by Gene Expression
+## Color Palettes
 
-```{r, eval = FALSE}
-# Analyze survival by gene expression
-result <- analyze_survival_by_expression("TP53", cancer = "BRCA")
-p <- result$survival$km_plot
-print(p)
+### Available Palettes
+
+```{r}
+# Get different palettes
+nature_palette <- get_palette("nature", n = 5)
+print(nature_palette)
+
+# Show palette colors
+barplot(rep(1, 5), col = nature_palette, main = "Nature Palette")
 ```
 
-## Immune Analysis Visualizations
+### Custom Colors
 
-### Immune Cell Correlation
+```{r}
+# Create custom color scheme
+custom_colors <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2")
+print(custom_colors)
 
-```{r, eval = FALSE}
-# Visualize gene-immune correlation
-p <- vis_gene_immune_cor("TP53", cancers = c("BRCA", "LUAD"))
-print(p)
+# Use in plot
+p2 <- ggplot(dummy_data, aes(x = x, y = y, color = group)) +
+  geom_point(size = 3) +
+  scale_color_manual(values = custom_colors[1:2]) +
+  theme_zinasuite()
+
+print(p2)
 ```
 
-### TIL Analysis
+## Basic Plot Types
 
-```{r, eval = FALSE}
-# Visualize TIL correlation
-p <- vis_gene_TIL_cor("TP53", cell_type = "CD8_T_cells")
-print(p)
+### Scatter Plots
+
+```{r}
+# Create sample correlation data
+set.seed(123)
+cor_data <- data.frame(
+  Gene1 = rnorm(100),
+  Gene2 = rnorm(100) + 0.5 * rnorm(100),
+  Cancer = sample(c("BRCA", "LUAD", "LUSC"), 100, replace = TRUE)
+)
+
+# Basic scatter plot
+p_scatter <- ggplot(cor_data, aes(x = Gene1, y = Gene2)) +
+  geom_point(alpha = 0.6, color = "steelblue") +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  theme_zinasuite() +
+  labs(
+    title = "Gene Correlation Scatter Plot",
+    x = "Gene 1 Expression",
+    y = "Gene 2 Expression"
+  )
+
+print(p_scatter)
 ```
 
-## Dimensionality Reduction
+### Box Plots
+
+```{r}
+# Create sample boxplot data
+box_data <- data.frame(
+  Expression = c(rnorm(50, mean = 5), rnorm(50, mean = 7)),
+  Type = rep(c("Tumor", "Normal"), each = 50),
+  Cancer = sample(c("BRCA", "LUAD"), 100, replace = TRUE)
+)
+
+# Box plot
+p_box <- ggplot(box_data, aes(x = Type, y = Expression, fill = Type)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("Tumor" = "#E69F00", "Normal" = "#56B4E9")) +
+  theme_zinasuite() +
+  labs(
+    title = "Expression Distribution by Type",
+    y = "Expression Level"
+  )
+
+print(p_box)
+```
+
+### Violin Plots
+
+```{r}
+# Violin plot
+p_violin <- ggplot(box_data, aes(x = Type, y = Expression, fill = Type)) +
+  geom_violin(alpha = 0.7) +
+  geom_boxplot(width = 0.1, fill = "white") +
+  scale_fill_manual(values = c("Tumor" = "#E69F00", "Normal" = "#56B4E9")) +
+  theme_zinasuite() +
+  labs(
+    title = "Expression Distribution (Violin)",
+    y = "Expression Level"
+  )
+
+print(p_violin)
+```
+
+## Heatmaps
+
+### Correlation Heatmap
+
+```{r}
+# Create correlation matrix
+genes <- c("TP53", "BRCA1", "EGFR", "MYC", "KRAS")
+cor_matrix <- matrix(
+  c(1.0, 0.3, 0.5, 0.2, 0.4,
+    0.3, 1.0, 0.4, 0.3, 0.2,
+    0.5, 0.4, 1.0, 0.6, 0.5,
+    0.2, 0.3, 0.6, 1.0, 0.4,
+    0.4, 0.2, 0.5, 0.4, 1.0),
+  nrow = 5,
+  dimnames = list(genes, genes)
+)
+
+# Convert to long format for ggplot
+cor_long <- data.frame(
+  Gene1 = rep(genes, each = 5),
+  Gene2 = rep(genes, 5),
+  Correlation = as.vector(cor_matrix)
+)
+
+# Create heatmap
+p_heatmap <- ggplot(cor_long, aes(x = Gene1, y = Gene2, fill = Correlation)) +
+  geom_tile() +
+  scale_fill_gradient2(
+    low = "blue",
+    high = "red",
+    mid = "white",
+    midpoint = 0,
+    limits = c(-1, 1)
+  ) +
+  theme_zinasuite() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.title = element_blank()
+  ) +
+  labs(title = "Gene Correlation Matrix")
+
+print(p_heatmap)
+```
+
+## Survival Plots
+
+### Kaplan-Meier Style Plot
+
+```{r}
+# Create sample survival data
+set.seed(123)
+surv_data <- data.frame(
+  time = rexp(200, rate = 0.1),
+  status = sample(0:1, 200, replace = TRUE),
+  group = rep(c("High", "Low"), each = 100)
+)
+
+# Survival curve approximation using step function
+surv_summary <- aggregate(time ~ group, data = surv_data, 
+                          FUN = function(x) c(mean = mean(x), median = median(x)))
+print(surv_summary)
+
+# Create survival-style plot
+p_surv <- ggplot(surv_data, aes(x = time, color = group)) +
+  stat_ecdf(geom = "step", size = 1) +
+  scale_color_manual(values = c("High" = "#E69F00", "Low" = "#56B4E9")) +
+  theme_zinasuite() +
+  labs(
+    title = "Survival Curve (Example)",
+    x = "Time",
+    y = "Cumulative Distribution",
+    color = "Expression Group"
+  )
+
+print(p_surv)
+```
+
+## Forest Plots
+
+### Hazard Ratio Plot
+
+```{r}
+# Create sample forest plot data
+forest_data <- data.frame(
+  Gene = c("TP53", "BRCA1", "EGFR", "MYC", "KRAS"),
+  HR = c(1.5, 0.8, 1.2, 1.8, 1.1),
+  Lower = c(1.2, 0.6, 0.9, 1.4, 0.8),
+  Upper = c(1.9, 1.0, 1.6, 2.3, 1.5),
+  P_value = c(0.001, 0.05, 0.1, 0.001, 0.2)
+)
+
+# Forest plot
+p_forest <- ggplot(forest_data, aes(x = HR, y = reorder(Gene, HR))) +
+  geom_point(aes(size = -log10(P_value)), color = "steelblue") +
+  geom_errorbarh(aes(xmin = Lower, xmax = Upper), height = 0.2) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "red") +
+  scale_size_continuous(name = "-log10(p)") +
+  theme_zinasuite() +
+  labs(
+    title = "Hazard Ratio Forest Plot",
+    x = "Hazard Ratio",
+    y = "Gene"
+  )
+
+print(p_forest)
+```
+
+## Dimension Reduction Plots
 
 ### PCA Plot
 
-```{r, eval = FALSE}
-# Query multiple genes
-genes <- c("TP53", "BRCA1", "EGFR", "KRAS", "MYC")
-expr_list <- query_molecules(genes, data_type = "mRNA", source = "tcga")
+```{r}
+# Create sample PCA data
+set.seed(123)
+pca_data <- data.frame(
+  PC1 = rnorm(100),
+  PC2 = rnorm(100),
+  Cancer = sample(c("BRCA", "LUAD", "LUSC", "COAD", "READ"), 100, replace = TRUE),
+  Group = sample(c("Tumor", "Normal"), 100, replace = TRUE)
+)
 
-# Create expression matrix
-expr_matrix <- do.call(rbind, lapply(expr_list, as.numeric))
+# PCA scatter plot
+p_pca <- ggplot(pca_data, aes(x = PC1, y = PC2, color = Cancer, shape = Group)) +
+  geom_point(size = 3, alpha = 0.7) +
+  scale_color_manual(values = get_palette("nature", n = 5)) +
+  theme_zinasuite() +
+  labs(
+    title = "PCA Plot (Example)",
+    x = "PC1",
+    y = "PC2"
+  )
 
-# Create PCA plot
-p <- vis_identifier_dim_dist(expr_matrix, method = "pca")
-print(p)
+print(p_pca)
 ```
 
-### t-SNE Plot
+## Bar Plots
 
-```{r, eval = FALSE}
-# Create t-SNE plot
-p <- vis_identifier_dim_dist(expr_matrix, method = "tsne")
-print(p)
+### Grouped Bar Plot
+
+```{r}
+# Create sample bar data
+bar_data <- data.frame(
+  Cancer = rep(c("BRCA", "LUAD", "LUSC", "COAD"), each = 2),
+  Type = rep(c("Tumor", "Normal"), 4),
+  Mean_Expression = c(7.5, 5.2, 6.8, 4.5, 8.1, 5.8, 7.2, 5.0)
+)
+
+# Grouped bar plot
+p_bar <- ggplot(bar_data, aes(x = Cancer, y = Mean_Expression, fill = Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = c("Tumor" = "#E69F00", "Normal" = "#56B4E9")) +
+  theme_zinasuite() +
+  labs(
+    title = "Mean Expression by Cancer Type",
+    y = "Mean Expression"
+  )
+
+print(p_bar)
 ```
 
-## Anatomical Visualizations
+## Customization Tips
 
-### Anatomical Expression Map
+### Modifying Themes
 
-```{r, eval = FALSE}
-# Create anatomical expression map
-p <- vis_pancan_anatomy("TP53", plot_type = "heatmap")
-print(p)
+```{r}
+# Custom theme modification
+custom_theme <- theme_zinasuite() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.text = element_text(size = 12),
+    legend.position = "bottom"
+  )
+
+p_custom <- ggplot(dummy_data, aes(x = x, y = y, color = group)) +
+  geom_point(size = 3) +
+  custom_theme +
+  labs(title = "Customized Theme Example")
+
+print(p_custom)
 ```
 
-## Customizing Plots
-
-### Themes
+### Saving Plots
 
 ```{r, eval = FALSE}
-# Use ZinaSuite theme
-p <- vis_gene_correlation("TP53", "BRCA1") +
-  theme_zinasuite()
-print(p)
-```
-
-### Color Palettes
-
-```{r, eval = FALSE}
-# Get custom palette
-palette <- get_palette("nature", n = 5)
+# Save plots in different formats
+ggsave("plot.pdf", plot = p_scatter, width = 8, height = 6)
+ggsave("plot.png", plot = p_scatter, width = 8, height = 6, dpi = 300)
+ggsave("plot.svg", plot = p_scatter, width = 8, height = 6)
 ```
 
 ## Interactive Plots
 
-When `plotly` is available, you can create interactive plots:
+### Using plotly
 
 ```{r, eval = FALSE}
-# Create interactive plot (requires plotly)
+# Create interactive plot (requires plotly package)
 if (requireNamespace("plotly", quietly = TRUE)) {
-  p <- vis_gene_correlation("TP53", "BRCA1")
-  plotly::ggplotly(p)
+  p_interactive <- ggplot(cor_data, aes(x = Gene1, y = Gene2, color = Cancer)) +
+    geom_point(size = 3, alpha = 0.6) +
+    theme_zinasuite() +
+    labs(title = "Interactive Correlation Plot")
+  
+  plotly::ggplotly(p_interactive)
 }
 ```
+
+## Session Information
+
+```{r}
+sessionInfo()
+```
+
+## Learn More
+
+- `vignette("introduction")` - Package overview
+- `vignette("data-query")` - Data querying guide
+- `vignette("analysis")` - Statistical analysis methods
+- [ggplot2 documentation](https://ggplot2.tidyverse.org/)

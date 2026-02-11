@@ -22,17 +22,106 @@ library(ZinaSuite)
 
 This vignette demonstrates how to query data from UCSC Xena using ZinaSuite.
 
-## Querying Gene Expression
+## Data Source Configuration
 
-### Single Gene
+### Available Data Sources
 
-```{r, eval = FALSE}
-# Query TP53 expression from TCGA
-tp53_expr <- query_gene_expression("TP53", source = "tcga")
-head(tp53_expr)
+```{r}
+# List available data sources
+data_sources <- list_data_sources()
+head(data_sources)
 ```
 
-### Multiple Genes
+### Data Source Objects
+
+```{r}
+# Get data source instances
+tcga_source <- get_data_source("tcga")
+pcawg_source <- get_data_source("pcawg")
+ccle_source <- get_data_source("ccle")
+
+# Check classes
+class(tcga_source)
+class(pcawg_source)
+class(ccle_source)
+```
+
+## Gene Validation
+
+Before querying, validate gene symbols:
+
+```{r}
+# Valid gene symbols
+validate_gene_symbol("TP53")
+validate_gene_symbol("BRCA1")
+validate_gene_symbol("EGFR")
+
+# Check multiple genes
+genes <- c("TP53", "BRCA1", "EGFR", "MYC")
+validation_results <- sapply(genes, validate_gene_symbol)
+validation_results
+```
+
+## Query Functions Overview
+
+### Available Query Functions
+
+```{r}
+# List query functions
+query_functions <- c(
+  "query_molecule",
+  "query_gene_expression", 
+  "query_mutation",
+  "query_cnv",
+  "query_protein",
+  "query_methylation",
+  "query_mirna"
+)
+query_functions
+```
+
+## Data Types
+
+### Supported Data Types
+
+```{r}
+# Show supported data types
+data_types <- c("mRNA", "protein", "mutation", "cnv", "methylation", "miRNA", "transcript")
+data_types
+```
+
+## Caching System
+
+### Cache Management
+
+```{r}
+# Access cache
+cache <- get_zina_cache()
+
+# Cache info
+class(cache)
+
+# Clear cache (optional)
+# clear_zina_cache()
+```
+
+## Query Examples (Require Internet)
+
+The following examples require an internet connection to UCSC Xena:
+
+### Query Gene Expression
+
+```{r, eval = FALSE}
+# Query single gene expression
+tp53_expr <- query_gene_expression("TP53", source = "tcga")
+head(tp53_expr)
+
+# Query from different sources
+tp53_tcga <- query_gene_expression("TP53", source = "tcga")
+tp53_ccle <- query_gene_expression("TP53", source = "ccle")
+```
+
+### Query Multiple Genes
 
 ```{r, eval = FALSE}
 # Query multiple genes
@@ -45,56 +134,52 @@ expr_list <- query_molecules(
 )
 ```
 
-## Querying Different Data Types
-
-### Protein Expression
+### Query Different Data Types
 
 ```{r, eval = FALSE}
-# Query protein expression
+# Protein expression
 tp53_protein <- query_protein("TP53", source = "tcga")
-```
 
-### Copy Number Variation
-
-```{r, eval = FALSE}
-# Query CNV data
+# Copy number variation
 tp53_cnv <- query_cnv("TP53", source = "tcga")
-```
 
-### Mutation Data
-
-```{r, eval = FALSE}
-# Query mutation data
+# Mutation data
 tp53_mut <- query_mutation("TP53", source = "tcga")
 ```
 
-## Querying Clinical Data
+## Clinical Data
 
-### Survival Data
+### Available Clinical Data Types
+
+```{r}
+# List available clinical data
+clinical_data_types <- c(
+  "survival",
+  "tumor_purity", 
+  "tmb",
+  "msi",
+  "stemness"
+)
+clinical_data_types
+```
+
+### Query Clinical Data
 
 ```{r, eval = FALSE}
 # Load survival data
 surv_data <- load_data("tcga_surv")
 head(surv_data)
-```
 
-### Tumor Purity
-
-```{r, eval = FALSE}
 # Query tumor purity
 purity <- query_purity(source = "tcga")
-```
 
-### TMB
-
-```{r, eval = FALSE}
-# Query tumor mutation burden
+# Query TMB
 tmb <- query_tmb(source = "tcga")
 ```
 
 ## Parallel Processing
 
-ZinaSuite supports parallel processing for faster data queries:
+### Multi-worker Queries
 
 ```{r, eval = FALSE}
 # Query multiple genes in parallel
@@ -102,33 +187,95 @@ results <- query_molecules(
   identifiers = c("TP53", "BRCA1", "EGFR", "KRAS", "MYC"),
   data_type = "mRNA",
   source = "tcga",
-  n_workers = 4,  # Use 4 parallel workers
-  .progress = TRUE  # Show progress bar
+  n_workers = 4,
+  .progress = TRUE
 )
 ```
 
-## Caching
+## Data Structure
 
-ZinaSuite automatically caches data to speed up repeated queries:
-
-```{r, eval = FALSE}
-# First query - will fetch from UCSC Xena
-tp53_1 <- query_gene_expression("TP53", source = "tcga")
-
-# Second query - will use cached data (much faster!)
-tp53_2 <- query_gene_expression("TP53", source = "tcga")
-```
-
-## Data Sources
-
-ZinaSuite supports multiple data sources:
-
-- **TCGA**: The Cancer Genome Atlas
-- **PCAWG**: Pan-Cancer Analysis of Whole Genomes
-- **CCLE**: Cancer Cell Line Encyclopedia
+### Query Result Format
 
 ```{r, eval = FALSE}
-# Query from different sources
-tcga_data <- query_gene_expression("TP53", source = "tcga")
-ccle_data <- query_gene_expression("TP53", source = "ccle")
+# Example query result structure
+result <- query_gene_expression("TP53", source = "tcga")
+
+# Check structure
+str(result)
+
+# Named vector with sample IDs as names
+head(names(result))
 ```
+
+## Error Handling
+
+### Robust Query Patterns
+
+```{r}
+# Function for safe querying
+safe_query <- function(gene, source = "tcga") {
+  tryCatch({
+    # Validate first
+    if (!validate_gene_symbol(gene)) {
+      stop("Invalid gene symbol: ", gene)
+    }
+    
+    # Query
+    result <- query_gene_expression(gene, source = source)
+    return(result)
+    
+  }, error = function(e) {
+    message("Query failed for ", gene, ": ", e$message)
+    return(NULL)
+  })
+}
+
+# Test with valid gene
+safe_query("TP53")
+```
+
+## Best Practices
+
+### 1. Validate Before Querying
+
+```{r}
+gene <- "TP53"
+if (validate_gene_symbol(gene)) {
+  cat(gene, "is valid, ready to query\n")
+}
+```
+
+### 2. Use Appropriate Data Sources
+
+```{r}
+# TCGA for primary tumors
+tcga_data <- get_data_source("tcga")
+
+# CCLE for cell lines  
+ccle_data <- get_data_source("ccle")
+
+# PCAWG for whole genomes
+pcawg_data <- get_data_source("pcawg")
+```
+
+### 3. Cache Frequently Used Data
+
+```{r, eval = FALSE}
+# First query - fetches from server
+data1 <- query_gene_expression("TP53", source = "tcga")
+
+# Second query - uses cache
+data2 <- query_gene_expression("TP53", source = "tcga")
+```
+
+## Session Information
+
+```{r}
+sessionInfo()
+```
+
+## Learn More
+
+- `vignette("introduction")` - Package overview
+- `vignette("visualization")` - Visualization techniques
+- `vignette("analysis")` - Statistical analysis methods
