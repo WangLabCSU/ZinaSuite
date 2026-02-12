@@ -52,45 +52,68 @@ vis_survival <- function(surv_result,
 #' @return ggplot object or ggsurvplot object
 #' @keywords internal
 vis_kaplan_meier <- function(km_result, title = NULL, conf.int = TRUE, risk.table = FALSE) {
-  # Check for required packages
-  if (!requireNamespace("survminer", quietly = TRUE)) {
-    check_vis_deps("survival")
-  }
-
-  if (!requireNamespace("survminer", quietly = TRUE)) {
-    # Fallback to basic ggplot2
-    # Extract data from fit object
-    fit <- km_result$fit
-    data <- as.data.frame(summary(fit)$table)
-    data$time <- as.numeric(rownames(data))
-    data$surv <- data$surv
-
-    p <- ggplot2::ggplot(data, ggplot2::aes(x = .data$time, y = .data$surv)) +
-      ggplot2::geom_step() +
-      ggplot2::labs(
-        title = title %||% "Kaplan-Meier Survival Curve",
-        x = "Time",
-        y = "Survival Probability"
-      ) +
-      ggplot2::ylim(0, 1) +
-      ggplot2::theme_minimal()
-
-    return(p)
-  }
-
-  # Use survminer for better plots
   fit <- km_result$fit
+  
+  # Always use basic ggplot2 version for reliability
+  vis_kaplan_meier_basic(fit, title, conf.int, km_result$pvalue)
+}
 
-  survminer::ggsurvplot(
-    fit,
-    conf.int = conf.int,
-    risk.table = risk.table,
-    title = title %||% "Kaplan-Meier Survival Curve",
-    xlab = "Time",
-    ylab = "Survival Probability",
-    pval = !is.null(km_result$pvalue),
-    pval.method = TRUE
-  )
+#' Basic Kaplan-Meier plot using ggplot2
+#' @keywords internal
+vis_kaplan_meier_basic <- function(fit, title = NULL, conf.int = TRUE, pvalue = NULL) {
+  # Extract survival data from fit using summary
+  surv_summary <- summary(fit, times = fit$time)
+  
+  # Create data frame for plotting
+  if (is.null(fit$strata)) {
+    # Single curve
+    plot_data <- data.frame(
+      time = surv_summary$time,
+      surv = surv_summary$surv,
+      lower = surv_summary$lower,
+      upper = surv_summary$upper,
+      group = "All"
+    )
+  } else {
+    # Multiple strata - extract strata information from summary
+    strata_vec <- as.character(surv_summary$strata)
+    # Clean up strata names (remove "group=" prefix if present)
+    strata_vec <- gsub("^group=", "", strata_vec)
+    plot_data <- data.frame(
+      time = surv_summary$time,
+      surv = surv_summary$surv,
+      lower = surv_summary$lower,
+      upper = surv_summary$upper,
+      group = strata_vec
+    )
+  }
+  
+  # Create plot
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = .data$time, y = .data$surv, color = .data$group)) +
+    ggplot2::geom_step(linewidth = 1) +
+    ggplot2::labs(
+      title = title %||% "Kaplan-Meier Survival Curve",
+      x = "Time",
+      y = "Survival Probability",
+      color = "Group"
+    ) +
+    ggplot2::ylim(0, 1) +
+    ggplot2::theme_minimal()
+  
+  # Add confidence intervals if requested
+  if (conf.int && !is.null(plot_data$lower)) {
+    p <- p + ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lower, ymax = .data$upper, fill = .data$group), 
+                                   alpha = 0.2, color = NA)
+  }
+  
+  # Add p-value if available
+  if (!is.null(pvalue)) {
+    p <- p + ggplot2::annotate("text", x = max(plot_data$time) * 0.1, y = 0.1, 
+                               label = paste("p =", format(pvalue, digits = 3)),
+                               hjust = 0, size = 4)
+  }
+  
+  p
 }
 
 #' Forest Plot for Cox Regression
@@ -158,7 +181,15 @@ vis_forest_plot <- function(cox_result, title = NULL) {
 #' print(p)
 #' }
 vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
-  data <- unicox_result
+  # Check if input is a gene list (character vector) or analysis result (data frame)
+  if (is.character(unicox_result)) {
+    # Input is a gene list, need to run analysis first
+    message("Running univariate Cox analysis for ", length(unicox_result), " genes...")
+    data <- analyze_unicox_batch(unicox_result)
+  } else {
+    # Input is already analysis result
+    data <- unicox_result
+  }
 
   # Filter valid results
   data <- data[!is.na(data$hr), ]
@@ -192,6 +223,7 @@ vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
 #'
 #' @param gene Gene symbol
 #' @param source Data source (default: "tcga")
+#' @param cancer TCGA cancer type code (e.g., "BRCA", "LUAD"). If NULL, uses all TCGA samples.
 #' @param cutoff_method Cutoff method: "median", "tertile", "quartile"
 #' @param title Plot title
 #' @return ggsurvplot object or ggplot object
@@ -199,15 +231,17 @@ vis_unicox_forest <- function(unicox_result, title = NULL, top_n = NULL) {
 #'
 #' @examples
 #' \dontrun{
-#' # Create survival plot by TP53 expression
+#' # Create survival plot by TP53 expression in BRCA
 #' p <- vis_survival_by_gene(
 #'   gene = "TP53",
+#'   cancer = "BRCA",
 #'   cutoff_method = "median",
 #'   title = "Survival by TP53 Expression"
 #' )
 #' print(p)
 #' }
 vis_survival_by_gene <- function(gene,
+                                 cancer = NULL,
                                  source = "tcga",
                                  cutoff_method = c("median", "tertile", "quartile"),
                                  title = NULL) {
@@ -216,6 +250,7 @@ vis_survival_by_gene <- function(gene,
   # Perform analysis
   result <- analyze_survival_by_expression(
     gene = gene,
+    cancer = cancer,
     cutoff_method = cutoff_method,
     source = source
   )

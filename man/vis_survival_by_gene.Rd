@@ -6,6 +6,7 @@
 \usage{
 vis_survival_by_gene(
   gene,
+  cancer = NULL,
   source = "tcga",
   cutoff_method = c("median", "tertile", "quartile"),
   title = NULL
@@ -13,6 +14,8 @@ vis_survival_by_gene(
 }
 \arguments{
 \item{gene}{Gene symbol}
+
+\item{cancer}{TCGA cancer type code (e.g., "BRCA", "LUAD"). If NULL, uses all TCGA samples.}
 
 \item{source}{Data source (default: "tcga")}
 
@@ -28,9 +31,10 @@ Create Kaplan-Meier curves comparing survival between high and low expression gr
 }
 \examples{
 \dontrun{
-# Create survival plot by TP53 expression
+# Create survival plot by TP53 expression in BRCA
 p <- vis_survival_by_gene(
   gene = "TP53",
+  cancer = "BRCA",
   cutoff_method = "median",
   title = "Survival by TP53 Expression"
 )

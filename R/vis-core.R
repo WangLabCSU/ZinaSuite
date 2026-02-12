@@ -54,7 +54,7 @@ theme_zinasuite <- function(base_size = 12, base_family = "") {
 #'
 #' # Get gradient palette
 #' grad_colors <- get_palette(10, palette = "gradient")
-get_palette <- function(n, palette = c("default", "cancer", "gradient", "diverging")) {
+get_palette <- function(n, palette = c("default", "cancer", "gradient", "diverging", "nature")) {
   palette <- match.arg(palette)
 
   switch(palette,
@@ -65,8 +65,8 @@ get_palette <- function(n, palette = c("default", "cancer", "gradient", "divergi
         grDevices::colorRampPalette(RColorBrewer::brewer.pal(8, "Set2"))(n)
       }
     },
-    "cancer" = {
-      # TCGA cancer type colors
+    "cancer" = , "nature" = {
+      # TCGA cancer type colors (Nature style)
       tcga_colors <- c(
         "#ED2891", "#F7941D", "#8DC63F", "#00AEEF", "#F9ED32",
         "#C4A4CC", "#00A651", "#F58220", "#6E298D", "#D2232A",

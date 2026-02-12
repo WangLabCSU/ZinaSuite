@@ -42,7 +42,11 @@ check_packages <- function(pkgs, stop_on_missing = TRUE) {
 #'
 #' @param source Data source name: "tcga", "pcawg", "ccle"
 #' @return DataSource instance
-#' @keywords internal
+#' @export
+#' @examples
+#' \dontrun{
+#' tcga_source <- get_data_source("tcga")
+#' }
 get_data_source <- function(source = c("tcga", "pcawg", "ccle")) {
   source <- match.arg(source)
 
@@ -51,6 +55,16 @@ get_data_source <- function(source = c("tcga", "pcawg", "ccle")) {
     pcawg = PCAWGData$new(),
     ccle = CCLEData$new()
   )
+}
+
+#' List available data sources
+#'
+#' @return Character vector of available data source names
+#' @export
+#' @examples
+#' list_data_sources()
+list_data_sources <- function() {
+  c("tcga", "pcawg", "ccle")
 }
 
 #' Get or create global async compute engine

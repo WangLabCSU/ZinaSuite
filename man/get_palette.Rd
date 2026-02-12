@@ -4,7 +4,10 @@
 \alias{get_palette}
 \title{Get Color Palette}
 \usage{
-get_palette(n, palette = c("default", "cancer", "gradient", "diverging"))
+get_palette(
+  n,
+  palette = c("default", "cancer", "gradient", "diverging", "nature")
+)
 }
 \arguments{
 \item{n}{Number of colors}

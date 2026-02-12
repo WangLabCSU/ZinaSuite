@@ -6,6 +6,7 @@
 \usage{
 analyze_survival_by_expression(
   gene,
+  cancer = NULL,
   cutoff_method = c("median", "tertile", "quartile", "custom"),
   cutoff_value = NULL,
   data_type = "mRNA",
@@ -15,6 +16,8 @@ analyze_survival_by_expression(
 }
 \arguments{
 \item{gene}{Gene symbol}
+
+\item{cancer}{TCGA cancer type code (e.g., "BRCA", "LUAD", "LUSC"). If NULL, uses all TCGA samples.}
 
 \item{cutoff_method}{Method to define groups: "median", "tertile", "quartile", "custom"}
 
@@ -34,9 +37,10 @@ Perform survival analysis comparing groups based on gene expression levels.
 }
 \examples{
 \dontrun{
-# Analyze survival by TP53 expression (median split)
+# Analyze survival by TP53 expression (median split) in BRCA
 result <- analyze_survival_by_expression(
   gene = "TP53",
+  cancer = "BRCA",
   cutoff_method = "median",
   analysis_type = "both"
 )

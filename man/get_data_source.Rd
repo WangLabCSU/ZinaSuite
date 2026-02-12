@@ -15,4 +15,8 @@ DataSource instance
 \description{
 Get data source instance
 }
-\keyword{internal}
+\examples{
+\dontrun{
+tcga_source <- get_data_source("tcga")
+}
+}

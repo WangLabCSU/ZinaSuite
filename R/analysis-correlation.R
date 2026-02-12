@@ -192,9 +192,9 @@ analyze_correlation_batch <- function(target_gene,
   results_df <- do.call(rbind, lapply(results_list, function(r) {
     data.frame(
       gene = r$gene,
-      correlation = r$cor,
-      p_value = r$pvalue,
-      n = r$n,
+      correlation = as.numeric(r$cor),
+      p_value = as.numeric(r$pvalue),
+      n = as.integer(r$n),
       stringsAsFactors = FALSE
     )
   }))
@@ -209,8 +209,12 @@ analyze_correlation_batch <- function(target_gene,
     )
   }
 
-  # Sort by absolute correlation
-  results_df <- results_df[order(-abs(results_df$correlation)), ]
+  # Sort by absolute correlation (handle NA values)
+  if (all(is.na(results_df$correlation))) {
+    results_df <- results_df[order(results_df$gene), ]
+  } else {
+    results_df <- results_df[order(-abs(results_df$correlation), na.last = TRUE), ]
+  }
   rownames(results_df) <- NULL
 
   results_df

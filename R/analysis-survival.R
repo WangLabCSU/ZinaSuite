@@ -120,6 +120,7 @@ analyze_survival <- function(time,
 #' Perform survival analysis comparing groups based on gene expression levels.
 #'
 #' @param gene Gene symbol
+#' @param cancer TCGA cancer type code (e.g., "BRCA", "LUAD", "LUSC"). If NULL, uses all TCGA samples.
 #' @param cutoff_method Method to define groups: "median", "tertile", "quartile", "custom"
 #' @param cutoff_value Custom cutoff value (if cutoff_method = "custom")
 #' @param data_type Type of molecular data
@@ -130,9 +131,10 @@ analyze_survival <- function(time,
 #'
 #' @examples
 #' \dontrun{
-#' # Analyze survival by TP53 expression (median split)
+#' # Analyze survival by TP53 expression (median split) in BRCA
 #' result <- analyze_survival_by_expression(
 #'   gene = "TP53",
+#'   cancer = "BRCA",
 #'   cutoff_method = "median",
 #'   analysis_type = "both"
 #' )
@@ -141,6 +143,7 @@ analyze_survival <- function(time,
 #' print(result$survival$cox$hr)
 #' }
 analyze_survival_by_expression <- function(gene,
+                                           cancer = NULL,
                                            cutoff_method = c("median", "tertile", "quartile", "custom"),
                                            cutoff_value = NULL,
                                            data_type = "mRNA",
@@ -157,6 +160,33 @@ analyze_survival_by_expression <- function(gene,
 
   # Load survival data
   surv_data <- load_data("tcga_surv")
+  
+  # Filter by cancer type if specified
+  if (!is.null(cancer)) {
+    # Load clinical data to get cancer type information
+    clinical_data <- load_data("tcga_clinical")
+    
+    # Map combined cancer types
+    cancer_types <- switch(cancer,
+      "COADREAD" = c("COAD", "READ"),
+      "GBMLGG" = c("GBM", "LGG"),
+      "LUNG" = c("LUAD", "LUSC"),
+      cancer
+    )
+    
+    # Filter clinical data by cancer type (use 'Cancer' column)
+    clinical_filtered <- clinical_data[clinical_data$Cancer %in% cancer_types, ]
+    
+    # Get samples for this cancer type (use 'Sample' column)
+    cancer_samples <- clinical_filtered$Sample
+    
+    # Filter survival data
+    surv_data <- surv_data[surv_data$Sample %in% cancer_samples, ]
+    
+    if (nrow(surv_data) < 10) {
+      stop("Insufficient samples for cancer type: ", cancer, " (found ", length(cancer_samples), " in clinical data, ", nrow(surv_data), " in survival data)")
+    }
+  }
 
   # Find common samples using barcode matching
   # (expression and survival data may have slightly different ID formats)
@@ -391,6 +421,9 @@ analyze_unicox_batch <- function(genes,
     )
   }))
 
+  # Ensure pvalue is numeric vector
+  results_df$pvalue <- as.numeric(results_df$pvalue)
+  
   # Adjust p-values
   valid_pvalues <- !is.na(results_df$pvalue)
   if (any(valid_pvalues)) {
@@ -401,8 +434,13 @@ analyze_unicox_batch <- function(genes,
     )
   }
 
-  # Sort by p-value
-  results_df <- results_df[order(results_df$pvalue), ]
+  # Sort by p-value (handle NA values)
+  if (all(is.na(results_df$pvalue))) {
+    # All p-values are NA, don't sort
+    results_df <- results_df[order(results_df$gene), ]
+  } else {
+    results_df <- results_df[order(results_df$pvalue, na.last = TRUE), ]
+  }
   rownames(results_df) <- NULL
 
   results_df

@@ -26,4 +26,36 @@
 
 ## usethis namespace: start
 ## usethis namespace: end
-NULL
+
+# Global environment for package
+.ZinaSuiteEnv <- new.env(parent = emptyenv())
+
+# Cache for data
+.zina_data_cache <- new.env(parent = emptyenv())
+
+# Async compute engine
+.zina_async_engine <- NULL
+
+#' Get or create global cache
+#'
+#' @return ZinaCache instance
+#' @export
+get_zina_cache <- function() {
+  if (!exists(".zina_global_cache", envir = .ZinaSuiteEnv)) {
+    cache <- ZinaCache$new()
+    assign(".zina_global_cache", cache, envir = .ZinaSuiteEnv)
+  }
+  get(".zina_global_cache", envir = .ZinaSuiteEnv)
+}
+
+#' Clear global cache
+#'
+#' @export
+clear_zina_cache <- function() {
+  if (exists(".zina_global_cache", envir = .ZinaSuiteEnv)) {
+    cache <- get(".zina_global_cache", envir = .ZinaSuiteEnv)
+    cache$clear()
+    rm(".zina_global_cache", envir = .ZinaSuiteEnv)
+  }
+  invisible(NULL)
+}
